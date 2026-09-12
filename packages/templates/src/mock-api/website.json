@@ -1,0 +1,42 @@
+{
+  "family": "website",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/website/landing-sections",
+      "statePath": "api.website.sections",
+      "response": {
+        "rows": [
+          { "name": "Hero", "status": "Ready", "owner": "AI Agent" },
+          { "name": "Feature Grid", "status": "Ready", "owner": "Design" },
+          { "name": "Pricing", "status": "Draft", "owner": "Growth" },
+          { "name": "FAQ", "status": "Ready", "owner": "Support" }
+        ],
+        "meta": { "artifact": "website", "scenario": "SaaS marketing landing page" }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/website/pricing-plans",
+      "statePath": "api.website.pricingPlans",
+      "response": {
+        "rows": [
+          { "plan": "Starter", "price": "$29", "cta": "Start Free", "highlight": false },
+          { "plan": "Growth", "price": "$99", "cta": "Try Growth", "highlight": true },
+          { "plan": "Scale", "price": "$299", "cta": "Contact Sales", "highlight": false }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/website/testimonials",
+      "statePath": "api.website.testimonials",
+      "response": {
+        "rows": [
+          { "customer": "Sample Customer A", "quote": "Placeholder testimonial copy — sample data for the landing-page pattern.", "role": "Head of Growth" },
+          { "customer": "Sample Customer B", "quote": "Placeholder testimonial copy — sample data for the landing-page pattern.", "role": "COO" }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "school-abc-console",
+  "name": "Sekolah ABC Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "feeCollection": [
+      { "label": "Jul", "value": 412000000 },
+      { "label": "Aug", "value": 438000000 },
+      { "label": "Sep", "value": 421000000 },
+      { "label": "Oct", "value": 452000000 }
+    ],
+    "studentReceivables": [
+      { "student": "Alya Putri", "class": "Grade 7A", "invoice": "FEE-2026-0821", "status": "Overdue", "outstanding": "Rp 3.200.000" },
+      { "student": "Bima Pratama", "class": "Grade 8B", "invoice": "FEE-2026-0822", "status": "Partially Paid", "outstanding": "Rp 1.750.000" },
+      { "student": "Citra Lestari", "class": "Grade 10 Science", "invoice": "FEE-2026-0823", "status": "Due This Week", "outstanding": "Rp 4.500.000" }
+    ],
+    "financeControls": [
+      { "module": "Student Fees", "control": "Student AR = Debtors - Tuition", "status": "Tied", "balance": "Rp 218.450.000" },
+      { "module": "Payroll", "control": "Salary Payable = unpaid payslips", "status": "Pending Approval", "balance": "Rp 167.800.000" },
+      { "module": "Budget", "control": "Program spend <= approved budget", "status": "Warning", "balance": "82% used" },
+      { "module": "Bank", "control": "Bank statement reconciled", "status": "3 unmatched", "balance": "Rp 1.12 M" }
+    ],
+    "ledger": [
+      { "date": "2026-08-20", "account": "Accounts Receivable - Tuition", "debit": "Rp 24.500.000", "credit": "Rp 0", "voucher": "Fee Invoice" },
+      { "date": "2026-08-20", "account": "Tuition Income", "debit": "Rp 0", "credit": "Rp 24.500.000", "voucher": "Fee Invoice" },
+      { "date": "2026-08-20", "account": "Salary Expense", "debit": "Rp 167.800.000", "credit": "Rp 0", "voucher": "Payroll Run" },
+      { "date": "2026-08-20", "account": "Salary Payable", "debit": "Rp 0", "credit": "Rp 167.800.000", "voucher": "Payroll Run" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": { "id": "page-header-template", "type": "Navbar", "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" }, "slots": { "title": [], "actions": [] } },
+    "tableCard": { "id": "table-card-template", "type": "DataTable", "props": { "emptyMessage": "No records" }, "style": { "width": "w-full" } },
+    "chartCard": { "id": "chart-card-template", "type": "Chart", "props": { "chartType": "bar", "xKey": "label", "yKey": "value" }, "style": { "width": "w-full" } }
+  },
+  "root": { "id": "school-console", "type": "Column", "style": { "gap": "gap-4", "padding": "p-4" }, "children": [
+    { "id": "school-header", "type": "Navbar", "componentId": "pageHeader", "slots": { "title": [{ "id": "school-title", "type": "Text", "props": { "value": "Sekolah ABC" }, "style": { "fontSize": "text-2xl", "fontWeight": 700 } }], "actions": [{ "id": "collect-fee", "type": "Button", "props": { "label": "Collect Fee" } }, { "id": "payroll-run", "type": "Button", "props": { "label": "Run Payroll" } }] } },
+    { "id": "school-kpis", "type": "GridView", "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" }, "children": [
+      { "id": "school-kpi-fee", "type": "Text", "props": { "value": "Fees Collected\nRp 438.000.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+      { "id": "school-kpi-ar", "type": "Text", "props": { "value": "Student Receivables\nRp 218.450.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+      { "id": "school-kpi-payroll", "type": "Text", "props": { "value": "Payroll Payable\nRp 167.800.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+      { "id": "school-kpi-bank", "type": "Text", "props": { "value": "Bank Balance\nRp 1.12 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+    ] },
+    { "id": "school-chart", "type": "Chart", "componentId": "chartCard", "props": { "title": "Fee Collection Trend", "chartType": "bar", "dataSource": "feeCollection" } },
+    { "id": "school-ar", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Student Receivables", "dataSource": "studentReceivables", "columns": [ { "key": "student", "label": "Student" }, { "key": "class", "label": "Class" }, { "key": "invoice", "label": "Invoice" }, { "key": "status", "label": "Status" }, { "key": "outstanding", "label": "Outstanding", "align": "right" } ], "rowActions": [{ "label": "Open" }, { "label": "Send Reminder" }] } },
+    { "id": "school-controls", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Finance Controls", "dataSource": "financeControls", "columns": [ { "key": "module", "label": "Module" }, { "key": "control", "label": "Control" }, { "key": "status", "label": "Status" }, { "key": "balance", "label": "Balance", "align": "right" } ] } },
+    { "id": "school-ledger", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Balanced Posting Preview", "dataSource": "ledger", "columns": [ { "key": "date", "label": "Date" }, { "key": "account", "label": "Account" }, { "key": "debit", "label": "Debit", "align": "right" }, { "key": "credit", "label": "Credit", "align": "right" }, { "key": "voucher", "label": "Voucher" } ] } }
+  ] }
+}

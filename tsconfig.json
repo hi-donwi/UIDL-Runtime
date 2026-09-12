@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./packages/core/src/*", "./src/*"],
+      "@uidl-runtime/core": ["./packages/core/src/index.ts", "./src/index.ts"],
+      "@uidl-runtime/core/*": ["./packages/core/src/*", "./src/*"],
+      "@uidl-runtime/templates": ["./packages/templates/src/index.ts"],
+      "@uidl-runtime/templates/*": ["./packages/templates/src/*"]
+    }
+  },
+  "include": [
+    "packages/**/*",
+    "apps/**/*",
+    "src/**/*",
+    "examples/**/*",
+    "e2e/**/*",
+    "scripts/**/*",
+    "playwright.config.ts"
+  ]
+}

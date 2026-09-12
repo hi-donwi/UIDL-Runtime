@@ -1,0 +1,45 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "knowledge-pack-suite",
+  "name": "Knowledge Pack Suite",
+  "route": "/examples/suites/knowledge-pack",
+  "definitions": {
+    "panel": { "id": "panel-template", "type": "Column", "style": { "padding": "p-6", "borderRadius": "rounded-2xl", "borderWidth": "border", "borderColor": "border-border", "backgroundColor": "bg-white", "gap": "gap-4" }, "slots": { "content": [] } }
+  },
+  "root": {
+    "id": "knowledge-root",
+    "type": "Column",
+    "style": { "gap": "gap-6", "padding": "p-8", "backgroundColor": "bg-surface" },
+    "children": [
+      { "id": "landing", "type": "Container", "componentId": "panel", "slots": { "content": [
+        { "id": "landing-title", "type": "Text", "props": { "value": "Knowledge Pack Suite" }, "style": { "fontSize": "text-4xl", "fontWeight": "font-bold" } },
+        { "id": "landing-subtitle", "type": "Text", "props": { "value": "Generate a resource landing page, learning guide, workshop deck, and exercise sheet from structured notes." } },
+        { "id": "landing-cta", "type": "Button", "props": { "label": "Start Workshop" }, "events": { "onClick": [{ "navigate": { "route": "/workshop" } }] } }
+      ] } },
+      { "id": "guide", "type": "Container", "componentId": "panel", "slots": { "content": [
+        { "id": "guide-title", "type": "Text", "props": { "value": "Learning Guide" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "guide-copy", "type": "Text", "props": { "value": "A practical guide turns raw operating knowledge into structured concepts, examples, exercises, and next actions." } },
+        { "id": "guide-table", "type": "DataTable", "props": { "title": "Guide Outline", "dataSource": "outline", "columns": [{ "key": "chapter", "label": "Chapter" }, { "key": "topic", "label": "Topic" }, { "key": "artifact", "label": "Artifact" }] } }
+      ] } },
+      { "id": "deck", "type": "Container", "componentId": "panel", "slots": { "content": [
+        { "id": "deck-title", "type": "Text", "props": { "value": "Workshop Deck" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "deck-grid", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-3", "gap": "gap-4" }, "children": [
+          { "id": "slide-a", "type": "Text", "props": { "value": "Slide 1: Why this matters" } },
+          { "id": "slide-b", "type": "Text", "props": { "value": "Slide 2: Framework" } },
+          { "id": "slide-c", "type": "Text", "props": { "value": "Slide 3: Practice" } }
+        ] }
+      ] } },
+      { "id": "sheet", "type": "Container", "componentId": "panel", "slots": { "content": [
+        { "id": "sheet-title", "type": "Text", "props": { "value": "Exercise Sheet" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "exercise-table", "type": "DataTable", "props": { "dataSource": "exercises", "columns": [{ "key": "step", "label": "Step" }, { "key": "prompt", "label": "Prompt" }, { "key": "score", "label": "Score", "align": "right" }] } },
+        { "id": "progress-chart", "type": "Chart", "props": { "title": "Exercise Progress", "dataSource": "progress", "xKey": "module", "yKey": "complete", "chartType": "bar" } }
+      ] } }
+    ]
+  },
+  "dataSources": {
+    "outline": [{ "chapter": "1", "topic": "Foundation", "artifact": "Checklist" }, { "chapter": "2", "topic": "Examples", "artifact": "Case study" }, { "chapter": "3", "topic": "Application", "artifact": "Worksheet" }],
+    "exercises": [{ "step": "Observe", "prompt": "Describe current workflow", "score": "20" }, { "step": "Map", "prompt": "Identify decision points", "score": "30" }, { "step": "Improve", "prompt": "Draft next experiment", "score": "50" }],
+    "progress": [{ "module": "Guide", "complete": 80 }, { "module": "Deck", "complete": 60 }, { "module": "Sheet", "complete": 45 }]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "family": "session",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/session/finance-manager",
+      "statePath": "api.session.financeManager",
+      "response": {
+        "user": { "id": "usr_fin_1", "name": "Finance Manager" },
+        "roles": ["Finance Manager"],
+        "permissions": { "dashboard": true, "revenue": true, "admin": false, "finance": { "enabled": true, "close": true, "variance": true, "admin": false }, "payroll": false }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/session/viewer",
+      "statePath": "api.session.viewer",
+      "response": {
+        "user": { "id": "usr_view_1", "name": "Read Only Viewer" },
+        "roles": ["Viewer"],
+        "permissions": { "dashboard": true, "revenue": false, "admin": false, "finance": { "enabled": false, "close": false, "variance": false, "admin": false }, "payroll": false }
+      }
+    }
+  ]
+}

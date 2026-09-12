@@ -1,0 +1,22 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/mock-api-manifest.json",
+  "version": "0.1.0",
+  "host": "https://mock.uidl-runtime.local",
+  "purpose": "Complete mock API catalog for uidl-runtime references and AI-agent generated UIDL documents.",
+  "usage": {
+    "apiAllowlist": ["mock.uidl-runtime.local"],
+    "stateBindingPattern": "API action writes response to state path from api.dataSource; widgets bind rows from state.api.<family>.<resource>.rows.",
+    "exampleAction": { "api": { "method": "GET", "url": "https://mock.uidl-runtime.local/dashboard/revenue-trend", "dataSource": "api.dashboard.revenueTrend" } },
+    "exampleRowsBinding": { "$bind": "state.api.dashboard.revenueTrend.rows" }
+  },
+  "files": [
+    { "family": "website", "file": "packages/templates/src/mock-api/website.json" },
+    { "family": "dashboard", "file": "packages/templates/src/mock-api/dashboard.json" },
+    { "family": "document", "file": "packages/templates/src/mock-api/document.json" },
+    { "family": "slide", "file": "packages/templates/src/mock-api/slide.json" },
+    { "family": "spreadsheet", "file": "packages/templates/src/mock-api/spreadsheet.json" },
+    { "family": "suites", "file": "packages/templates/src/mock-api/suites.json" },
+    { "family": "erp", "file": "packages/templates/src/mock-api/erp.json" },
+    { "family": "session", "file": "packages/templates/src/mock-api/session.json" }
+  ]
+}

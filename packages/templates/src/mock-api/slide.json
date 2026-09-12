@@ -1,0 +1,23 @@
+{
+  "family": "slide",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/slide/deck/agenda",
+      "statePath": "api.slide.agenda",
+      "response": { "rows": [{ "order": "1", "topic": "Component coverage" }, { "order": "2", "topic": "AI contract" }, { "order": "3", "topic": "API data" }, { "order": "4", "topic": "Export roadmap" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/slide/deck/adoption",
+      "statePath": "api.slide.adoption",
+      "response": { "rows": [{ "quarter": "Q1", "count": 12 }, { "quarter": "Q2", "count": 32 }, { "quarter": "Q3", "count": 64 }, { "quarter": "Q4", "count": 120 }] }
+    },
+    {
+      "method": "GET",
+      "path": "/slide/deck/risks",
+      "statePath": "api.slide.risks",
+      "response": { "rows": [{ "risk": "Over-specific components", "mitigation": "Prefer definitions first" }, { "risk": "Unsecured UI gating", "mitigation": "Enforce permissions in API" }] }
+    }
+  ]
+}

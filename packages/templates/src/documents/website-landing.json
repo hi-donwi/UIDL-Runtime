@@ -1,0 +1,91 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "website-landing",
+  "name": "Website Landing Example",
+  "route": "/examples/website-landing",
+  "definitions": {
+    "websiteShell": {
+      "id": "website-shell-template",
+      "type": "Column",
+      "style": { "minHeight": "min-h-screen", "backgroundColor": "bg-white" },
+      "slots": { "navbar": [], "hero": [], "sections": [], "footer": [] }
+    },
+    "featureCard": {
+      "id": "feature-card-template",
+      "type": "Column",
+      "style": { "padding": "p-6", "borderWidth": "border", "borderColor": "border-border", "borderRadius": "rounded-2xl", "gap": "gap-3", "backgroundColor": "bg-white" },
+      "slots": { "content": [] }
+    }
+  },
+  "root": {
+    "id": "site",
+    "type": "Container",
+    "componentId": "websiteShell",
+    "slots": {
+      "navbar": [
+        {
+          "id": "top-nav",
+          "type": "Navbar",
+          "style": { "justifyContent": "space-between", "padding": "px-8 py-5", "borderWidth": "border-b", "borderColor": "border-border" },
+          "children": [
+            { "id": "brand", "type": "Text", "props": { "value": "AtlasFlow" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "color": "text-text-primary" } },
+            { "id": "nav-cta", "type": "Button", "props": { "label": "Start Free" }, "style": { "padding": "px-4 py-2", "borderRadius": "rounded-full", "backgroundColor": "bg-primary", "color": "text-white" }, "events": { "onClick": [{ "navigate": { "route": "/signup" } }] } }
+          ]
+        }
+      ],
+      "hero": [
+        {
+          "id": "hero",
+          "type": "GridView",
+          "style": { "display": "grid", "gridTemplateColumns": "grid-cols-2", "gap": "gap-10", "padding": "px-8 py-16", "alignItems": "items-center" },
+          "children": [
+            {
+              "id": "hero-copy",
+              "type": "Column",
+              "style": { "gap": "gap-5" },
+              "children": [
+                { "id": "hero-badge", "type": "Badge", "style": { "width": "w-fit", "padding": "px-3 py-1", "borderRadius": "rounded-full", "backgroundColor": "bg-accent-subtle" }, "children": [{ "id": "hero-badge-text", "type": "Text", "props": { "value": "AI-generated website components" } }] },
+                { "id": "hero-title", "type": "Text", "props": { "value": "Generate polished landing pages from JSON schema" }, "style": { "fontSize": "text-5xl", "fontWeight": "font-bold", "color": "text-text-primary" } },
+                { "id": "hero-subtitle", "type": "Text", "props": { "value": "Use uidl-runtime to compose hero sections, feature grids, pricing cards, forms, and CTAs without custom React per page." }, "style": { "fontSize": "text-lg", "color": "text-text-secondary" } },
+                { "id": "hero-actions", "type": "Row", "style": { "gap": "gap-3" }, "children": [
+                  { "id": "primary-action", "type": "Button", "props": { "label": "View Components" }, "style": { "padding": "px-5 py-3", "borderRadius": "rounded-xl", "backgroundColor": "bg-primary", "color": "text-white" } },
+                  { "id": "secondary-action", "type": "Button", "props": { "label": "Read Contract" }, "style": { "padding": "px-5 py-3", "borderRadius": "rounded-xl", "borderWidth": "border", "borderColor": "border-border" } }
+                ] }
+              ]
+            },
+            {
+              "id": "hero-panel",
+              "type": "Column",
+              "style": { "padding": "p-6", "borderRadius": "rounded-3xl", "backgroundColor": "bg-surface", "borderWidth": "border", "borderColor": "border-border", "gap": "gap-4" },
+              "children": [
+                { "id": "panel-title", "type": "Text", "props": { "value": "Generated Sections" }, "style": { "fontWeight": "font-semibold" } },
+                { "id": "panel-table", "type": "DataTable", "props": { "dataSource": "sections", "columns": [{ "key": "name", "label": "Section" }, { "key": "status", "label": "Status" }] } }
+              ]
+            }
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "features",
+          "type": "GridView",
+          "style": { "display": "grid", "gridTemplateColumns": "grid-cols-3", "gap": "gap-5", "padding": "px-8 py-12" },
+          "children": [
+            { "id": "feature-1", "type": "Container", "componentId": "featureCard", "slots": { "content": [{ "id": "feature-1-title", "type": "Text", "props": { "value": "Reusable Patterns" }, "style": { "fontWeight": "font-semibold" } }, { "id": "feature-1-body", "type": "Text", "props": { "value": "Cards, grids, testimonials, forms, and pricing sections become reusable UIDL definitions." } }] } },
+            { "id": "feature-2", "type": "Container", "componentId": "featureCard", "slots": { "content": [{ "id": "feature-2-title", "type": "Text", "props": { "value": "AI Agent Ready" }, "style": { "fontWeight": "font-semibold" } }, { "id": "feature-2-body", "type": "Text", "props": { "value": "Agents generate JSON, validate schema, render smoke tests, and repair invalid output." } }] } },
+            { "id": "feature-3", "type": "Container", "componentId": "featureCard", "slots": { "content": [{ "id": "feature-3-title", "type": "Text", "props": { "value": "Portable Runtime" }, "style": { "fontWeight": "font-semibold" } }, { "id": "feature-3-body", "type": "Text", "props": { "value": "Host projects inject data, session, routing, and theme while reusing the same document schema." } }] } }
+          ]
+        }
+      ],
+      "footer": [{ "id": "footer", "type": "Text", "props": { "value": "AtlasFlow demo generated with uidl-runtime UIDL." }, "style": { "padding": "px-8 py-8", "color": "text-text-muted" } }]
+    }
+  },
+  "dataSources": {
+    "sections": [
+      { "name": "Hero", "status": "Ready" },
+      { "name": "Feature Grid", "status": "Ready" },
+      { "name": "CTA", "status": "Planned" }
+    ]
+  }
+}

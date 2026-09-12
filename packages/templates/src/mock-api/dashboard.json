@@ -1,0 +1,29 @@
+{
+  "family": "dashboard",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/dashboard/revenue-trend",
+      "statePath": "api.dashboard.revenueTrend",
+      "response": { "rows": [{ "month": "Apr", "value": 128000 }, { "month": "May", "value": 164000 }, { "month": "Jun", "value": 219000 }] }
+    },
+    {
+      "method": "GET",
+      "path": "/dashboard/segments",
+      "statePath": "api.dashboard.segments",
+      "response": { "rows": [{ "segment": "Enterprise", "revenue": "$238K", "growth": "+18%" }, { "segment": "Mid Market", "revenue": "$142K", "growth": "+11%" }, { "segment": "SMB", "revenue": "$48K", "growth": "+4%" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/dashboard/kpis",
+      "statePath": "api.dashboard.kpis",
+      "response": { "rows": [{ "metric": "Revenue", "value": "$428K", "delta": "+16%" }, { "metric": "Conversion", "value": "8.4%", "delta": "+1.2pt" }, { "metric": "Churn Risk", "value": "2.1%", "delta": "-0.4pt" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/dashboard/tasks",
+      "statePath": "api.dashboard.tasks",
+      "response": { "rows": [{ "task": "Review QBR", "owner": "Maya", "status": "Open" }, { "task": "Approve forecast", "owner": "Nina", "status": "Blocked" }, { "task": "Publish dashboard", "owner": "Rafi", "status": "Done" }] }
+    }
+  ]
+}

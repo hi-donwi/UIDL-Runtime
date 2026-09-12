@@ -1,0 +1,66 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "spreadsheet-budget",
+  "name": "Spreadsheet Budget Example",
+  "route": "/examples/spreadsheet-budget",
+  "definitions": {
+    "workbookShell": {
+      "id": "workbook-shell-template",
+      "type": "Column",
+      "style": { "minHeight": "min-h-screen", "backgroundColor": "bg-white", "gap": "gap-4", "padding": "p-6" },
+      "slots": { "toolbar": [], "sheets": [], "summary": [] }
+    }
+  },
+  "root": {
+    "id": "workbook",
+    "type": "Container",
+    "componentId": "workbookShell",
+    "slots": {
+      "toolbar": [
+        { "id": "sheet-toolbar", "type": "Toolbar", "children": [
+          { "id": "workbook-title", "type": "Text", "props": { "value": "FY2027 Budget Workbook" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-bold" } },
+          { "id": "sheet-badge", "type": "Badge", "style": { "padding": "px-3 py-1", "borderRadius": "rounded-full", "backgroundColor": "bg-accent-subtle" }, "children": [{ "id": "sheet-badge-text", "type": "Text", "props": { "value": "Spreadsheet-like UIDL" } }] }
+        ] }
+      ],
+      "sheets": [
+        { "id": "budget-table", "type": "DataTable", "props": { "title": "Operating Budget", "dataSource": "budgetRows", "columns": [
+          { "key": "account", "label": "Account" },
+          { "key": "q1", "label": "Q1", "align": "right" },
+          { "key": "q2", "label": "Q2", "align": "right" },
+          { "key": "q3", "label": "Q3", "align": "right" },
+          { "key": "q4", "label": "Q4", "align": "right" },
+          { "key": "formula", "label": "Formula" }
+        ] } },
+        { "id": "variance-table", "type": "DataTable", "props": { "title": "Variance Review", "dataSource": "varianceRows", "columns": [
+          { "key": "department", "label": "Department" },
+          { "key": "budget", "label": "Budget", "align": "right" },
+          { "key": "actual", "label": "Actual", "align": "right" },
+          { "key": "variance", "label": "Variance", "align": "right" }
+        ] } }
+      ],
+      "summary": [
+        { "id": "budget-chart", "type": "Chart", "props": { "title": "Quarterly Spend", "dataSource": "quarterlySpend", "chartType": "bar", "xKey": "quarter", "yKey": "amount" } },
+        { "id": "sheet-note", "type": "Text", "props": { "value": "Formula fields are represented as display values for now; calculation/export engines are planned as a later adapter layer." }, "style": { "color": "text-text-secondary" } }
+      ]
+    }
+  },
+  "dataSources": {
+    "budgetRows": [
+      { "account": "People", "q1": "$120K", "q2": "$126K", "q3": "$132K", "q4": "$138K", "formula": "SUM(B:E)" },
+      { "account": "Cloud", "q1": "$28K", "q2": "$31K", "q3": "$34K", "q4": "$39K", "formula": "SUM(B:E)" },
+      { "account": "Marketing", "q1": "$42K", "q2": "$54K", "q3": "$62K", "q4": "$76K", "formula": "SUM(B:E)" }
+    ],
+    "varianceRows": [
+      { "department": "Engineering", "budget": "$289K", "actual": "$281K", "variance": "+$8K" },
+      { "department": "Sales", "budget": "$188K", "actual": "$196K", "variance": "-$8K" },
+      { "department": "Operations", "budget": "$76K", "actual": "$73K", "variance": "+$3K" }
+    ],
+    "quarterlySpend": [
+      { "quarter": "Q1", "amount": 190000 },
+      { "quarter": "Q2", "amount": 211000 },
+      { "quarter": "Q3", "amount": 228000 },
+      { "quarter": "Q4", "amount": 253000 }
+    ]
+  }
+}

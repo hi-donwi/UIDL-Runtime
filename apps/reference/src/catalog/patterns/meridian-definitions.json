@@ -1,0 +1,169 @@
+{
+  "appShell": {
+    "id": "app-shell-template",
+    "type": "Container",
+    "style": {
+      "display": "flex",
+      "minHeight": "min-h-screen",
+      "background": "{primitives.color.background}",
+      "color": "{primitives.color.text-primary}"
+    },
+    "slots": {
+      "sidebar": [],
+      "main": []
+    }
+  },
+  "pageHeader": {
+    "id": "page-header-template",
+    "type": "Navbar",
+    "style": {
+      "justifyContent": "space-between",
+      "padding": "p-4",
+      "borderColor": "{primitives.color.border}",
+      "borderWidth": "border-b"
+    },
+    "slots": {
+      "title": [],
+      "actions": []
+    }
+  },
+  "chartCard": {
+    "id": "chart-card-template",
+    "type": "Chart",
+    "props": {
+      "chartType": "bar",
+      "xKey": "label",
+      "yKey": "value"
+    },
+    "style": {
+      "width": "w-full"
+    }
+  },
+  "tableCard": {
+    "id": "table-card-template",
+    "type": "DataTable",
+    "props": {
+      "emptyMessage": "No records"
+    },
+    "style": {
+      "width": "w-full"
+    }
+  },
+  "filterBar": {
+    "id": "filter-bar-template",
+    "type": "Toolbar",
+    "style": {
+      "display": "flex",
+      "justifyContent": "space-between",
+      "alignItems": "items-center",
+      "gap": "gap-3",
+      "padding": "p-3",
+      "borderColor": "{primitives.color.border}",
+      "borderWidth": "border",
+      "borderRadius": "rounded-lg",
+      "background": "{primitives.color.surface}"
+    },
+    "slots": {
+      "filters": [],
+      "actions": []
+    }
+  },
+  "actionToolbar": {
+    "id": "action-toolbar-template",
+    "type": "Toolbar",
+    "style": {
+      "display": "flex",
+      "justifyContent": "flex-end",
+      "alignItems": "items-center",
+      "gap": "gap-2",
+      "padding": "p-2"
+    },
+    "slots": {
+      "actions": []
+    }
+  },
+  "reportLayout": {
+    "id": "report-layout-template",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4"
+    },
+    "slots": {
+      "header": [],
+      "filters": [],
+      "summary": [],
+      "table": []
+    }
+  },
+  "formLayout": {
+    "id": "form-layout-template",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4",
+      "borderColor": "{primitives.color.border}",
+      "borderWidth": "border",
+      "borderRadius": "rounded-lg",
+      "background": "{primitives.color.surface-elevated}"
+    },
+    "slots": {
+      "header": [],
+      "fields": [],
+      "lines": [],
+      "summary": [],
+      "actions": []
+    }
+  },
+  "invoiceLayout": {
+    "id": "invoice-layout-template",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4",
+      "borderColor": "{primitives.color.border}",
+      "borderWidth": "border",
+      "borderRadius": "rounded-lg",
+      "background": "{primitives.color.surface-elevated}"
+    },
+    "slots": {
+      "header": [],
+      "party": [],
+      "lineItems": [],
+      "totals": [],
+      "actions": []
+    }
+  },
+  "lineItemTable": {
+    "id": "line-item-table-template",
+    "type": "DataTable",
+    "props": {
+      "title": "Line Items",
+      "emptyMessage": "No line items",
+      "columns": [
+        { "key": "item", "label": "Item" },
+        { "key": "description", "label": "Description" },
+        { "key": "quantity", "label": "Qty", "align": "right" },
+        { "key": "rate", "label": "Rate", "align": "right" },
+        { "key": "amount", "label": "Amount", "align": "right" }
+      ]
+    },
+    "style": {
+      "width": "w-full"
+    }
+  },
+  "posLayout": {
+    "id": "pos-layout-template",
+    "type": "GridView",
+    "style": {
+      "display": "grid",
+      "gap": "gap-4",
+      "gridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))"
+    },
+    "slots": {
+      "catalog": [],
+      "cart": [],
+      "payment": []
+    }
+  }
+}

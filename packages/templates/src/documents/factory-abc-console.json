@@ -1,0 +1,49 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "factory-abc-console",
+  "name": "Pabrik ABC Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "productionCost": [
+      { "label": "Material", "value": 520000000 },
+      { "label": "Labor", "value": 184000000 },
+      { "label": "Overhead", "value": 96000000 },
+      { "label": "Variance", "value": 28000000 }
+    ],
+    "workOrders": [
+      { "wo": "WO-2026-044", "item": "Gear Housing A", "status": "In Process", "wip": "Rp 186.400.000", "qty": "420 / 600" },
+      { "wo": "WO-2026-045", "item": "Pump Bracket B", "status": "QC Hold", "wip": "Rp 74.800.000", "qty": "180 / 300" },
+      { "wo": "WO-2026-046", "item": "Valve Cover C", "status": "Material Short", "wip": "Rp 42.100.000", "qty": "0 / 500" }
+    ],
+    "stockLedger": [
+      { "item": "Steel Coil SPCC", "warehouse": "Raw Material", "qty": "12.4 ton", "value": "Rp 248.000.000", "control": "Inventory GL tied" },
+      { "item": "Gear Housing A", "warehouse": "Finished Goods", "qty": "380 pcs", "value": "Rp 323.000.000", "control": "COGS pending delivery" },
+      { "item": "WIP - Assembly", "warehouse": "Production Floor", "qty": "3 WO", "value": "Rp 303.300.000", "control": "WIP account tied" }
+    ],
+    "ledger": [
+      { "date": "2026-08-20", "account": "Work In Progress", "debit": "Rp 520.000.000", "credit": "Rp 0", "voucher": "Material Issue" },
+      { "date": "2026-08-20", "account": "Raw Material Inventory", "debit": "Rp 0", "credit": "Rp 520.000.000", "voucher": "Material Issue" },
+      { "date": "2026-08-20", "account": "Finished Goods", "debit": "Rp 312.000.000", "credit": "Rp 0", "voucher": "Manufacture Receipt" },
+      { "date": "2026-08-20", "account": "Work In Progress", "debit": "Rp 0", "credit": "Rp 312.000.000", "voucher": "Manufacture Receipt" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": { "id": "page-header-template", "type": "Navbar", "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" }, "slots": { "title": [], "actions": [] } },
+    "tableCard": { "id": "table-card-template", "type": "DataTable", "props": { "emptyMessage": "No records" }, "style": { "width": "w-full" } },
+    "chartCard": { "id": "chart-card-template", "type": "Chart", "props": { "chartType": "donut", "xKey": "label", "yKey": "value" }, "style": { "width": "w-full" } }
+  },
+  "root": { "id": "factory-console", "type": "Column", "style": { "gap": "gap-4", "padding": "p-4" }, "children": [
+    { "id": "factory-header", "type": "Navbar", "componentId": "pageHeader", "slots": { "title": [{ "id": "factory-title", "type": "Text", "props": { "value": "Pabrik ABC" }, "style": { "fontSize": "text-2xl", "fontWeight": 700 } }], "actions": [{ "id": "new-wo", "type": "Button", "props": { "label": "+ Work Order" } }, { "id": "close-period", "type": "Button", "props": { "label": "Close Period" } }] } },
+    { "id": "factory-kpis", "type": "GridView", "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" }, "children": [
+      { "id": "factory-kpi-wip", "type": "Text", "props": { "value": "WIP Balance\nRp 303.300.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+      { "id": "factory-kpi-raw", "type": "Text", "props": { "value": "Raw Material\nRp 2.14 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+      { "id": "factory-kpi-fg", "type": "Text", "props": { "value": "Finished Goods\nRp 1.67 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+      { "id": "factory-kpi-cogs", "type": "Text", "props": { "value": "COGS This Month\nRp 892.000.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+    ] },
+    { "id": "factory-chart", "type": "Chart", "componentId": "chartCard", "props": { "title": "Production Cost Split", "chartType": "donut", "dataSource": "productionCost" } },
+    { "id": "factory-wo", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Work Orders", "dataSource": "workOrders", "columns": [ { "key": "wo", "label": "WO" }, { "key": "item", "label": "Item" }, { "key": "status", "label": "Status" }, { "key": "wip", "label": "WIP", "align": "right" }, { "key": "qty", "label": "Qty" } ], "rowActions": [{ "label": "Open" }, { "label": "Issue Material" }] } },
+    { "id": "factory-stock", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Stock Value Tie-Out", "dataSource": "stockLedger", "columns": [ { "key": "item", "label": "Item" }, { "key": "warehouse", "label": "Warehouse" }, { "key": "qty", "label": "Qty", "align": "right" }, { "key": "value", "label": "Value", "align": "right" }, { "key": "control", "label": "Control" } ] } },
+    { "id": "factory-ledger", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Manufacturing GL Preview", "dataSource": "ledger", "columns": [ { "key": "date", "label": "Date" }, { "key": "account", "label": "Account" }, { "key": "debit", "label": "Debit", "align": "right" }, { "key": "credit", "label": "Credit", "align": "right" }, { "key": "voucher", "label": "Voucher" } ] } }
+  ] }
+}

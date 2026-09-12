@@ -1,0 +1,23 @@
+{
+  "family": "document",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/document/proposal/milestones",
+      "statePath": "api.document.milestones",
+      "response": { "rows": [{ "phase": "1", "deliverable": "Discovery and schema map", "timeline": "1 week" }, { "phase": "2", "deliverable": "Dashboard and document generation", "timeline": "2 weeks" }, { "phase": "3", "deliverable": "Export adapter pilot", "timeline": "3 weeks" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/document/proposal/approvals",
+      "statePath": "api.document.approvals",
+      "response": { "rows": [{ "name": "Client Sponsor", "role": "Approver", "status": "Pending" }, { "name": "Delivery Lead", "role": "Owner", "status": "Ready" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/document/report/findings",
+      "statePath": "api.document.findings",
+      "response": { "rows": [{ "finding": "Schema-first generation reduces rework", "severity": "High" }, { "finding": "Export adapters remain a separate layer", "severity": "Medium" }] }
+    }
+  ]
+}

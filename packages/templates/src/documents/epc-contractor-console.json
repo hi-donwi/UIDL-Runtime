@@ -1,0 +1,147 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "epc-contractor-console",
+  "name": "PT Rekayasa Konstruksi Nusantara EPC Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "wbsTree": [
+      {
+        "id": "wbs-root",
+        "label": "Pabrik Kelapa Sawit 60 TPH (Total EPC Contract)",
+        "badge": "Project Root",
+        "value": "Rp 120.000.000.000 (68% PoC)",
+        "children": [
+          {
+            "id": "wbs-civil",
+            "label": "1.0 Pekerjaan Sipil & Pondasi Mesin",
+            "badge": "Sub-Project",
+            "value": "Rp 32.000.000.000 (92% Complete)",
+            "children": [
+              { "id": "wbs-1-1", "label": "1.1 Soil Investigation & Land Clearing", "badge": "Milestone", "value": "100%" },
+              { "id": "wbs-1-2", "label": "1.2 Tiang Pancang Spun Pile & Loading Test", "badge": "Milestone", "value": "100%" },
+              { "id": "wbs-1-3", "label": "1.3 Struktur Beton Bertulang Sterilizer & Boiler", "badge": "Milestone", "value": "85%" }
+            ]
+          },
+          {
+            "id": "wbs-mech",
+            "label": "2.0 Pekerjaan Mekanikal & Fabrikasi Baja",
+            "badge": "Sub-Project",
+            "value": "Rp 58.000.000.000 (65% Complete)",
+            "children": [
+              { "id": "wbs-2-1", "label": "2.1 Erection Kolom Baja Utama Pabrik", "badge": "Milestone", "value": "90%" },
+              { "id": "wbs-2-2", "label": "2.2 Instalasi Sterilizer Door & Thresher Drum", "badge": "Milestone", "value": "55%" },
+              { "id": "wbs-2-3", "label": "2.3 Perpipaan Steam Boiler & Turbin Uap", "badge": "Milestone", "value": "40%" }
+            ]
+          },
+          {
+            "id": "wbs-elec",
+            "label": "3.0 Pekerjaan Elektrikal & Otomasi SCADA",
+            "badge": "Sub-Project",
+            "value": "Rp 30.000.000.000 (35% Complete)",
+            "children": [
+              { "id": "wbs-3-1", "label": "3.1 Panel MCC & Kabel Tray Utama", "badge": "Milestone", "value": "50%" },
+              { "id": "wbs-3-2", "label": "3.2 PLC Programming & HMI Instrumentation", "badge": "Milestone", "value": "20%" }
+            ]
+          }
+        ]
+      }
+    ],
+    "subcontractors": [
+      { "subcon": "PT Pancang Nusantara", "scope": "Pondasi Spun Pile", "contractValue": "Rp 8.500.000.000", "billedAmount": "Rp 8.500.000.000", "retention": "Rp 425.000.000", "status": "Finished - Warranty" },
+      { "subcon": "CV Fabrikasi Baja Mandiri", "scope": "Rangka Baja & Roof Truss", "contractValue": "Rp 14.200.000.000", "billedAmount": "Rp 11.360.000.000", "retention": "Rp 710.000.000", "status": "In Progress (80%)" },
+      { "subcon": "PT Otomasi Industri Presisi", "scope": "Panel Listrik & SCADA", "contractValue": "Rp 9.800.000.000", "billedAmount": "Rp 2.940.000.000", "retention": "Rp 490.000.000", "status": "In Progress (30%)" }
+    ],
+    "milestoneInvoices": [
+      { "invoiceNo": "EPC-INV-001", "milestone": "Uang Muka (DP 20%)", "date": "2027-01-15", "amount": "Rp 24.000.000.000", "status": "Paid" },
+      { "invoiceNo": "EPC-INV-002", "milestone": "Progress Termin 1 (PoC 30%)", "date": "2027-04-10", "amount": "Rp 12.000.000.000", "status": "Paid" },
+      { "invoiceNo": "EPC-INV-003", "milestone": "Progress Termin 2 (PoC 60%)", "date": "2027-07-01", "amount": "Rp 36.000.000.000", "status": "Paid" },
+      { "invoiceNo": "EPC-INV-004", "milestone": "Progress Termin 3 (PoC 80%)", "date": "2027-08-20", "amount": "Rp 24.000.000.000", "status": "Submitted" }
+    ]
+  },
+  "definitions": {
+    "headerTpl": {
+      "id": "epc-header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "epc-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "epc-nav",
+        "type": "Navbar",
+        "componentId": "headerTpl",
+        "slots": {
+          "title": [
+            {
+              "id": "epc-title",
+              "type": "Text",
+              "props": { "value": "PT Rekayasa Konstruksi Nusantara — EPC Project Console" },
+              "style": { "fontSize": "text-xl", "fontWeight": 700 }
+            }
+          ],
+          "actions": [
+            { "id": "btn-progress", "type": "Button", "props": { "label": "Certify Progress (PoC)" } },
+            { "id": "btn-subcon", "type": "Button", "props": { "label": "Subcontractor Claim" } }
+          ]
+        }
+      },
+      {
+        "id": "epc-kpis",
+        "type": "GridView",
+        "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" },
+        "children": [
+          { "id": "k-1", "type": "Text", "props": { "value": "Contract Value\nRp 120.00 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "k-2", "type": "Text", "props": { "value": "Certified PoC\n68.0%" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "k-3", "type": "Text", "props": { "value": "Actual Cost Incurred\nRp 71.40 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "k-4", "type": "Text", "props": { "value": "Retention Held (5%)\nRp 3.60 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+        ]
+      },
+      {
+        "id": "epc-wbs",
+        "type": "TreeView",
+        "props": {
+          "title": "Work Breakdown Structure (WBS) & Engineering Milestones",
+          "dataSource": "wbsTree"
+        }
+      },
+      {
+        "id": "epc-subcon-table",
+        "type": "DataTable",
+        "props": {
+          "title": "Subcontractor Progress & 5% Retention Control",
+          "dataSource": "subcontractors",
+          "columns": [
+            { "key": "subcon", "label": "Subcontractor Name" },
+            { "key": "scope", "label": "Scope of Work" },
+            { "key": "contractValue", "label": "Contract Value", "align": "right" },
+            { "key": "billedAmount", "label": "Approved Billing", "align": "right" },
+            { "key": "retention", "label": "Retention Guarantee", "align": "right" },
+            { "key": "status", "label": "Work Status" }
+          ],
+          "rowActions": [{ "label": "Progress Claim" }, { "label": "Release Retention" }]
+        }
+      },
+      {
+        "id": "epc-inv-table",
+        "type": "DataTable",
+        "props": {
+          "title": "Owner Progress Billing & Percentage of Completion (PoC)",
+          "dataSource": "milestoneInvoices",
+          "columns": [
+            { "key": "invoiceNo", "label": "Certificate / Invoice" },
+            { "key": "milestone", "label": "Progress Milestone" },
+            { "key": "date", "label": "Submission Date" },
+            { "key": "amount", "label": "Invoice Amount", "align": "right" },
+            { "key": "status", "label": "Payment Status" }
+          ]
+        }
+      }
+    ]
+  }
+}

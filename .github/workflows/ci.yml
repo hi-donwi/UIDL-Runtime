@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Build library and schemas
+        run: npm run build
+
+      - name: Validate example documents
+        run: npm run validate:examples
+
+      - name: Architecture, maturity and balanced-GL gates
+        run: npm run audit:reference
+
+      - name: Build reference application
+        run: npm run build:reference

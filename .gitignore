@@ -1,0 +1,18 @@
+node_modules/
+dist/
+*.tsbuildinfo
+*.tgz
+
+# Test and build output
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# Local environment and editor state
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+*.local

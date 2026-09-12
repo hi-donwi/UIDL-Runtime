@@ -1,0 +1,91 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/catalog-structure.json",
+  "version": "0.2.0",
+  "purpose": "Catalog organization for AI agents generating every kind of UI artifact from uidl-runtime JSON schema.",
+  "principles": [
+    "JSON documents are the product source of truth; React code is host/runtime glue only.",
+    "Catalog entries must be reusable across projects, not tied to one reference company or route.",
+    "Use definitions/componentId/slots for reusable UI patterns before creating new primitives.",
+    "Separate visual family, pattern, data fixture, permission model, and export intent so agents can recombine them.",
+    "Every production-ready catalog item should have a parse/render smoke test and example dataSources."
+  ],
+  "recommendedTree": [
+    {
+      "path": "packages/templates/src/catalog/contracts/",
+      "contains": "AI-agent contracts, host integration rules, session/RBAC shape, validation gates, and output policies.",
+      "status": "migrated",
+      "currentEquivalent": [
+        "packages/templates/src/catalog/contracts/ai-agent-contract.json"
+      ]
+    },
+    {
+      "path": "packages/templates/src/catalog/families/",
+      "contains": "One file per visual family: website, dashboard, document, slide, spreadsheet, app-shell, mixed-suite.",
+      "status": "migrated",
+      "currentEquivalent": [
+        "packages/templates/src/catalog/families/capabilities.json"
+      ]
+    },
+    {
+      "path": "packages/templates/src/catalog/patterns/",
+      "contains": "Reusable pattern definitions such as hero, pricing, dashboard-shell, kpi-card, report-page, slide, workbook-sheet, RBAC nav.",
+      "status": "migrated",
+      "currentEquivalent": [
+        "packages/templates/src/catalog/patterns/meridian-definitions.json",
+        "packages/templates/src/catalog/patterns/rbac-navigation.json"
+      ]
+    },
+    {
+      "path": "packages/templates/src/catalog/reference-suites/",
+      "contains": "Curated reference suites with scenario, audience, included documents, data fixtures, permissions, and verification points.",
+      "status": "migrated",
+      "currentEquivalent": [
+        "packages/templates/src/catalog/reference-suites/reference-suite-drafts.json"
+      ]
+    },
+    {
+      "path": "packages/templates/src/documents/",
+      "contains": "Renderable UIDLDocument examples. Drafts can live here until a future migration separates stable vs experimental references.",
+      "status": "unchanged",
+      "currentEquivalent": [
+        "packages/templates/src/documents/*.json"
+      ]
+    },
+    {
+      "path": "packages/templates/src/fixtures/",
+      "contains": "Optional shared datasets for references that should not inline all dataSources.",
+      "status": "not started",
+      "currentEquivalent": []
+    },
+    {
+      "path": "packages/templates/src/export-intents/",
+      "contains": "Future export adapter metadata for HTML/PDF/DOCX/PPTX/XLSX outputs.",
+      "status": "not started",
+      "currentEquivalent": []
+    }
+  ],
+  "notMigrated": [
+    {
+      "path": "packages/templates/src/catalog/recommended-catalog-structure.json",
+      "reason": "This file describes the catalog structure; it stays at the catalog root rather than nesting inside one of the folders it describes."
+    },
+    {
+      "path": "packages/templates/src/mock-api/*.json",
+      "reason": "Mock API fixtures for host references/tests; out of scope for this migration, which only covers the four folders above."
+    }
+  ],
+  "promotionLevels": [
+    {
+      "level": "draft",
+      "meaning": "Representative example; can change freely; must parse/render before being referenced by tests."
+    },
+    {
+      "level": "candidate",
+      "meaning": "Stable enough for references; has explicit session/data requirements and DOM smoke tests."
+    },
+    {
+      "level": "stable",
+      "meaning": "Public pattern contract; breaking changes require migration notes."
+    }
+  ]
+}

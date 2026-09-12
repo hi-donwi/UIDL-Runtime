@@ -1,0 +1,54 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/capabilities.json",
+  "version": "0.1.0",
+  "runtime": "uidl-runtime",
+  "purpose": "Universal JSON-first visual generation runtime for websites, dashboards, documents, slides, and spreadsheet-like business views.",
+  "families": [
+    {
+      "id": "website",
+      "label": "Website",
+      "supports": ["landing pages", "marketing sections", "cards", "forms", "pricing", "FAQ", "CTA", "footer"],
+      "recommendedWidgets": ["Container", "Row", "Column", "GridView", "Text", "Image", "Button", "Badge", "TextField", "Divider"],
+      "example": "packages/templates/src/documents/website-landing.json"
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard",
+      "supports": ["sidebar", "navbar", "KPI cards", "tables", "filters", "charts", "drawers", "dialogs", "RBAC navigation"],
+      "recommendedWidgets": ["Sidebar", "Navbar", "Toolbar", "Panel", "Drawer", "DataTable", "Chart", "Text", "Button", "Badge"],
+      "example": "packages/templates/src/documents/dashboard-analytics.json"
+    },
+    {
+      "id": "document",
+      "label": "Document",
+      "supports": ["document pages", "headings", "paragraphs", "sections", "callouts", "tables", "signature blocks"],
+      "recommendedWidgets": ["Container", "Column", "Row", "Text", "DataTable", "Divider", "Badge"],
+      "example": "packages/templates/src/documents/document-proposal.json"
+    },
+    {
+      "id": "slide",
+      "label": "Slide Deck",
+      "supports": ["title slides", "agenda", "two-column slides", "chart slides", "image/content slides"],
+      "recommendedWidgets": ["Container", "GridView", "Column", "Row", "Text", "Chart", "Image", "Badge"],
+      "example": "packages/templates/src/documents/slide-deck.json"
+    },
+    {
+      "id": "spreadsheet",
+      "label": "Spreadsheet",
+      "supports": ["workmeridian", "sheets", "budget tables", "formula display", "variance tables", "charts"],
+      "recommendedWidgets": ["Container", "Toolbar", "DataTable", "Chart", "Text", "Badge"],
+      "example": "packages/templates/src/documents/spreadsheet-budget.json"
+    }
+  ],
+  "sharedRuntimeFeatures": [
+    "definitions/componentId reusable schema templates",
+    "slots for reusable shell/content composition",
+    "dataSources resolved into DataTable/Chart rows",
+    "api actions fetch allowed endpoints into stateStore paths",
+    "state-bound DataTable/Chart rows for live API data",
+    "visibility.condition for conditional rendering",
+    "session.* scope for RBAC UI gating",
+    "state.* bindings for interactive overlays/forms",
+    "navigate actions surfaced through onRouteChange"
+  ]
+}

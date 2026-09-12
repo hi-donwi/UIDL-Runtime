@@ -1,0 +1,352 @@
+{
+  "$schema": "../../dist/schema/uidl-document.schema.json",
+  "version": "1.0.0",
+  "id": "koperasi-bmt-console",
+  "name": "Koperasi Simpan Pinjam & BMT Syariah Mandiri",
+  "theme": "default-light",
+  "dataSources": {
+    "savingsComposition": [
+      { "label": "Simpanan Pokok", "value": 723 },
+      { "label": "Simpanan Wajib", "value": 2169 },
+      { "label": "Simpanan Sukarela", "value": 1928 }
+    ],
+    "shuDistributionTree": [
+      {
+        "id": "shu-root",
+        "label": "Total Alokasi Sisa Hasil Usaha (SHU) Berjalan",
+        "subtitle": "Sesuai AD/ART dan Keputusan Rapat Anggota Tahunan (RAT)",
+        "badge": "100%",
+        "value": "Rp 420.000.000",
+        "children": [
+          {
+            "id": "shu-modal",
+            "label": "1. Jasa Modal / Simpanan Anggota",
+            "subtitle": "Dibagikan proporsional berdasarkan saldo simpanan pokok & wajib",
+            "badge": "40%",
+            "value": "Rp 168.000.000"
+          },
+          {
+            "id": "shu-usaha",
+            "label": "2. Jasa Usaha & Transaksi Anggota",
+            "subtitle": "Dibagikan proporsional atas partisipasi pembiayaan & belanja unit",
+            "badge": "30%",
+            "value": "Rp 126.000.000"
+          },
+          {
+            "id": "shu-cadangan",
+            "label": "3. Dana Cadangan Koperasi",
+            "subtitle": "Dipupuk untuk memperkuat struktur permodalan institusi",
+            "badge": "20%",
+            "value": "Rp 84.000.000"
+          },
+          {
+            "id": "shu-sosial",
+            "label": "4. Dana Pendidikan, Pengurus & Sosial",
+            "subtitle": "Santunan sosial dhuafa, zakat institusi, dan diklat pengurus",
+            "badge": "10% (Sosial)",
+            "value": "Rp 42.000.000"
+          }
+        ]
+      }
+    ],
+    "financings": [
+      {
+        "accountNo": "MRB-2027-0104",
+        "member": "Hj. Siti Rohmah",
+        "akad": "Murabahah",
+        "object": "Modal Kerja Toko Sembako",
+        "plafond": "Rp 75.000.000",
+        "margin": "Rp 9.000.000 (12%)",
+        "tenor": "24 Bulan",
+        "installment": "Rp 3.500.000 / bln",
+        "status": "Lancar (Kolektibilitas 1)"
+      },
+      {
+        "accountNo": "IJR-2027-0052",
+        "member": "Ahmad Fauzi",
+        "akad": "Ijarah Multijasa",
+        "object": "Biaya Pendidikan PTN",
+        "plafond": "Rp 25.000.000",
+        "margin": "Rp 2.500.000 (10%)",
+        "tenor": "12 Bulan",
+        "installment": "Rp 2.291.000 / bln",
+        "status": "Lancar (Kolektibilitas 1)"
+      },
+      {
+        "accountNo": "MRB-2027-0089",
+        "member": "Bambang Triyono",
+        "akad": "Murabahah",
+        "object": "Pengadaan Mesin Penggiling Padi",
+        "plafond": "Rp 120.000.000",
+        "margin": "Rp 16.800.000 (14%)",
+        "tenor": "36 Bulan",
+        "installment": "Rp 3.800.000 / bln",
+        "status": "Dalam Perhatian (Kol 2)"
+      }
+    ],
+    "membersSavings": [
+      {
+        "memberId": "ANGG-00142",
+        "name": "Hj. Siti Rohmah",
+        "branch": "Cabang Pasar Minggu",
+        "simpananPokok": "Rp 500.000",
+        "simpananWajib": "Rp 3.600.000",
+        "simpananSukarela": "Rp 42.500.000",
+        "totalBalance": "Rp 46.600.000"
+      },
+      {
+        "memberId": "ANGG-00188",
+        "name": "Ahmad Fauzi",
+        "branch": "Cabang Jagakarsa",
+        "simpananPokok": "Rp 500.000",
+        "simpananWajib": "Rp 2.400.000",
+        "simpananSukarela": "Rp 14.200.000",
+        "totalBalance": "Rp 17.100.000"
+      },
+      {
+        "memberId": "ANGG-00205",
+        "name": "Bambang Triyono",
+        "branch": "Cabang Depok",
+        "simpananPokok": "Rp 500.000",
+        "simpananWajib": "Rp 4.800.000",
+        "simpananSukarela": "Rp 8.900.000",
+        "totalBalance": "Rp 14.200.000"
+      }
+    ],
+    "taxCompliance": [
+      {
+        "taxItem": "e-Faktur PPN Keluaran 11%",
+        "basis": "Rp 842.000.000",
+        "taxAmount": "Rp 92.620.000",
+        "status": "Siap Upload DJP CSV",
+        "dueDate": "Akhir Bulan Depan"
+      },
+      {
+        "taxItem": "PPh 21 Pegawai (Skema TER PMK 168/2023)",
+        "basis": "Rp 68.500.000 (14 Staf)",
+        "taxAmount": "Rp 3.425.000",
+        "status": "EBilling Terbit",
+        "dueDate": "Tgl 10 Bulan Depan"
+      },
+      {
+        "taxItem": "BPJS Ketenagakerjaan (JKK, JKM, JHT, JP)",
+        "basis": "Rp 68.500.000",
+        "taxAmount": "Rp 6.329.400",
+        "status": "Autodebet Berhasil",
+        "dueDate": "Tgl 15 Tiap Bulan"
+      },
+      {
+        "taxItem": "BPJS Kesehatan (4% Pemberi Kerja + 1% Karyawan)",
+        "basis": "Rp 68.500.000",
+        "taxAmount": "Rp 3.425.000",
+        "status": "Autodebet Berhasil",
+        "dueDate": "Tgl 10 Tiap Bulan"
+      }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderWidth": "border-b",
+        "borderColor": "{primitives.color.border}",
+        "background": "{primitives.color.surface}"
+      },
+      "slots": { "title": [], "actions": [] }
+    },
+    "kpiCard": {
+      "id": "kpi-card-template",
+      "type": "Column",
+      "style": {
+        "padding": "p-4",
+        "borderRadius": "rounded-lg",
+        "borderWidth": "border",
+        "borderColor": "{primitives.color.border}",
+        "background": "{primitives.color.surface}",
+        "gap": "gap-1"
+      }
+    }
+  },
+  "root": {
+    "id": "koperasi-page",
+    "type": "Column",
+    "style": {
+      "gap": "gap-6",
+      "padding": "p-6",
+      "background": "{primitives.color.background}",
+      "minHeight": "min-h-screen"
+    },
+    "children": [
+      {
+        "id": "header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "title-text",
+              "type": "Text",
+              "props": { "value": "Koperasi & BMT Syariah Mandiri" },
+              "style": { "fontSize": "text-2xl", "fontWeight": 700, "color": "{primitives.color.text-primary}" }
+            },
+            {
+              "id": "subtitle-text",
+              "type": "Text",
+              "props": { "value": "Dashboard Pengawasan Simpan Pinjam Syariah, Alokasi SHU & Kepatuhan Pajak/BPJS" },
+              "style": { "fontSize": "text-xs", "color": "{primitives.color.text-secondary}" }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-akad",
+              "type": "Button",
+              "props": { "label": "+ Akad Pembiayaan" },
+              "style": { "padding": "p-2", "fontSize": "text-sm", "borderRadius": "rounded-md", "borderWidth": "border" }
+            },
+            {
+              "id": "btn-shu",
+              "type": "Button",
+              "props": { "label": "Hitung SHU Anggota" },
+              "style": { "padding": "p-2", "fontSize": "text-sm", "borderRadius": "rounded-md", "background": "{primitives.color.text-primary}", "color": "{primitives.color.background}" }
+            }
+          ]
+        }
+      },
+      {
+        "id": "kpi-grid",
+        "type": "GridView",
+        "style": {
+          "display": "grid",
+          "gridTemplateColumns": "repeat(auto-fit, minmax(220px, 1fr))",
+          "gap": "gap-4"
+        },
+        "children": [
+          {
+            "id": "kpi-simpanan",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              { "id": "kpi-lbl-1", "type": "Text", "props": { "value": "Total Dana Simpanan Anggota" }, "style": { "fontSize": "text-xs", "color": "{primitives.color.text-secondary}", "fontWeight": 600 } },
+              { "id": "kpi-val-1", "type": "Text", "props": { "value": "Rp 4.820.000.000" }, "style": { "fontSize": "text-xl", "fontWeight": 700, "color": "{primitives.color.text-primary}" } },
+              { "id": "kpi-sub-1", "type": "Text", "props": { "value": "1.240 Anggota Aktif" }, "style": { "fontSize": "text-xs", "color": "#10b981" } }
+            ]
+          },
+          {
+            "id": "kpi-pembiayaan",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              { "id": "kpi-lbl-2", "type": "Text", "props": { "value": "Outstanding Pembiayaan (Murabahah)" }, "style": { "fontSize": "text-xs", "color": "{primitives.color.text-secondary}", "fontWeight": 600 } },
+              { "id": "kpi-val-2", "type": "Text", "props": { "value": "Rp 6.450.000.000" }, "style": { "fontSize": "text-xl", "fontWeight": 700, "color": "{primitives.color.text-primary}" } },
+              { "id": "kpi-sub-2", "type": "Text", "props": { "value": "FDR Rasio: 133.8%" }, "style": { "fontSize": "text-xs", "color": "{primitives.color.text-secondary}" } }
+            ]
+          },
+          {
+            "id": "kpi-npf",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              { "id": "kpi-lbl-3", "type": "Text", "props": { "value": "Kolektibilitas / NPF Gross" }, "style": { "fontSize": "text-xs", "color": "{primitives.color.text-secondary}", "fontWeight": 600 } },
+              { "id": "kpi-val-3", "type": "Text", "props": { "value": "1.42%" }, "style": { "fontSize": "text-xl", "fontWeight": 700, "color": "#10b981" } },
+              { "id": "kpi-sub-3", "type": "Text", "props": { "value": "Kategori: Sangat Sehat (<5%)" }, "style": { "fontSize": "text-xs", "color": "#10b981" } }
+            ]
+          },
+          {
+            "id": "kpi-shu",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              { "id": "kpi-lbl-4", "type": "Text", "props": { "value": "Estimasi SHU Tahun Berjalan" }, "style": { "fontSize": "text-xs", "color": "{primitives.color.text-secondary}", "fontWeight": 600 } },
+              { "id": "kpi-val-4", "type": "Text", "props": { "value": "Rp 420.000.000" }, "style": { "fontSize": "text-xl", "fontWeight": 700, "color": "{primitives.color.accent}" } },
+              { "id": "kpi-sub-4", "type": "Text", "props": { "value": "Siap RAT Des 2027" }, "style": { "fontSize": "text-xs", "color": "{primitives.color.accent}" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "middle-grid",
+        "type": "GridView",
+        "style": {
+          "display": "grid",
+          "gridTemplateColumns": "1fr 1.4fr",
+          "gap": "gap-6"
+        },
+        "children": [
+          {
+            "id": "chart-savings",
+            "type": "Chart",
+            "props": {
+              "title": "Komposisi Dana Simpanan Anggota (Juta Rp)",
+              "chartType": "donut",
+              "dataSource": "savingsComposition",
+              "xKey": "label",
+              "yKey": "value"
+            }
+          },
+          {
+            "id": "tree-shu",
+            "type": "TreeView",
+            "props": {
+              "title": "Struktur Hierarki Distribusi SHU Anggota Sesuai RAT",
+              "dataSource": "shuDistributionTree"
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-financing",
+        "type": "DataTable",
+        "props": {
+          "title": "Akad Pembiayaan Anggota Aktif (Murabahah & Ijarah)",
+          "dataSource": "financings",
+          "columns": [
+            { "key": "accountNo", "label": "No Akad" },
+            { "key": "member", "label": "Nama Anggota" },
+            { "key": "akad", "label": "Jenis Akad" },
+            { "key": "object", "label": "Tujuan Pembiayaan" },
+            { "key": "plafond", "label": "Plafond", "align": "right" },
+            { "key": "margin", "label": "Margin BMT", "align": "right" },
+            { "key": "tenor", "label": "Tenor" },
+            { "key": "installment", "label": "Angsuran", "align": "right" },
+            { "key": "status", "label": "Kolektibilitas" }
+          ]
+        }
+      },
+      {
+        "id": "table-members",
+        "type": "DataTable",
+        "props": {
+          "title": "Daftar Rekening Simpanan Anggota",
+          "dataSource": "membersSavings",
+          "columns": [
+            { "key": "memberId", "label": "No Anggota" },
+            { "key": "name", "label": "Nama Anggota" },
+            { "key": "branch", "label": "Kantor Kas" },
+            { "key": "simpananPokok", "label": "Simpanan Pokok", "align": "right" },
+            { "key": "simpananWajib", "label": "Simpanan Wajib", "align": "right" },
+            { "key": "simpananSukarela", "label": "Simpanan Sukarela", "align": "right" },
+            { "key": "totalBalance", "label": "Total Saldo Simpanan", "align": "right" }
+          ]
+        }
+      },
+      {
+        "id": "table-tax",
+        "type": "DataTable",
+        "props": {
+          "title": "Kepatuhan Perpajakan DJP (e-Faktur PPN, PPh 21 TER) & BPJS Ketenagakerjaan/Kesehatan",
+          "dataSource": "taxCompliance",
+          "columns": [
+            { "key": "taxItem", "label": "Kewajiban Perpajakan / Ketenagakerjaan" },
+            { "key": "basis", "label": "Dasar Pengenaan / DPP" },
+            { "key": "taxAmount", "label": "Nilai Pajak / Iuran", "align": "right" },
+            { "key": "status", "label": "Status Pelaporan" },
+            { "key": "dueDate", "label": "Jatuh Tempo" }
+          ]
+        }
+      }
+    ]
+  }
+}

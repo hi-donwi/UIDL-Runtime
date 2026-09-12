@@ -1,0 +1,42 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/ai-agent-contract.json",
+  "version": "0.1.0",
+  "goal": "Guide AI agents to generate portable uidl-runtime UIDL JSON for other projects.",
+  "inputShape": {
+    "intent": "What visual artifact to generate: website, dashboard, document, slide deck, spreadsheet, or mixed app shell.",
+    "audience": "Who will use or read the artifact.",
+    "brand": "Tone, color, density, typography, and visual references.",
+    "data": "Rows, metrics, chart data, document facts, slide points, or spreadsheet values.",
+    "session": "Optional user, roles, and boolean permissions provided by the host application.",
+    "routeModel": "Optional route paths that host apps will handle through onRouteChange."
+  },
+  "outputRules": [
+    "Return one valid UIDLDocument JSON object.",
+    "Use existing widget types before inventing custom widgets.",
+    "Put reusable shells, cards, page headers, document sections, slides, and sheet layouts under definitions.",
+    "Instantiate reusable templates with componentId and slots.",
+    "Use dataSources for tables/charts instead of embedding large repeated UI manually.",
+    "For live API data, use an api action with dataSource pointing to a state path, then bind widget rows from state.api.*.rows.",
+    "Never assume API calls are enabled by default; host projects must pass apiAllowlist for trusted hosts.",
+    "Use visibility.condition with session.permissions.* for RBAC menu/page/section visibility.",
+    "Use navigate actions for route changes and let the host app handle actual routing.",
+    "Keep authorization enforcement in the host/API; UIDL visibility is UI gating only."
+  ],
+  "minimumValidation": [
+    "DocumentSchema.parse(document) succeeds.",
+    "renderUIDocument(document, { dataSources: document.dataSources, session }) does not throw.",
+    "API-backed documents render after mocked fetch responses populate the configured state paths.",
+    "Important text labels render in a DOM smoke test.",
+    "If RBAC is used, denied navigation/page sections are absent for a restricted session."
+  ],
+  "recommendedSessionShape": {
+    "user": { "id": "usr_1", "name": "Finance Manager" },
+    "roles": ["Finance Manager"],
+    "permissions": { "dashboard": true, "finance": true, "payroll": false }
+  },
+  "apiDataPattern": {
+    "action": { "api": { "method": "GET", "url": "https://mock.uidl-runtime.local/dashboard/revenue-trend", "dataSource": "api.dashboard.revenueTrend" } },
+    "rowsBinding": { "$bind": "state.api.dashboard.revenueTrend.rows" },
+    "hostRequirement": "Pass apiAllowlist: ['mock.uidl-runtime.local'] or an equivalent predicate."
+  }
+}

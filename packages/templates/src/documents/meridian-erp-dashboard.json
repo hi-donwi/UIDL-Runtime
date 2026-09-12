@@ -1,0 +1,1924 @@
+{
+  "version": "1.0.0",
+  "id": "meridian-dashboard",
+  "name": "Meridian Trading Co. Dashboard",
+  "dataSources": {
+    "incomeExpense": [
+      {
+        "label": "Income",
+        "value": 113945000
+      },
+      {
+        "label": "Expense",
+        "value": 101940000
+      }
+    ],
+    "expenseBreakdown": [
+      {
+        "label": "Cost of Goods Sold",
+        "value": 46940000
+      },
+      {
+        "label": "Rent Expense",
+        "value": 12000000
+      },
+      {
+        "label": "Salaries Expense",
+        "value": 38000000
+      },
+      {
+        "label": "Utilities Expense",
+        "value": 5000000
+      }
+    ],
+    "dimensions": [
+      {
+        "dimension": "Department",
+        "reference": "Department",
+        "default": "Operations",
+        "mandatory": "P&L",
+        "coverage": "92%"
+      },
+      {
+        "dimension": "Project",
+        "reference": "Project",
+        "default": "Meridian Rollout",
+        "mandatory": "Both",
+        "coverage": "78%"
+      },
+      {
+        "dimension": "Sales Channel",
+        "reference": "Sales Channel",
+        "default": "B2B Direct",
+        "mandatory": "P&L",
+        "coverage": "86%"
+      }
+    ],
+    "procurement": [
+      {
+        "id": "P2P-001",
+        "materialRequest": "MR-2027-00014",
+        "rfq": "RFQ-2027-00009",
+        "supplierQuotation": "SQ-SUPP-002",
+        "purchaseOrder": "PO-2027-00031",
+        "receiptStatus": "Quality Check",
+        "paymentStatus": "Pending Invoice",
+        "value": "Rp 19.200.000"
+      },
+      {
+        "id": "P2P-002",
+        "materialRequest": "MR-2027-00015",
+        "rfq": "RFQ-2027-00010",
+        "supplierQuotation": "SQ-SUPP-005",
+        "purchaseOrder": "PO-2027-00032",
+        "receiptStatus": "Put Away",
+        "paymentStatus": "Payment Order Draft",
+        "value": "Rp 8.400.000"
+      },
+      {
+        "id": "P2P-003",
+        "materialRequest": "Auto Reorder",
+        "rfq": "RFQ-2027-00011",
+        "supplierQuotation": "Comparing",
+        "purchaseOrder": "Not Created",
+        "receiptStatus": "Not Received",
+        "paymentStatus": "Not Due",
+        "value": "Rp 1.280.000"
+      }
+    ],
+    "salesLifecycle": [
+      {
+        "id": "Q2C-001",
+        "quotation": "SQTN-2027-00001",
+        "salesOrder": "SO-2027-00018",
+        "delivery": "Delivered",
+        "invoice": "SINV-2027-00004",
+        "paymentReminder": "WhatsApp",
+        "value": "Rp 47.175.000"
+      },
+      {
+        "id": "Q2C-002",
+        "quotation": "SQTN-2027-00002",
+        "salesOrder": "SO-2027-00019",
+        "delivery": "Reserved Batch",
+        "invoice": "Draft",
+        "paymentReminder": "Email",
+        "value": "Rp 14.319.000"
+      },
+      {
+        "id": "Q2C-003",
+        "quotation": "SQTN-2027-00005",
+        "salesOrder": "SO-2027-00020",
+        "delivery": "Material Request",
+        "invoice": "Not Invoiced",
+        "paymentReminder": "Telegram",
+        "value": "Rp 1.998.000"
+      }
+    ],
+    "manufacturing": [
+      {
+        "id": "MRP-001",
+        "productionPlan": "PP-2027-00004",
+        "item": "Meja Kantor",
+        "projectedQty": "12",
+        "shortfallQty": "4",
+        "materialRequest": "MR-2027-00014",
+        "workOrder": "WO-2027-00008",
+        "qcGate": "BOM + Routing Ready"
+      },
+      {
+        "id": "MRP-002",
+        "productionPlan": "PP-2027-00004",
+        "item": "Kursi Kantor Ergonomis",
+        "projectedQty": "18",
+        "shortfallQty": "0",
+        "materialRequest": "Not Required",
+        "workOrder": "WO-2027-00009",
+        "qcGate": "Inspection Template"
+      },
+      {
+        "id": "MRP-003",
+        "productionPlan": "PP-2027-00005",
+        "item": "Box Packaging",
+        "projectedQty": "-260",
+        "shortfallQty": "260",
+        "materialRequest": "Auto Reorder",
+        "workOrder": "Purchase Only",
+        "qcGate": "Receipt Hold"
+      }
+    ],
+    "suppliers": [
+      {
+        "supplier": "PT Distribusi Utama",
+        "onTime": "96%",
+        "defect": "1.2%",
+        "response": "94",
+        "standing": "Preferred"
+      },
+      {
+        "supplier": "CV Bahan Baku Sejahtera",
+        "onTime": "88%",
+        "defect": "3.8%",
+        "response": "82",
+        "standing": "Watch"
+      },
+      {
+        "supplier": "UD Sumber Material",
+        "onTime": "71%",
+        "defect": "7.4%",
+        "response": "68",
+        "standing": "Restricted"
+      }
+    ],
+    "quality": [
+      {
+        "id": "QC-2027-00001",
+        "referenceType": "Purchase Receipt",
+        "referenceId": "PREC-2027-00001",
+        "item": "Kayu Jati Solid",
+        "sampleSize": "50 units",
+        "defectCount": 0,
+        "status": "Passed",
+        "inspectedBy": "Budi Santoso",
+        "date": "2027-07-04",
+        "defects": "0 (0.0%)"
+      },
+      {
+        "id": "QC-2027-00002",
+        "referenceType": "Purchase Receipt",
+        "referenceId": "PREC-2027-00003",
+        "item": "Baut & Fitting Set",
+        "sampleSize": "100 units",
+        "defectCount": 6,
+        "status": "Hold",
+        "inspectedBy": "Dewi Lestari",
+        "date": "2027-07-21",
+        "defects": "6 (6.0%)"
+      },
+      {
+        "id": "QC-2027-00003",
+        "referenceType": "Delivery",
+        "referenceId": "SHP-2027-00002",
+        "item": "Meja Kantor Eksekutif",
+        "sampleSize": "10 units",
+        "defectCount": 0,
+        "status": "Passed",
+        "inspectedBy": "Budi Santoso",
+        "date": "2027-07-06",
+        "defects": "0 (0.0%)"
+      },
+      {
+        "id": "QC-2027-00004",
+        "referenceType": "Job Card",
+        "referenceId": "WO-2027-00008",
+        "item": "Finishing & Coating",
+        "sampleSize": "12 units",
+        "defectCount": 1,
+        "status": "Passed",
+        "inspectedBy": "Hendra Wijaya",
+        "date": "2027-07-18",
+        "defects": "1 (8.3%)"
+      }
+    ],
+    "support": [
+      {
+        "id": "TCK-2027-0001",
+        "subject": "Permintaan Penyesuaian Faktur Pajak",
+        "customer": "PT Megah Jaya",
+        "priority": "High",
+        "status": "In Progress",
+        "slaDue": "2h remaining",
+        "responseTimeMinutes": 24,
+        "responseTime": "24m"
+      },
+      {
+        "id": "TCK-2027-0002",
+        "subject": "Konfirmasi Jadwal Kirim Batch 2",
+        "customer": "CV Sinar Terang",
+        "priority": "Medium",
+        "status": "Resolved",
+        "slaDue": "Met SLA",
+        "responseTimeMinutes": 15,
+        "responseTime": "15m"
+      },
+      {
+        "id": "TCK-2027-0003",
+        "subject": "Klaim Garansi Engsel Kursi",
+        "customer": "PT Karya Abadi",
+        "priority": "Urgent",
+        "status": "Open",
+        "slaDue": "45m remaining",
+        "responseTimeMinutes": 8,
+        "responseTime": "8m"
+      },
+      {
+        "id": "TCK-2027-0004",
+        "subject": "Pertanyaan Integrasi e-Faktur API",
+        "customer": "PT Global Distribusi",
+        "priority": "Low",
+        "status": "Resolved",
+        "slaDue": "Met SLA",
+        "responseTimeMinutes": 45,
+        "responseTime": "45m"
+      }
+    ],
+    "projects": [
+      {
+        "id": "PROJ-2027-001",
+        "name": "Fitout Kantor Pusat Megah Jaya",
+        "customer": "PT Megah Jaya",
+        "budget": "Rp 150.000.000",
+        "actualSpend": "Rp 112.500.000",
+        "progressPercent": 75,
+        "status": "On Track",
+        "progress": "75%"
+      },
+      {
+        "id": "PROJ-2027-002",
+        "name": "Pengadaan Meja Ergonomis B2B",
+        "customer": "PT Teknologi Nusantara",
+        "budget": "Rp 85.000.000",
+        "actualSpend": "Rp 68.000.000",
+        "progressPercent": 80,
+        "status": "On Track",
+        "progress": "80%"
+      },
+      {
+        "id": "PROJ-2027-003",
+        "name": "Renovasi Showroom Cabang Timur",
+        "customer": "Meridian Internal",
+        "budget": "Rp 45.000.000",
+        "actualSpend": "Rp 42.000.000",
+        "progressPercent": 93,
+        "status": "In Progress",
+        "progress": "93%"
+      }
+    ]
+  },
+  "definitions": {},
+  "root": {
+    "id": "page",
+    "type": "Column",
+    "style": {
+      "gap": "gap-0"
+    },
+    "children": [
+      {
+        "id": "title",
+        "type": "Text",
+        "props": {
+          "value": "Dashboard"
+        },
+        "style": {
+          "fontSize": "text-2xl",
+          "fontWeight": 700,
+          "padding": "p-4"
+        }
+      },
+      {
+        "id": "kpis",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(200px, 1fr))"
+          }
+        },
+        "style": {
+          "gap": "gap-3",
+          "padding": "p-4"
+        },
+        "children": [
+          {
+            "id": "kpi-0",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "kpi-0-label",
+                "type": "Text",
+                "props": {
+                  "value": "Total Receivables"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "kpi-0-value",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 76.628.850"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-1",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "kpi-1-label",
+                "type": "Text",
+                "props": {
+                  "value": "Total Payables"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "kpi-1-value",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 31.413.000"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-2",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "kpi-2-label",
+                "type": "Text",
+                "props": {
+                  "value": "Cash & Bank"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "kpi-2-value",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 79.959.700"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-3",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "kpi-3-label",
+                "type": "Text",
+                "props": {
+                  "value": "Net Profit (Jul 2027)"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "kpi-3-value",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 12.005.000"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cashflow-section",
+        "type": "Column",
+        "style": {
+          "gap": "gap-3",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "cashflow-chart",
+            "type": "Chart",
+            "props": {
+              "title": "Cashflow",
+              "chartType": "bar",
+              "xKey": "label",
+              "yKey": "value",
+              "dataSource": "incomeExpense"
+            },
+            "style": {
+              "width": "w-full"
+            }
+          }
+        ]
+      },
+      {
+        "id": "unpaid-section",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))"
+          }
+        },
+        "style": {
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "unpaid-sales",
+            "type": "Column",
+            "style": {
+              "gap": "gap-3",
+              "padding": "p-4"
+            },
+            "children": [
+              {
+                "id": "unpaid-sales-title",
+                "type": "Text",
+                "props": {
+                  "value": "Sales Invoices"
+                },
+                "style": {
+                  "fontSize": "text-base",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "unpaid-sales-amounts",
+                "type": "Row",
+                "props": {
+                  "style": {
+                    "display": "flex",
+                    "justifyContent": "space-between"
+                  }
+                },
+                "children": [
+                  {
+                    "id": "unpaid-sales-paid",
+                    "type": "Text",
+                    "props": {
+                      "value": "Rp 47.657.850 Paid"
+                    },
+                    "style": {
+                      "fontSize": "text-sm",
+                      "fontWeight": 600
+                    }
+                  },
+                  {
+                    "id": "unpaid-sales-unpaid",
+                    "type": "Text",
+                    "props": {
+                      "value": "Rp 88.256.100 Unpaid"
+                    },
+                    "style": {
+                      "fontSize": "text-sm",
+                      "fontWeight": 600,
+                      "color": "{primitives.color.text-secondary}"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "unpaid-sales-bar",
+                "type": "Row",
+                "props": {
+                  "style": {
+                    "height": "16px",
+                    "borderRadius": "6px",
+                    "overflow": "hidden"
+                  }
+                },
+                "style": {
+                  "width": "w-full",
+                  "background": "{primitives.color.border}"
+                },
+                "children": [
+                  {
+                    "id": "unpaid-sales-bar-fill",
+                    "type": "Row",
+                    "props": {
+                      "style": {
+                        "width": "35%",
+                        "height": "100%",
+                        "background": "#3b82f6"
+                      }
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "unpaid-sales-view",
+                "type": "Button",
+                "props": {
+                  "label": "View Sales Invoices"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/list/SalesInvoice"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "unpaid-purchase",
+            "type": "Column",
+            "style": {
+              "gap": "gap-3",
+              "padding": "p-4"
+            },
+            "children": [
+              {
+                "id": "unpaid-purchase-title",
+                "type": "Text",
+                "props": {
+                  "value": "Purchase Invoices"
+                },
+                "style": {
+                  "fontSize": "text-base",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "unpaid-purchase-amounts",
+                "type": "Row",
+                "props": {
+                  "style": {
+                    "display": "flex",
+                    "justifyContent": "space-between"
+                  }
+                },
+                "children": [
+                  {
+                    "id": "unpaid-purchase-paid",
+                    "type": "Text",
+                    "props": {
+                      "value": "Rp 14.296.800 Paid"
+                    },
+                    "style": {
+                      "fontSize": "text-sm",
+                      "fontWeight": 600
+                    }
+                  },
+                  {
+                    "id": "unpaid-purchase-unpaid",
+                    "type": "Text",
+                    "props": {
+                      "value": "Rp 44.910.600 Unpaid"
+                    },
+                    "style": {
+                      "fontSize": "text-sm",
+                      "fontWeight": 600,
+                      "color": "{primitives.color.text-secondary}"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "unpaid-purchase-bar",
+                "type": "Row",
+                "props": {
+                  "style": {
+                    "height": "16px",
+                    "borderRadius": "6px",
+                    "overflow": "hidden"
+                  }
+                },
+                "style": {
+                  "width": "w-full",
+                  "background": "{primitives.color.border}"
+                },
+                "children": [
+                  {
+                    "id": "unpaid-purchase-bar-fill",
+                    "type": "Row",
+                    "props": {
+                      "style": {
+                        "width": "24%",
+                        "height": "100%",
+                        "background": "#ec4899"
+                      }
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "unpaid-purchase-view",
+                "type": "Button",
+                "props": {
+                  "label": "View Purchase Invoices"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/list/PurchaseInvoice"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pnl-expenses-section",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))"
+          }
+        },
+        "style": {
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "pnl-widget",
+            "type": "Column",
+            "style": {
+              "gap": "gap-3",
+              "padding": "p-4"
+            },
+            "children": [
+              {
+                "id": "pnl-chart",
+                "type": "Chart",
+                "props": {
+                  "title": "Profit and Loss",
+                  "chartType": "bar",
+                  "xKey": "label",
+                  "yKey": "value",
+                  "dataSource": "incomeExpense"
+                },
+                "style": {
+                  "width": "w-full"
+                }
+              }
+            ]
+          },
+          {
+            "id": "expenses-widget",
+            "type": "Column",
+            "style": {
+              "gap": "gap-3",
+              "padding": "p-4"
+            },
+            "children": [
+              {
+                "id": "expenses-chart",
+                "type": "Chart",
+                "props": {
+                  "title": "Expenses",
+                  "chartType": "bar",
+                  "xKey": "label",
+                  "yKey": "value",
+                  "dataSource": "expenseBreakdown"
+                },
+                "style": {
+                  "width": "w-full"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "erp-header",
+        "type": "Column",
+        "style": {
+          "gap": "gap-2",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-t"
+        },
+        "children": [
+          {
+            "id": "erp-eyebrow",
+            "type": "Text",
+            "props": {
+              "value": "Extended ERP workflow layer"
+            },
+            "style": {
+              "fontSize": "text-xs",
+              "fontWeight": 600,
+              "color": "{primitives.color.text-secondary}"
+            }
+          },
+          {
+            "id": "erp-title",
+            "type": "Text",
+            "props": {
+              "value": "From Meridian ledger to ERP operations"
+            },
+            "style": {
+              "fontSize": "text-2xl",
+              "fontWeight": 700
+            }
+          },
+          {
+            "id": "erp-copy",
+            "type": "Text",
+            "props": {
+              "value": "Meridian keeps the existing Meridian-style accounting dashboard, then adds extended ERP workflows for dimensions, procure-to-pay, quote-to-cash, MRP, quality gates, and supplier performance using the same UIDL style."
+            },
+            "style": {
+              "fontSize": "text-sm",
+              "color": "{primitives.color.text-secondary}"
+            }
+          }
+        ]
+      },
+      {
+        "id": "erp-kpis",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))"
+          }
+        },
+        "style": {
+          "gap": "gap-3",
+          "padding": "p-4"
+        },
+        "children": [
+          {
+            "id": "erp-kpi-dimensions",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "erp-kpi-dimensions-label",
+                "type": "Text",
+                "props": {
+                  "value": "Dimension Coverage"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-kpi-dimensions-value",
+                "type": "Text",
+                "props": {
+                  "value": "85%"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              },
+              {
+                "id": "erp-kpi-dimensions-helper",
+                "type": "Text",
+                "props": {
+                  "value": "Department, Project, Sales Channel"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "erp-kpi-procure",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "erp-kpi-procure-label",
+                "type": "Text",
+                "props": {
+                  "value": "Procure-to-Pay"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-kpi-procure-value",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 28.880.000"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              },
+              {
+                "id": "erp-kpi-procure-helper",
+                "type": "Text",
+                "props": {
+                  "value": "3 active buying chains"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "erp-kpi-sales",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "erp-kpi-sales-label",
+                "type": "Text",
+                "props": {
+                  "value": "Quote-to-Cash"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-kpi-sales-value",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 63.492.000"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              },
+              {
+                "id": "erp-kpi-sales-helper",
+                "type": "Text",
+                "props": {
+                  "value": "3 linked sales chains"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "erp-kpi-mrp",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "erp-kpi-mrp-label",
+                "type": "Text",
+                "props": {
+                  "value": "MRP Shortfall"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-kpi-mrp-value",
+                "type": "Text",
+                "props": {
+                  "value": "264 units"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              },
+              {
+                "id": "erp-kpi-mrp-helper",
+                "type": "Text",
+                "props": {
+                  "value": "Auto reorder + work order readiness"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "erp-kpi-qc",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "erp-kpi-qc-label",
+                "type": "Text",
+                "props": {
+                  "value": "Quality Pass Rate"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-kpi-qc-value",
+                "type": "Text",
+                "props": {
+                  "value": "75%"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              },
+              {
+                "id": "erp-kpi-qc-helper",
+                "type": "Text",
+                "props": {
+                  "value": "4 gate inspections logged"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "erp-kpi-sla",
+            "type": "Column",
+            "style": {
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}",
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "erp-kpi-sla-label",
+                "type": "Text",
+                "props": {
+                  "value": "Support SLA"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-kpi-sla-value",
+                "type": "Text",
+                "props": {
+                  "value": "100%"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700
+                }
+              },
+              {
+                "id": "erp-kpi-sla-helper",
+                "type": "Text",
+                "props": {
+                  "value": "4 service tickets tracked"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "erp-module-summary",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(260px, 1fr))"
+          }
+        },
+        "style": {
+          "gap": "gap-4",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "erp-core-modules",
+            "type": "Column",
+            "style": {
+              "gap": "gap-3",
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "erp-core-title",
+                "type": "Text",
+                "props": {
+                  "value": "Core ERP Modules & Navigation"
+                },
+                "style": {
+                  "fontSize": "text-base",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "erp-core-copy",
+                "type": "Text",
+                "props": {
+                  "value": "Accounting Dimensions, Procurement, Sales, Stock, Manufacturing/MRP, Quality Gates, Help Desk/SLA, and Project Budgeting."
+                },
+                "style": {
+                  "fontSize": "text-sm",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-module-actions",
+                "type": "Row",
+                "props": {
+                  "style": {
+                    "display": "flex",
+                    "flexWrap": "wrap"
+                  }
+                },
+                "style": {
+                  "gap": "gap-2"
+                },
+                "children": [
+                  {
+                    "id": "erp-open-gl",
+                    "type": "Button",
+                    "props": {
+                      "label": "General Ledger"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/report/GeneralLedger"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-dimensions",
+                    "type": "Button",
+                    "props": {
+                      "label": "Dimensions"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/AccountingDimension"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-procurement",
+                    "type": "Button",
+                    "props": {
+                      "label": "Procurement"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/ProcurementTracker"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-q2c",
+                    "type": "Button",
+                    "props": {
+                      "label": "Quote-to-Cash"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/SalesLifecycleTracker"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-mrp",
+                    "type": "Button",
+                    "props": {
+                      "label": "MRP Readiness"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/ManufacturingPlan"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-suppliers",
+                    "type": "Button",
+                    "props": {
+                      "label": "Supplier Scorecard"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/SupplierScorecard"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-qc",
+                    "type": "Button",
+                    "props": {
+                      "label": "Quality Gates"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/QualityInspection"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-support",
+                    "type": "Button",
+                    "props": {
+                      "label": "Help Desk & SLA"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/SupportTicket"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-projects",
+                    "type": "Button",
+                    "props": {
+                      "label": "Projects"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/list/ProjectSummary"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-pos",
+                    "type": "Button",
+                    "props": {
+                      "label": "Point of Sale"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/pos"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  },
+                  {
+                    "id": "erp-open-stock",
+                    "type": "Button",
+                    "props": {
+                      "label": "Stock Balance"
+                    },
+                    "events": {
+                      "onClick": [
+                        {
+                          "navigate": {
+                            "route": "/meridian/report/StockBalance"
+                          }
+                        }
+                      ]
+                    },
+                    "style": {
+                      "padding": "p-2",
+                      "borderRadius": "rounded-md",
+                      "borderColor": "{primitives.color.border}",
+                      "borderWidth": "border",
+                      "fontSize": "text-sm"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "erp-controls",
+            "type": "Column",
+            "style": {
+              "gap": "gap-3",
+              "padding": "p-4",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "erp-controls-title",
+                "type": "Text",
+                "props": {
+                  "value": "ERP Control Signals & Governance"
+                },
+                "style": {
+                  "fontSize": "text-base",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "erp-controls-copy",
+                "type": "Text",
+                "props": {
+                  "value": "Submitted documents stay immutable, double-entry ledger totals remain balanced, and every operational chain links back to a voucher or stock movement."
+                },
+                "style": {
+                  "fontSize": "text-sm",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "erp-controls-note",
+                "type": "Text",
+                "props": {
+                  "value": "All operational records maintain trace links across Sales Quotes, Sales Orders, Work Orders, Purchase Receipts, and Service Tickets."
+                },
+                "style": {
+                  "fontSize": "text-sm",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "erp-dimensions-section",
+        "type": "Column",
+        "style": {
+          "gap": "gap-3",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "erp-dimensions-title",
+            "type": "Text",
+            "props": {
+              "value": "Accounting Dimensions"
+            },
+            "style": {
+              "fontSize": "text-lg",
+              "fontWeight": 700
+            }
+          },
+          {
+            "id": "erp-dimensions-copy",
+            "type": "Text",
+            "props": {
+              "value": "Segment one chart of accounts by Department, Project, and Sales Channel instead of creating duplicate accounts for every reporting axis."
+            },
+            "style": {
+              "fontSize": "text-sm",
+              "color": "{primitives.color.text-secondary}"
+            }
+          },
+          {
+            "id": "erp-dimensions-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Dimension setup and coverage",
+              "dataSource": "dimensions",
+              "columns": [
+                {
+                  "key": "dimension",
+                  "label": "Dimension"
+                },
+                {
+                  "key": "reference",
+                  "label": "Reference DocType"
+                },
+                {
+                  "key": "default",
+                  "label": "Default"
+                },
+                {
+                  "key": "mandatory",
+                  "label": "Mandatory"
+                },
+                {
+                  "key": "coverage",
+                  "label": "Coverage",
+                  "align": "right"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          }
+        ]
+      },
+      {
+        "id": "erp-workflows-section",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(320px, 1fr))"
+          }
+        },
+        "style": {
+          "gap": "gap-4",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "erp-procurement-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Procure-to-Pay Tracker",
+              "dataSource": "procurement",
+              "columns": [
+                {
+                  "key": "materialRequest",
+                  "label": "MR"
+                },
+                {
+                  "key": "rfq",
+                  "label": "RFQ"
+                },
+                {
+                  "key": "purchaseOrder",
+                  "label": "PO"
+                },
+                {
+                  "key": "receiptStatus",
+                  "label": "Receipt"
+                },
+                {
+                  "key": "value",
+                  "label": "Value",
+                  "align": "right"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          },
+          {
+            "id": "erp-sales-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Quote-to-Cash Tracker",
+              "dataSource": "salesLifecycle",
+              "columns": [
+                {
+                  "key": "quotation",
+                  "label": "Quotation"
+                },
+                {
+                  "key": "salesOrder",
+                  "label": "Sales Order"
+                },
+                {
+                  "key": "delivery",
+                  "label": "Delivery"
+                },
+                {
+                  "key": "paymentReminder",
+                  "label": "Reminder"
+                },
+                {
+                  "key": "value",
+                  "label": "Value",
+                  "align": "right"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          }
+        ]
+      },
+      {
+        "id": "erp-operations-section",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(320px, 1fr))"
+          }
+        },
+        "style": {
+          "gap": "gap-4",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "erp-mrp-table",
+            "type": "DataTable",
+            "props": {
+              "title": "MRP and Manufacturing Readiness",
+              "dataSource": "manufacturing",
+              "columns": [
+                {
+                  "key": "productionPlan",
+                  "label": "Plan"
+                },
+                {
+                  "key": "item",
+                  "label": "Item"
+                },
+                {
+                  "key": "projectedQty",
+                  "label": "Projected",
+                  "align": "right"
+                },
+                {
+                  "key": "shortfallQty",
+                  "label": "Shortfall",
+                  "align": "right"
+                },
+                {
+                  "key": "qcGate",
+                  "label": "Gate"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          },
+          {
+            "id": "erp-supplier-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Supplier Scorecard",
+              "dataSource": "suppliers",
+              "columns": [
+                {
+                  "key": "supplier",
+                  "label": "Supplier"
+                },
+                {
+                  "key": "onTime",
+                  "label": "On-time",
+                  "align": "right"
+                },
+                {
+                  "key": "defect",
+                  "label": "Defect",
+                  "align": "right"
+                },
+                {
+                  "key": "response",
+                  "label": "Response",
+                  "align": "right"
+                },
+                {
+                  "key": "standing",
+                  "label": "Standing"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          }
+        ]
+      },
+      {
+        "id": "erp-quality-support-section",
+        "type": "GridView",
+        "props": {
+          "style": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(auto-fit, minmax(320px, 1fr))"
+          }
+        },
+        "style": {
+          "gap": "gap-4",
+          "padding": "p-4",
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border-b"
+        },
+        "children": [
+          {
+            "id": "erp-quality-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Quality Gates & Inspections",
+              "dataSource": "quality",
+              "columns": [
+                {
+                  "key": "referenceType",
+                  "label": "Ref Type"
+                },
+                {
+                  "key": "referenceId",
+                  "label": "Ref ID"
+                },
+                {
+                  "key": "item",
+                  "label": "Item"
+                },
+                {
+                  "key": "sampleSize",
+                  "label": "Sample",
+                  "align": "right"
+                },
+                {
+                  "key": "defects",
+                  "label": "Defects",
+                  "align": "right"
+                },
+                {
+                  "key": "status",
+                  "label": "QC Status"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          },
+          {
+            "id": "erp-support-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Customer Support & SLA Tracking",
+              "dataSource": "support",
+              "columns": [
+                {
+                  "key": "id",
+                  "label": "Ticket"
+                },
+                {
+                  "key": "subject",
+                  "label": "Subject"
+                },
+                {
+                  "key": "customer",
+                  "label": "Customer"
+                },
+                {
+                  "key": "priority",
+                  "label": "Priority"
+                },
+                {
+                  "key": "slaDue",
+                  "label": "SLA Status"
+                },
+                {
+                  "key": "status",
+                  "label": "Status"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          }
+        ]
+      },
+      {
+        "id": "erp-projects-section",
+        "type": "Column",
+        "style": {
+          "gap": "gap-3",
+          "padding": "p-4"
+        },
+        "children": [
+          {
+            "id": "erp-projects-title",
+            "type": "Text",
+            "props": {
+              "value": "Project Governance & Budget Utilization"
+            },
+            "style": {
+              "fontSize": "text-lg",
+              "fontWeight": 700
+            }
+          },
+          {
+            "id": "erp-projects-copy",
+            "type": "Text",
+            "props": {
+              "value": "Track cross-functional customer fitout and renovation projects against approved budgets and milestones."
+            },
+            "style": {
+              "fontSize": "text-sm",
+              "color": "{primitives.color.text-secondary}"
+            }
+          },
+          {
+            "id": "erp-projects-table",
+            "type": "DataTable",
+            "props": {
+              "title": "Active projects budget vs actual",
+              "dataSource": "projects",
+              "columns": [
+                {
+                  "key": "name",
+                  "label": "Project Name"
+                },
+                {
+                  "key": "customer",
+                  "label": "Customer"
+                },
+                {
+                  "key": "budget",
+                  "label": "Budget",
+                  "align": "right"
+                },
+                {
+                  "key": "actualSpend",
+                  "label": "Actual Spend",
+                  "align": "right"
+                },
+                {
+                  "key": "progress",
+                  "label": "Progress",
+                  "align": "right"
+                },
+                {
+                  "key": "status",
+                  "label": "Status"
+                }
+              ]
+            },
+            "style": {
+              "width": "w-full"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

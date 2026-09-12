@@ -1,0 +1,48 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "finance-ops-suite",
+  "name": "Finance Operations Suite",
+  "route": "/examples/suites/finance-ops",
+  "state": { "overlays": { "closeChecklist": true } },
+  "definitions": {
+    "card": { "id": "card-template", "type": "Column", "style": { "padding": "p-5", "borderWidth": "border", "borderColor": "border-border", "borderRadius": "rounded-2xl", "backgroundColor": "bg-white", "gap": "gap-3" }, "slots": { "content": [] } }
+  },
+  "root": {
+    "id": "finance-root",
+    "type": "Container",
+    "style": { "display": "flex", "minHeight": "min-h-screen", "backgroundColor": "bg-surface" },
+    "children": [
+      { "id": "sidebar", "type": "Sidebar", "style": { "width": "w-64", "padding": "p-4", "gap": "gap-2", "backgroundColor": "bg-white", "borderWidth": "border-r", "borderColor": "border-border" }, "children": [
+        { "id": "brand", "type": "Text", "props": { "value": "Finance Operations Suite" }, "style": { "fontWeight": "font-bold", "fontSize": "text-xl" } },
+        { "id": "nav-close", "type": "Button", "props": { "label": "Month-End Close" }, "visibility": { "condition": { "path": "session.permissions.finance.close" } }, "events": { "onClick": [{ "navigate": { "route": "/finance/close" } }] } },
+        { "id": "nav-variance", "type": "Button", "props": { "label": "Variance Review" }, "visibility": { "condition": { "path": "session.permissions.finance.variance" } }, "events": { "onClick": [{ "navigate": { "route": "/finance/variance" } }] } },
+        { "id": "nav-admin", "type": "Button", "props": { "label": "Admin Controls" }, "visibility": { "condition": { "path": "session.permissions.finance.admin" } } }
+      ] },
+      { "id": "main", "type": "Column", "style": { "flex": "flex-1", "gap": "gap-5", "padding": "p-6" }, "children": [
+        { "id": "navbar", "type": "Navbar", "style": { "justifyContent": "space-between" }, "children": [
+          { "id": "title", "type": "Text", "props": { "value": "Month-End Close" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } },
+          { "id": "user", "type": "Text", "props": { "value": { "$expr": { "path": "session.user.name" } } } }
+        ] },
+        { "id": "metrics", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-3", "gap": "gap-4" }, "children": [
+          { "id": "metric-1", "type": "Container", "componentId": "card", "slots": { "content": [{ "id": "m1-label", "type": "Text", "props": { "value": "Closed Entities" } }, { "id": "m1-value", "type": "Text", "props": { "value": "7 / 9" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } }] } },
+          { "id": "metric-2", "type": "Container", "componentId": "card", "slots": { "content": [{ "id": "m2-label", "type": "Text", "props": { "value": "Recon Exceptions" } }, { "id": "m2-value", "type": "Text", "props": { "value": "12" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } }] } },
+          { "id": "metric-3", "type": "Container", "componentId": "card", "slots": { "content": [{ "id": "m3-label", "type": "Text", "props": { "value": "Cash Conversion" } }, { "id": "m3-value", "type": "Text", "props": { "value": "34 days" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } }] } }
+        ] },
+        { "id": "close-grid", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-2", "gap": "gap-4" }, "children": [
+          { "id": "close-chart", "type": "Chart", "props": { "title": "Close Progress", "dataSource": "closeProgress", "xKey": "day", "yKey": "done", "chartType": "bar" } },
+          { "id": "variance-table", "type": "DataTable", "props": { "title": "Variance Memo", "dataSource": "variance", "columns": [{ "key": "area", "label": "Area" }, { "key": "variance", "label": "Variance", "align": "right" }, { "key": "owner", "label": "Owner" }] } }
+        ] },
+        { "id": "working-capital", "type": "DataTable", "props": { "title": "Working Capital Workbook", "dataSource": "workingCapital", "columns": [{ "key": "metric", "label": "Metric" }, { "key": "current", "label": "Current", "align": "right" }, { "key": "target", "label": "Target", "align": "right" }, { "key": "formula", "label": "Formula" }] } }
+      ] },
+      { "id": "checklist", "type": "Drawer", "props": { "open": { "$bind": "state.overlays.closeChecklist" }, "title": "Close Checklist" }, "visibility": { "condition": { "path": "session.permissions.finance.close" } }, "events": { "onClose": [{ "setState": { "path": "overlays.closeChecklist", "value": false } }] }, "children": [
+        { "id": "checklist-copy", "type": "Text", "props": { "value": "Review bank reconciliation, accruals, revenue cutoff, inventory tie-out, and variance explanations." } }
+      ] }
+    ]
+  },
+  "dataSources": {
+    "closeProgress": [{ "day": "D+1", "done": 18 }, { "day": "D+3", "done": 54 }, { "day": "D+5", "done": 78 }],
+    "variance": [{ "area": "Revenue", "variance": "+$42K", "owner": "Controller" }, { "area": "COGS", "variance": "-$18K", "owner": "Ops Finance" }, { "area": "Payroll", "variance": "+$7K", "owner": "HR Finance" }],
+    "workingCapital": [{ "metric": "DSO", "current": "38", "target": "35", "formula": "AR / sales * days" }, { "metric": "DPO", "current": "44", "target": "42", "formula": "AP / COGS * days" }, { "metric": "Inventory Days", "current": "51", "target": "48", "formula": "Inventory / COGS * days" }]
+  }
+}

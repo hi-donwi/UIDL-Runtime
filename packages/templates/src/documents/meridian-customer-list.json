@@ -1,0 +1,815 @@
+{
+  "version": "1.0.0",
+  "id": "meridian-customer-list",
+  "name": "Customers",
+  "definitions": {
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderColor": "{primitives.color.border}",
+        "borderWidth": "border-b"
+      },
+      "slots": {
+        "title": [],
+        "actions": []
+      }
+    }
+  },
+  "root": {
+    "id": "page",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4"
+    },
+    "children": [
+      {
+        "id": "header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "title",
+              "type": "Text",
+              "props": {
+                "value": "Customers"
+              },
+              "style": {
+                "fontSize": "text-2xl",
+                "fontWeight": 700
+              }
+            }
+          ],
+          "actions": []
+        }
+      },
+      {
+        "id": "count",
+        "type": "Text",
+        "props": {
+          "value": "8 record(s)"
+        },
+        "style": {
+          "fontSize": "text-sm",
+          "color": "{primitives.color.text-secondary}"
+        }
+      },
+      {
+        "id": "list-table",
+        "type": "Column",
+        "style": {
+          "borderColor": "{primitives.color.border}",
+          "borderWidth": "border",
+          "borderRadius": "rounded-lg"
+        },
+        "children": [
+          {
+            "id": "list-table-head",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "background": "{primitives.color.surface}",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-head-0",
+                "type": "Text",
+                "props": {
+                  "value": "Customer"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "fontWeight": 600,
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "list-table-head-1",
+                "type": "Text",
+                "props": {
+                  "value": "Email"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "fontWeight": 600,
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "list-table-head-2",
+                "type": "Text",
+                "props": {
+                  "value": "City"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "fontWeight": 600,
+                  "color": "{primitives.color.text-secondary}"
+                }
+              },
+              {
+                "id": "list-table-head-3",
+                "type": "Text",
+                "props": {
+                  "value": "Outstanding",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "fontWeight": 600,
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-0",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-0-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "PT Sinar Abadi Jaya"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-0-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "finance@sinarabadi.co.id"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-0-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Jakarta"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-0-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 1.609.500",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-0-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-001"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-1",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-1-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "CV Mitra Sejahtera"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-1-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "ap@mitrasejahtera.co.id"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-1-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Bandung"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-1-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 0",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-1-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-002"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-2",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-2-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "Toko Berkah Makmur"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-2-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "toko.berkah@gmail.com"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-2-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Surabaya"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-2-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 1.359.750",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-2-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-003"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-3",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-3-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "PT Cahaya Nusantara"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-3-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "procurement@cahayanusantara.co.id"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-3-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Jakarta"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-3-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 47.175.000",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-3-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-004"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-4",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-4-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "UD Sumber Rejeki"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-4-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "sumberrejeki.ud@gmail.com"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-4-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Yogyakarta"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-4-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 0",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-4-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-005"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-5",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-5-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "PT Global Trading Indonesia"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-5-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "ap@globaltrading.co.id"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-5-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Jakarta"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-5-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 15.939.600",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-5-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-006"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-6",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-6-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "CV Karya Utama"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-6-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "finance@karyautama.co.id"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-6-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Semarang"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-6-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 10.545.000",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-6-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-007"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-table-row-7",
+            "type": "Row",
+            "props": {
+              "style": {
+                "display": "grid",
+                "gridTemplateColumns": "repeat(4, minmax(0, 1fr)) 90px",
+                "alignItems": "center"
+              }
+            },
+            "style": {
+              "padding": "p-3",
+              "borderColor": "{primitives.color.border}",
+              "borderWidth": "border-b"
+            },
+            "children": [
+              {
+                "id": "list-table-row-7-cell-0",
+                "type": "Text",
+                "props": {
+                  "value": "Toko Maju Bersama"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-7-cell-1",
+                "type": "Text",
+                "props": {
+                  "value": "majubersama.toko@gmail.com"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-7-cell-2",
+                "type": "Text",
+                "props": {
+                  "value": "Medan"
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-7-cell-3",
+                "type": "Text",
+                "props": {
+                  "value": "Rp 0",
+                  "style": {
+                    "textAlign": "right"
+                  }
+                },
+                "style": {
+                  "fontSize": "text-sm"
+                }
+              },
+              {
+                "id": "list-table-row-7-open",
+                "type": "Button",
+                "props": {
+                  "label": "Open"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "navigate": {
+                        "route": "/meridian/edit/Customer/CUST-008"
+                      }
+                    }
+                  ]
+                },
+                "style": {
+                  "padding": "p-2",
+                  "borderRadius": "rounded-md",
+                  "borderColor": "{primitives.color.border}",
+                  "borderWidth": "border",
+                  "fontSize": "text-sm"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
