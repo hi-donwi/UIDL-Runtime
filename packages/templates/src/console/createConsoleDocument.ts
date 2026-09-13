@@ -8,7 +8,7 @@
  * closed by a `border-b`.
  */
 import { meridianKpiRow, meridianPageHeader } from "../meridian/meridianLayout";
-import { resolveActionIcon } from "../meridian/icons";
+import { resolveActionIcon } from "../meridian/iconRules";
 import type { CompanyDemo, PageSpec } from "./types";
 
 export function createConsoleDocument(company: CompanyDemo, pageId: string, page: PageSpec) {

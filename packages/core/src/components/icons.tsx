@@ -11,10 +11,7 @@
  *   - JSON documents use the registered `Icon` widget, or `iconName` on `Button`
  */
 import type { CSSProperties } from "react";
-import { ICON_PATHS, ICON_NAMES, hasIcon, type IconName } from "./iconPaths";
-
-export { ICON_PATHS, ICON_NAMES, hasIcon };
-export type { IconName };
+import { ICON_PATHS } from "./iconPaths";
 
 export interface IconProps {
   /** A name from `ICON_NAMES`. An unknown name renders nothing rather than a broken glyph. */
