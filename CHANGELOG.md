@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versioning follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-09-13
+
+### Added
+- `repository`, `homepage`, `bugs` and `author` fields in `package.json`, so the npm
+  package page links back to this repository.
+
+### Fixed
+- Normalized the `uidl-validate` bin path (dropped a redundant leading `./`).
+
 ## [0.1.0] - 2026-09-13
 
 Initial public release.
@@ -25,4 +34,5 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
+[0.1.1]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.1
 [0.1.0]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.0
