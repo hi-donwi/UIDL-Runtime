@@ -97,6 +97,8 @@ npm run dev:reference:http
 | `npm run build:reference` | Build the reference application suite |
 | `npm run audit:reference` | Architecture, maturity and balanced-GL gates |
 | `npm run test:reference` | Playwright acceptance tests, in memory |
+| `npm run test:reference:visual` | Playwright visual baseline tests |
+| `npm run test:reference:update` | Regenerate reviewed visual baselines |
 | `npm run test:reference:http` | Playwright acceptance tests over HTTP |
 | `npm run smoke:package` | Pack and consume the public npm artifact |
 | `npm run validate:examples` | Validate the example UIDL documents |
@@ -150,6 +152,10 @@ uidl-runtime/
 
 `packages/core`, `packages/templates` and `apps/reference` are private workspaces. The
 published artifact is `uidl-runtime`, including its required `style.css`.
+
+Visual regression tests are intentionally separate from the default reference command.
+Run `npm run test:reference:visual` only on an environment with committed platform
+baselines, and use `npm run test:reference:update` only for a reviewed visual change.
 
 ## Reference suite
 
