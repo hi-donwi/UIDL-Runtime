@@ -1,5 +1,9 @@
 # uidl-runtime
 
+[![npm version](https://img.shields.io/npm/v/uidl-runtime.svg)](https://www.npmjs.com/package/uidl-runtime)
+[![CI](https://github.com/hi-donwi/UIDL-Runtime/actions/workflows/ci.yml/badge.svg)](https://github.com/hi-donwi/UIDL-Runtime/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/npm/l/uidl-runtime.svg)](LICENSE)
+
 A schema-driven React runtime that renders validated JSON documents into real application
 surfaces — lists, forms, reports, dashboards and settings — without putting business
 workflows inside page components.
@@ -13,6 +17,12 @@ document runs in memory, against a mock API, or against a real backend.
 It was built for three callers: AI agents that generate interfaces from structured
 instructions, ERP-style products whose screens are defined by metadata rather than code, and
 low-code systems that need a validated document model instead of generated page files.
+
+## Install
+
+```bash
+npm install uidl-runtime
+```
 
 ```tsx
 import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "uidl-runtime";
@@ -41,11 +51,17 @@ certified systems — read the maturity table below before treating any of them 
 - 11 industry reference consoles plus a full double-entry accounting reference
 - Every financial posting satisfies `sum(debit) === sum(credit)`, checked by an audit gate
 
-## Quick start
+## Contributing to this repository
+
+The rest of this document is for working on `uidl-runtime` itself — the runtime, the
+reference suite, and the build. If you only want to consume the library, `npm install
+uidl-runtime` above is all you need.
 
 Node.js LTS and npm.
 
 ```bash
+git clone https://github.com/hi-donwi/UIDL-Runtime.git
+cd UIDL-Runtime
 npm install
 npm run dev
 ```
