@@ -154,7 +154,8 @@ uidl-runtime/
 published artifact is `uidl-runtime`, including its required `style.css`.
 
 Visual regression tests are intentionally separate from the default reference command.
-Run `npm run test:reference:visual` only on an environment with committed platform
+The committed baselines are generated on the canonical Linux CI environment. Run
+`npm run test:reference:visual` locally only on an environment with matching platform
 baselines, and use `npm run test:reference:update` only for a reviewed visual change.
 
 ## Reference suite
