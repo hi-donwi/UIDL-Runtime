@@ -15,7 +15,7 @@
     "./schema/*.json": "./dist/schema/*.json"
   },
   "bin": {
-    "uidl-validate": "./bin/validate.mjs"
+    "uidl-validate": "bin/validate.mjs"
   },
   "files": [
     "dist",
