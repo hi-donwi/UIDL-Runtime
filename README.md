@@ -18,6 +18,16 @@ It was built for three callers: AI agents that generate interfaces from structur
 instructions, ERP-style products whose screens are defined by metadata rather than code, and
 low-code systems that need a validated document model instead of generated page files.
 
+## Screenshots
+
+Every screen below is generated UIDL, rendered by the same `UIDocumentRenderer` — none of it
+is hand-built page markup.
+
+| | |
+|---|---|
+| ![Reference gallery](docs/screenshots/landing.png) <br> Reference gallery — 11 industry consoles plus Meridian | ![Meridian dashboard](docs/screenshots/meridian-dashboard.png) <br> Meridian — cashflow, P&L and expenses derived from postings |
+| ![Meridian POS](docs/screenshots/meridian-pos.png) <br> Point of sale, generated from the same document model | ![Hospital console](docs/screenshots/hospital-console.png) <br> Hospital reference console — one of eleven industry verticals |
+
 ## Install
 
 ```bash
