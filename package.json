@@ -45,8 +45,9 @@
     "validate": "node bin/validate.mjs",
     "validate:examples": "node bin/validate.mjs packages/templates/src/documents/*.json",
     "audit:reference": "tsx scripts/audit-reference-coverage.mts",
-    "test:reference": "playwright test",
-    "test:reference:update": "playwright test --update-snapshots",
+    "test:reference": "playwright test e2e/real-reference-acceptance.spec.ts",
+    "test:reference:visual": "playwright test e2e/visual-regression.spec.ts e2e/meridian-reference.spec.ts --grep \"visual baseline|matches its visual baseline\"",
+    "test:reference:update": "playwright test e2e/visual-regression.spec.ts e2e/meridian-reference.spec.ts --grep \"visual baseline|matches its visual baseline\" --update-snapshots",
     "test:reference:http": "PLAYWRIGHT_DATA_MODE=http playwright test e2e/real-reference-acceptance.spec.ts"
   },
   "peerDependencies": {
