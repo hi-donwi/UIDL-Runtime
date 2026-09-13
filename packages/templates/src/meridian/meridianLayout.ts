@@ -16,7 +16,7 @@
  */
 
 import type { UIDLNode } from "~/types";
-import { resolveActionIcon } from "./icons";
+import { resolveActionIcon } from "./iconRules";
 
 export interface ListColumn {
   key: string;
