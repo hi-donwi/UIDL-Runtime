@@ -30,6 +30,20 @@ export interface DayMetric {
   [key: string]: unknown;
 }
 
+export interface ActiveClockInfo {
+  actor?: string;
+  tool?: string;
+  start?: string;
+  note?: string;
+  [key: string]: unknown;
+}
+
+export interface ActiveClocks {
+  human?: ActiveClockInfo | null;
+  agent?: ActiveClockInfo | null;
+  [key: string]: unknown;
+}
+
 export interface ActivityData {
   hours?: {
     human_total?: number;
@@ -37,6 +51,7 @@ export interface ActivityData {
     days?: DayMetric[];
   };
   usage?: UsageData;
+  active_clocks?: ActiveClocks;
   [key: string]: unknown;
 }
 
@@ -170,6 +185,7 @@ export function buildActivityDocument(projectKey: string, activityData: Activity
   const outTokens = (usage?.output_tokens || 0).toLocaleString();
 
   const days = activityData?.hours?.days || [];
+  const activeClocks = activityData?.active_clocks;
 
   return {
     version: "1.0.0",
@@ -224,8 +240,12 @@ export function buildActivityDocument(projectKey: string, activityData: Activity
                 {
                   id: "kpi-human-desc",
                   type: "Text",
-                  props: { value: "Single-threaded developer attention" },
-                  style: { fontSize: "0.75rem", color: "#6e7681" },
+                  props: {
+                    value: activeClocks?.human
+                      ? `Currently clocked in: @${activeClocks.human.actor || "active"}`
+                      : "Single-threaded developer attention",
+                  },
+                  style: { fontSize: "0.75rem", color: activeClocks?.human ? "#58a6ff" : "#6e7681" },
                 },
               ],
             },
@@ -249,8 +269,12 @@ export function buildActivityDocument(projectKey: string, activityData: Activity
                 {
                   id: "kpi-agent-desc",
                   type: "Text",
-                  props: { value: "Autonomous agent machine execution" },
-                  style: { fontSize: "0.75rem", color: "#6e7681" },
+                  props: {
+                    value: activeClocks?.agent
+                      ? `Currently active: ${activeClocks.agent.tool || "agent"}`
+                      : "Autonomous agent machine execution",
+                  },
+                  style: { fontSize: "0.75rem", color: activeClocks?.agent ? "#2ea043" : "#6e7681" },
                 },
               ],
             },

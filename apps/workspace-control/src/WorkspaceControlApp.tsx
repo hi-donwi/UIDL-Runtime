@@ -7,6 +7,7 @@ import {
   buildCommitsDocument,
   type BoardData,
   type ActivityData,
+  type ActiveClocks,
   type CommitItem,
   type TaskItem,
 } from "./uidlDocuments";
@@ -31,6 +32,7 @@ export function WorkspaceControlApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [activeClocks, setActiveClocks] = useState<ActiveClocks | null>(null);
 
   // Modal states for New Task and Move Task
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
@@ -70,7 +72,10 @@ export function WorkspaceControlApp() {
   );
 
   const fetchViewData = useCallback(
-    async (project: string, tab: string): Promise<{ doc: UIDLDocument; tasks: TaskItem[] }> => {
+    async (
+      project: string,
+      tab: string,
+    ): Promise<{ doc: UIDLDocument; tasks: TaskItem[]; clocks?: ActiveClocks | null }> => {
       if (tab === "board") {
         const boardData = await api<BoardData>(`/api/projects/${encodeURIComponent(project)}/board`);
         const allBoardTasks: TaskItem[] = [];
@@ -90,7 +95,11 @@ export function WorkspaceControlApp() {
         const activityData = await api<ActivityData>(
           `/api/projects/${encodeURIComponent(project)}/activity`,
         );
-        return { doc: buildActivityDocument(project, activityData), tasks: [] };
+        return {
+          doc: buildActivityDocument(project, activityData),
+          tasks: [],
+          clocks: activityData.active_clocks || null,
+        };
       } else {
         const commitsData = await api<{ commits: CommitItem[] }>(
           `/api/projects/${encodeURIComponent(project)}/commits`,
@@ -128,12 +137,15 @@ export function WorkspaceControlApp() {
     if (!selectedProject) return;
     let cancelled = false;
     fetchViewData(selectedProject, activeTab)
-      .then(({ doc, tasks }) => {
+      .then(({ doc, tasks, clocks }) => {
         if (cancelled) return;
         setDocument(doc);
         if (tasks.length > 0) {
           setAvailableTasks(tasks);
           setMoveTaskId((prev) => (prev && tasks.some((t) => t.id === prev) ? prev : tasks[0].id));
+        }
+        if (clocks !== undefined) {
+          setActiveClocks(clocks);
         }
         setLoading(false);
       })
@@ -153,10 +165,13 @@ export function WorkspaceControlApp() {
     if (!autoRefresh || !selectedProject) return;
     const interval = setInterval(() => {
       fetchViewData(selectedProject, activeTab)
-        .then(({ doc, tasks }) => {
+        .then(({ doc, tasks, clocks }) => {
           setDocument(doc);
           if (tasks.length > 0) {
             setAvailableTasks(tasks);
+          }
+          if (clocks !== undefined) {
+            setActiveClocks(clocks);
           }
         })
         .catch(() => {});
@@ -169,11 +184,14 @@ export function WorkspaceControlApp() {
     setLoading(true);
     setError(null);
     fetchViewData(selectedProject, activeTab)
-      .then(({ doc, tasks }) => {
+      .then(({ doc, tasks, clocks }) => {
         setDocument(doc);
         if (tasks.length > 0) {
           setAvailableTasks(tasks);
           setMoveTaskId((prev) => (prev && tasks.some((t) => t.id === prev) ? prev : tasks[0].id));
+        }
+        if (clocks !== undefined) {
+          setActiveClocks(clocks);
         }
       })
       .catch((err: unknown) => {
@@ -205,11 +223,10 @@ export function WorkspaceControlApp() {
       setNewTaskTitle("");
       setNewTaskDesc("");
       setNewTaskOwner("");
-      const { doc, tasks } = await fetchViewData(selectedProject, activeTab);
+      const { doc, tasks, clocks } = await fetchViewData(selectedProject, activeTab);
       setDocument(doc);
-      if (tasks.length > 0) {
-        setAvailableTasks(tasks);
-      }
+      if (tasks.length > 0) setAvailableTasks(tasks);
+      if (clocks !== undefined) setActiveClocks(clocks);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(`Failed to create task: ${msg}`);
@@ -234,14 +251,37 @@ export function WorkspaceControlApp() {
         },
       );
       setIsMoveOpen(false);
-      const { doc, tasks } = await fetchViewData(selectedProject, activeTab);
+      const { doc, tasks, clocks } = await fetchViewData(selectedProject, activeTab);
       setDocument(doc);
-      if (tasks.length > 0) {
-        setAvailableTasks(tasks);
-      }
+      if (tasks.length > 0) setAvailableTasks(tasks);
+      if (clocks !== undefined) setActiveClocks(clocks);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(`Failed to move task: ${msg}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleClockAction(action: "in" | "out") {
+    if (!selectedProject) return;
+    const promptMsg = action === "in" ? "Optional note for clock in:" : "Optional note for clock out:";
+    const note = prompt(promptMsg, "");
+    if (note === null) return;
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await api(`/api/projects/${encodeURIComponent(selectedProject)}/clock`, {
+        method: "POST",
+        body: JSON.stringify({ action, kind: "human", note: note.trim() }),
+      });
+      const { doc, tasks, clocks } = await fetchViewData(selectedProject, activeTab);
+      setDocument(doc);
+      if (tasks.length > 0) setAvailableTasks(tasks);
+      if (clocks !== undefined) setActiveClocks(clocks);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Clock action failed: ${msg}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -355,6 +395,29 @@ export function WorkspaceControlApp() {
             />
             Auto 10s
           </label>
+
+          {activeClocks?.human ? (
+            <div className="flex items-center gap-1.5">
+              <span className="bg-[#1f6feb]/20 text-[#58a6ff] border border-[#388bfd]/40 text-xs px-2 py-1 rounded font-mono">
+                CLOCKED IN
+              </span>
+              <button
+                onClick={() => handleClockAction("out")}
+                disabled={isSubmitting}
+                className="bg-[#da3633] hover:bg-[#f85149] text-white text-xs px-2.5 py-1.5 rounded font-medium transition-colors disabled:opacity-50"
+              >
+                Clock Out
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => handleClockAction("in")}
+              disabled={isSubmitting}
+              className="bg-[#21262d] hover:bg-[#30363d] text-[#58a6ff] text-xs px-2.5 py-1.5 rounded border border-[#30363d] transition-colors disabled:opacity-50"
+            >
+              Clock In
+            </button>
+          )}
 
           <button
             onClick={handleRefresh}
