@@ -15,6 +15,12 @@ export interface RenderOptions {
   theme?: Theme;
   stateStore?: DocumentStateStore;
   session?: Record<string, unknown>;
+  /**
+   * Route params for the `route` render scope (state.md). Hosts pass the current navigation
+   * target here so `route.*` bindings and `$expr` references resolve through the standard
+   * render path (matching what `navigate` actions can emit via `onRouteChange`).
+   */
+  route?: Record<string, unknown>;
   dataSources?: Record<string, unknown>;
   /**
    * A `DataAdapter` to resolve `{"$query": {...}}` entries in `dataSources` against. Only
@@ -52,6 +58,7 @@ export interface RenderContext {
   data: Record<string, unknown>;
   stateSnapshot: Record<string, unknown> | undefined;
   session: Record<string, unknown> | undefined;
+  route: Record<string, unknown> | undefined;
   eventBus: EventBus;
   interpreter: ActionInterpreter;
 }
@@ -95,9 +102,12 @@ export function createRenderContext(document: UIDLDocument, options: RenderOptio
     });
   }
 
+  const route = options.route;
+
   const interpreter = new ActionInterpreter({
     stateStore,
     session: options.session,
+    route,
     data,
     eventBus,
     mutationHandler: options.mutationHandler,
@@ -110,7 +120,7 @@ export function createRenderContext(document: UIDLDocument, options: RenderOptio
     apiMaxConcurrentCalls: options.apiMaxConcurrentCalls,
   });
 
-  return { theme, data, stateSnapshot, session: options.session, eventBus, interpreter };
+  return { theme, data, stateSnapshot, session: options.session, route, eventBus, interpreter };
 }
 
 /**
@@ -147,12 +157,13 @@ export function renderUIDocument(
   options: RenderOptions = {},
 ): React.ReactNode {
   warnIfUnresolvedQuery(document);
-  const { theme, data, stateSnapshot, session, interpreter } = createRenderContext(document, options);
+  const { theme, data, stateSnapshot, session, route, interpreter } = createRenderContext(document, options);
 
   const rendered = renderNode(document.root, {
     theme,
     state: stateSnapshot,
     session,
+    route,
     data,
     actionInterpreter: interpreter,
     registry: options.registry,

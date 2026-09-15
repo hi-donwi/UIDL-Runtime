@@ -42,6 +42,7 @@ export function UIDocumentRenderer({
   apiAllowlist,
   apiMaxResponseBytes,
   apiMaxConcurrentCalls,
+  route,
 }: UIDocumentRendererProps) {
   // Re-render when the document state store changes, so `state.*` bindings (e.g. an overlay's
   // `open: { "$bind": "state.overlays.x" }` closed by an onClose setState action) stay live.
@@ -108,6 +109,7 @@ export function UIDocumentRenderer({
         theme,
         stateStore,
         session,
+        route,
         dataSources: effectiveDataSources,
         dataAdapter,
         mutationHandler,
@@ -135,6 +137,7 @@ export function UIDocumentRenderer({
       apiAllowlist,
       apiMaxResponseBytes,
       apiMaxConcurrentCalls,
+      route,
       stateVersion,
     ],
   );
@@ -163,6 +166,7 @@ export function UIDocumentRenderer({
     theme: context.theme,
     state: context.stateSnapshot,
     session: context.session,
+    route: context.route,
     data: context.data,
     actionInterpreter: context.interpreter,
     registry,
