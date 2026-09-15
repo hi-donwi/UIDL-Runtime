@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"canonical-if","class":"expression","status":"active","spec":"v1","input":{"op":"if","test":{"literal":true},"then":{"literal":"yes"},"else":{"literal":"no"}},"context":{},"expected":"yes"}

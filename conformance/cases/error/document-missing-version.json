@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"document-missing-version","class":"error","status":"active","spec":"v1","input":{"id":"doc-1","name":"no version","root":{"id":"root","type":"Screen"}},"context":{},"expected":"DOCUMENT_VALIDATION"}

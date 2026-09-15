@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"download-resolvable","class":"action","status":"active","spec":"v1","input":{"download":{"url":"https://reports.example.com/invoice-march.xlsx","filename":"invoice-march.xlsx","errorPath":"state.downloadError","statusPath":"state.downloadStatus"}},"context":{},"expected":true}
