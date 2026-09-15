@@ -8,10 +8,16 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 - Manual GitHub Actions smoke test for installing and importing the GitHub Packages mirror.
+- GitHub Actions workflow for publishing the public npm package with npm Trusted Publishing
+  and OIDC.
+- Manual GitHub Actions smoke test for installing and importing the public npm package.
 
 ### Changed
 - GitHub Packages mirror publishing now requires an explicit version on manual dispatch.
+- GitHub Packages mirror publishing now disables package-manager cache in the release job.
+- Manual publish dispatches now require the default branch.
 - Documented npm authentication for installing the GitHub Packages mirror.
+- Documented the release automation and npm trusted publisher settings.
 
 ### Fixed
 - Renamed the ESLint flat config to `eslint.config.mjs` so lint runs without Node module-type
