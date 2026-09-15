@@ -8,6 +8,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
   root: __dirname,
+  base: "./",
   plugins: [react(), tailwindcss()],
   server: {
     port: 5174,
