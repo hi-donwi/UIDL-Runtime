@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "title": "UIDL Conformance Case",
+  "description": "One testable behaviour. Active cases are run by the reference runtime; planned cases are authored but skip.",
+  "type": "object",
+  "required": ["$schema", "id", "class", "status", "spec", "input", "context", "expected"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "https://uidl.dev/schema/v1/conformance-case.schema.json" },
+    "id": { "type": "string" },
+    "class": { "enum": ["expression", "binding", "condition", "render", "data", "error", "action"] },
+    "status": { "enum": ["active", "planned"] },
+    "spec": { "const": "v1" },
+    "input": {
+      "description": "For expression/binding: the raw expression to evaluate. For condition: the same.",
+      "type": "object"
+    },
+    "context": {
+      "description": "The partial render scope used for evaluation. Completely null for expression and condition.",
+      "type": "object"
+    },
+    "expected": {
+      "description": "The expected result for active cases. For planned render/data cases: not executed.",
+      "type": ["object", "array", "boolean", "number", "string", "null"]
+    }
+  }
+}

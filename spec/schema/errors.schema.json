@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/errors.schema.json",
+  "title": "UIDL Error Codes",
+  "description": "The stable error-code vocabulary of spec/semantics/errors.md (Approved, ADR-0002). Codes never change meaning and are never repurposed; new codes are additive minors.",
+  "type": "string",
+  "enum": [
+    "UNSUPPORTED_VERSION",
+    "MALFORMED_VERSION",
+    "DOCUMENT_VALIDATION",
+    "VALIDATION",
+    "UNSUPPORTED_EVENT",
+    "UNSUPPORTED_COMPONENT",
+    "INVALID_STATE",
+    "UNKNOWN_ACTION",
+    "DATA",
+    "NAVIGATION",
+    "UNAUTHORIZED",
+    "FORBIDDEN",
+    "RUNTIME",
+    "RENDER"
+  ]
+}

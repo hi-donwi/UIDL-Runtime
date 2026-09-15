@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/action.schema.json",
+  "title": "UIDL Action",
+  "description": "Declarative behaviour attached to events (spec/semantics/actions.md). Mirrors the reference runtime's action vocabulary exactly (packages/core/src/types/actions.ts, schemas/actions.ts); the discriminator key is the top-level key of the action.",
+  "$ref": "#/$defs/action",
+  "$defs": {
+    "action": {
+      "oneOf": [
+        { "$ref": "#/$defs/setState" },
+        { "$ref": "#/$defs/navigate" },
+        { "$ref": "#/$defs/api" },
+        { "$ref": "#/$defs/mutate" },
+        { "$ref": "#/$defs/command" },
+        { "$ref": "#/$defs/download" },
+        { "$ref": "#/$defs/query" },
+        { "$ref": "#/$defs/showSnackbar" },
+        { "$ref": "#/$defs/showDialog" },
+        { "$ref": "#/$defs/validate" },
+        { "$ref": "#/$defs/sequence" },
+        { "$ref": "#/$defs/if" }
+      ]
+    },
+    "boundOrExpr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["$bind"],
+          "additionalProperties": false,
+          "properties": { "$bind": { "type": "string" } }
+        },
+        {
+          "type": "object",
+          "required": ["$expr"],
+          "additionalProperties": false,
+          "properties": { "$expr": {} }
+        }
+      ]
+    },
+    "resolvableString": {
+      "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/boundOrExpr" }]
+    },
+    "resolvableId": {
+      "oneOf": [{ "type": "string" }, { "type": "number" }, { "$ref": "#/$defs/boundOrExpr" }]
+    },
+    "resolvableNumber": {
+      "oneOf": [{ "type": "number" }, { "$ref": "#/$defs/boundOrExpr" }]
+    },
+    "resolvableRecord": {
+      "oneOf": [{ "type": "object", "additionalProperties": {} }, { "$ref": "#/$defs/boundOrExpr" }]
+    },
+    "setState": {
+      "type": "object",
+      "required": ["setState"],
+      "additionalProperties": false,
+      "properties": {
+        "setState": {
+          "type": "object",
+          "required": ["path", "value"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "type": "string" },
+            "value": {}
+          }
+        }
+      }
+    },
+    "navigate": {
+      "type": "object",
+      "required": ["navigate"],
+      "additionalProperties": false,
+      "properties": {
+        "navigate": {
+          "type": "object",
+          "required": ["route"],
+          "additionalProperties": false,
+          "properties": {
+            "route": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "object", "additionalProperties": {} }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "api": {
+      "type": "object",
+      "required": ["api"],
+      "additionalProperties": false,
+      "properties": {
+        "api": {
+          "type": "object",
+          "required": ["url", "method"],
+          "additionalProperties": false,
+          "properties": {
+            "url": { "type": "string" },
+            "method": { "enum": ["GET", "POST", "PUT", "DELETE"] },
+            "body": { "type": "object", "additionalProperties": {} },
+            "dataSource": { "type": "string" }
+          }
+        }
+      }
+    },
+    "mutate": {
+      "type": "object",
+      "required": ["mutate"],
+      "additionalProperties": false,
+      "properties": {
+        "mutate": {
+          "type": "object",
+          "required": ["operation", "collection"],
+          "additionalProperties": false,
+          "properties": {
+            "operation": { "enum": ["create", "update", "delete", "transition"] },
+            "collection": { "$ref": "#/$defs/resolvableString" },
+            "id": { "$ref": "#/$defs/resolvableId" },
+            "payload": { "$ref": "#/$defs/resolvableRecord" },
+            "transition": { "$ref": "#/$defs/resolvableString" },
+            "version": { "$ref": "#/$defs/resolvableNumber" },
+            "resultPath": { "type": "string" },
+            "errorPath": { "type": "string" },
+            "fieldErrorsPath": { "type": "string" },
+            "statusPath": { "type": "string" },
+            "onSuccess": { "$ref": "#/$defs/action" },
+            "onError": { "$ref": "#/$defs/action" }
+          }
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "required": ["command"],
+      "additionalProperties": false,
+      "properties": {
+        "command": {
+          "type": "object",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "$ref": "#/$defs/resolvableString" },
+            "payload": { "$ref": "#/$defs/resolvableRecord" },
+            "resultPath": { "type": "string" },
+            "errorPath": { "type": "string" },
+            "statusPath": { "type": "string" },
+            "onSuccess": { "$ref": "#/$defs/action" },
+            "onError": { "$ref": "#/$defs/action" }
+          }
+        }
+      }
+    },
+    "download": {
+      "type": "object",
+      "required": ["download"],
+      "additionalProperties": false,
+      "properties": {
+        "download": {
+          "type": "object",
+          "required": ["url"],
+          "additionalProperties": false,
+          "properties": {
+            "url": { "$ref": "#/$defs/resolvableString" },
+            "filename": { "$ref": "#/$defs/resolvableString" },
+            "resultPath": { "type": "string" },
+            "errorPath": { "type": "string" },
+            "statusPath": { "type": "string" },
+            "onSuccess": { "$ref": "#/$defs/action" },
+            "onError": { "$ref": "#/$defs/action" }
+          }
+        }
+      }
+    },
+    "query": {
+      "type": "object",
+      "required": ["query"],
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "object",
+          "required": ["target"],
+          "additionalProperties": false,
+          "properties": {
+            "target": { "type": "string" },
+            "onSuccess": { "$ref": "#/$defs/action" },
+            "onError": { "$ref": "#/$defs/action" }
+          }
+        }
+      }
+    },
+    "showSnackbar": {
+      "type": "object",
+      "required": ["showSnackbar"],
+      "additionalProperties": false,
+      "properties": {
+        "showSnackbar": {
+          "type": "object",
+          "required": ["message"],
+          "additionalProperties": false,
+          "properties": {
+            "message": { "type": "string" },
+            "duration": { "type": "number" }
+          }
+        }
+      }
+    },
+    "showDialog": {
+      "type": "object",
+      "required": ["showDialog"],
+      "additionalProperties": false,
+      "properties": {
+        "showDialog": {
+          "type": "object",
+          "required": ["title", "content"],
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string" },
+            "content": { "type": "string" }
+          }
+        }
+      }
+    },
+    "validate": {
+      "type": "object",
+      "required": ["validate"],
+      "additionalProperties": false,
+      "properties": {
+        "validate": {
+          "type": "object",
+          "required": ["fields"],
+          "additionalProperties": false,
+          "properties": {
+            "fields": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "sequence": {
+      "type": "object",
+      "required": ["sequence"],
+      "additionalProperties": false,
+      "properties": {
+        "sequence": { "type": "array", "items": { "$ref": "#/$defs/action" } }
+      }
+    },
+    "if": {
+      "type": "object",
+      "required": ["if"],
+      "additionalProperties": false,
+      "properties": {
+        "if": {
+          "type": "object",
+          "required": ["condition", "then"],
+          "additionalProperties": false,
+          "properties": {
+            "condition": { "type": "object", "additionalProperties": {} },
+            "then": { "$ref": "#/$defs/action" },
+            "else": { "$ref": "#/$defs/action" }
+          }
+        }
+      }
+    }
+  }
+}
