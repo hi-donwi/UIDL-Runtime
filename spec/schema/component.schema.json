@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/component.schema.json",
+  "title": "UIDL Component",
+  "description": "A reusable component contract. Planned content; only the shape is pinned so component documents can carry a version today.",
+  "type": "object",
+  "required": ["version", "id", "props"],
+  "additionalProperties": true,
+  "properties": {
+    "version": { "$ref": "version.schema.json" },
+    "id": { "type": "string" },
+    "props": {
+      "type": "object",
+      "description": "Prop name to shape. Accepted shapes: any JSON type, an expression shape, or a nested object of the same.",
+      "additionalProperties": true
+    }
+  }
+}

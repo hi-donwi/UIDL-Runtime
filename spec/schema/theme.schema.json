@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/theme.schema.json",
+  "title": "UIDL Theme",
+  "description": "Named style tokens a document may reference. Tolerant: any names, values, and nesting the renderer's style system accepts; the schema constrains only the top shape.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "colors": { "type": "object", "additionalProperties": true },
+    "spacing": { "type": "object", "additionalProperties": true },
+    "typography": { "type": "object", "additionalProperties": true },
+    "radius": { "type": "object", "additionalProperties": true },
+    "components": { "type": "object", "additionalProperties": true }
+  }
+}

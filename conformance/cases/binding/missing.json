@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"bind-missing","class":"binding","status":"active","spec":"v1","input":{"$bind":"state.absent"},"context":{"state":{}},"expected":null}

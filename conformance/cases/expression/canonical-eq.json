@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"canonical-eq","class":"expression","status":"active","spec":"v1","input":{"op":"eq","left":{"literal":1},"right":{"literal":"1"}},"context":{},"expected":false}

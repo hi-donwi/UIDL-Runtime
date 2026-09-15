@@ -93,6 +93,10 @@ export interface RunDataSourcesOptions {
  * to `DataError` shape before being written, so a document's `visibility.condition` on
  * `state.$data.<name>.error.code` behaves the same whether the adapter is in-memory or HTTP.
  *
+ * `names` (optional, additive) narrows the run to a subset of data-source names — the seam the
+ * `query` action uses to re-run one declared `$query` source on demand. When omitted, every
+ * `$query` entry runs (the refresh-on-change path).
+ *
  * A caller that re-invokes this on every state change (as `UIDocumentRenderer` does) must diff
  * the *resolved* query per name against the previous run before calling — this function itself
  * does not debounce or dedupe, so re-running it with an unchanged query re-fetches unconditionally.
@@ -100,18 +104,23 @@ export interface RunDataSourcesOptions {
 export async function runDataSources(
   dataSources: Record<string, unknown> | undefined,
   options: RunDataSourcesOptions,
+  names?: Iterable<string>,
 ): Promise<void> {
   if (!dataSources) return;
 
   const entries = Object.entries(dataSources).filter((entry): entry is [string, QueryDataSource] => isQueryDataSource(entry[1]));
   if (entries.length === 0) return;
 
-  for (const [name] of entries) {
+  const wanted = names ? new Set(names) : null;
+  const targets = entries.filter(([name]) => !wanted || wanted.has(name));
+  if (targets.length === 0) return;
+
+  for (const [name] of targets) {
     options.stateStore.setState(`$data.${name}.status`, "loading" satisfies DataSourceStatus);
   }
 
   await Promise.all(
-    entries.map(async ([name, descriptor]) => {
+    targets.map(async ([name, descriptor]) => {
       try {
         const query = resolveQueryDescriptor(descriptor, {
           state: options.stateStore.getValue() as Record<string, unknown>,

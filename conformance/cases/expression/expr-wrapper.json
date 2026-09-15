@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"expr-wrapper","class":"expression","status":"active","spec":"v1","input":{"$expr":{"op":"add","left":{"literal":3},"right":{"literal":4}}},"context":{},"expected":7}

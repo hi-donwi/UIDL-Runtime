@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"document-bad-node","class":"error","status":"active","spec":"v1","input":{"version":"1.0","id":"doc-2","name":"bad node","root":{"name":"Screen"}},"context":{},"expected":"DOCUMENT_VALIDATION"}

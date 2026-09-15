@@ -1,16 +1,25 @@
+import { ERROR_CODES } from "../errors/errors";
 import type {
   Action,
   CommandActionConfig,
   CommandHandler,
   CommandRequest,
   CommandResponse,
+  DownloadActionConfig,
+  DownloadHandler,
+  DownloadRequest,
+  DownloadResponse,
   MutationActionConfig,
   MutationHandler,
   MutationRequest,
   MutationResponse,
+  QueryActionConfig,
+  QueryResponse,
 } from "../types/actions";
 import type { DocumentStateStore } from "../state/createDocumentState";
 import { getByPath } from "../state/createDocumentState";
+import { isQueryDataSource, runDataSources } from "../state/dataSources";
+import type { DataAdapter } from "../data/types";
 import { evaluate, type RenderScope } from "../expr/evaluate";
 import { createEventBus } from "./eventBus";
 
@@ -31,6 +40,32 @@ function resolveEventBind(bindPath: string, eventValue: unknown): unknown {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function describeAction(action: unknown): string {
+  if (isRecord(action) && typeof action.type === "string") {
+    return JSON.stringify(action);
+  }
+  if (isRecord(action)) {
+    const key = Object.keys(action)[0];
+    if (key) return `key "${key}"`;
+  }
+  return `value of kind ${typeof action}`;
+}
+
+/**
+ * Raised when an action matches none of the known vocabulary — see `ActionInterpreter.run`.
+ * The stable code (`UNKNOWN_ACTION`) is what the error pipeline and conformance cases assert.
+ */
+class UnknownActionError extends Error {
+  readonly code = ERROR_CODES.UNKNOWN_ACTION;
+
+  constructor(action: unknown) {
+    super(
+      `Action execution failed: no handler for ${describeAction(action)}. The action vocabulary is fixed: sequence, if, setState, navigate, api, mutate, command, download, query, showSnackbar, showDialog, validate.`,
+    );
+    this.name = "UnknownActionError";
+  }
 }
 
 function isBoundActionValue(value: unknown): value is { $bind: string } {
@@ -127,6 +162,14 @@ export interface ActionContext {
   eventBus?: ReturnType<typeof createEventBus>;
   mutationHandler?: MutationHandler;
   commandHandler?: CommandHandler;
+  downloadHandler?: DownloadHandler;
+  /**
+   * The document's declared `dataSources`, passed so the `query` action can re-run one `$query`
+   * source on demand. Always set when constructed through `createRenderContext`.
+   */
+  dataSources?: Record<string, unknown>;
+  /** The host `DataAdapter` used to actually resolve `$query` sources on `query` actions. */
+  dataAdapter?: DataAdapter;
   apiAllowlist?: ApiAllowlist;
   /** Max `api` response body size in bytes before the request is aborted. Default 5MB. */
   apiMaxResponseBytes?: number;
@@ -136,6 +179,19 @@ export interface ActionContext {
    * of a `repeat`) can't hammer an allowlisted host or exhaust client connections. Default 6.
    */
   apiMaxConcurrentCalls?: number;
+}
+
+/** The stable failure code for a rejected action; only `UNKNOWN_ACTION` is guaranteed by v1. */
+export interface ActionErrorReport {
+  code: string;
+  message: string;
+}
+
+/** The outcome of `ActionInterpreter.run` — observable without relying on the console. */
+export interface ActionReport {
+  ok: boolean;
+  action: Action;
+  error?: ActionErrorReport;
 }
 
 function isHostAllowed(host: string, allowlist: string[]): boolean {
@@ -156,6 +212,9 @@ export class ActionInterpreter {
   private eventBus: ReturnType<typeof createEventBus>;
   private mutationHandler?: MutationHandler;
   private commandHandler?: CommandHandler;
+  private downloadHandler?: DownloadHandler;
+  private dataSources?: Record<string, unknown>;
+  private dataAdapter?: DataAdapter;
   private apiAllowlist?: ApiAllowlist;
   private apiMaxResponseBytes: number;
   private apiMaxConcurrentCalls: number;
@@ -169,6 +228,9 @@ export class ActionInterpreter {
     this.eventBus = context.eventBus ?? createEventBus();
     this.mutationHandler = context.mutationHandler;
     this.commandHandler = context.commandHandler;
+    this.downloadHandler = context.downloadHandler;
+    this.dataSources = context.dataSources;
+    this.dataAdapter = context.dataAdapter;
     this.apiAllowlist = context.apiAllowlist;
     this.apiMaxResponseBytes = context.apiMaxResponseBytes ?? DEFAULT_API_MAX_RESPONSE_BYTES;
     this.apiMaxConcurrentCalls = context.apiMaxConcurrentCalls ?? DEFAULT_API_MAX_CONCURRENT_CALLS;
@@ -179,12 +241,32 @@ export class ActionInterpreter {
   }
 
   execute(action: Action, eventValue?: unknown): void {
+    const report = this.run(action, eventValue);
+    if (!report.ok && process.env.NODE_ENV !== "production") {
+      console.warn("[uidl-runtime] Action execution failed:", report.error, action);
+    }
+  }
+
+  /**
+   * Run an action without swallowing the result. Unlike `execute` (which only warns in dev),
+   * `run` returns a report callers — and the conformance harness — can assert on. Failures
+   * raised synchronously carry a stable `code` (`UNKNOWN_ACTION`, or `ACTION_FAILED` for any
+   * other handler error); asynchronous failures (mutate/command/api) still go through their
+   * eventBus responses and are not part of this report.
+   */
+  run(action: Action, eventValue?: unknown): ActionReport {
     try {
       this.executeAction(action, eventValue);
+      return { ok: true, action };
     } catch (error) {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("[uidl-runtime] Action execution failed:", error, action);
-      }
+      return {
+        ok: false,
+        action,
+        error: {
+          code: isRecord(error) && typeof error.code === "string" ? error.code : "ACTION_FAILED",
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
     }
   }
 
@@ -266,6 +348,16 @@ export class ActionInterpreter {
       return;
     }
 
+    if ("download" in action) {
+      this.executeDownload(action.download, eventValue);
+      return;
+    }
+
+    if ("query" in action) {
+      this.executeQuery(action.query, eventValue);
+      return;
+    }
+
     if ("showSnackbar" in action) {
       const { message, duration } = action.showSnackbar;
       this.eventBus.emit("snackbar", { message, duration: duration ?? 3000 });
@@ -281,6 +373,8 @@ export class ActionInterpreter {
       this.eventBus.emit("validate", action.validate);
       return;
     }
+
+    throw new UnknownActionError(action);
   }
 
   private executeMutation(config: MutationActionConfig, eventValue?: unknown): void {
@@ -427,6 +521,124 @@ export class ActionInterpreter {
     const payload = optionalResolvedRecord(resolveActionValue(config.payload, eventValue, scope), "command.payload");
     if (payload !== undefined) request.payload = payload;
     return request;
+  }
+
+  private executeDownload(config: DownloadActionConfig, eventValue?: unknown): void {
+    if (config.statusPath) this.stateStore?.setState(config.statusPath, "loading");
+    if (config.errorPath) this.stateStore?.setState(config.errorPath, undefined);
+    void this.runDownload(config, eventValue);
+  }
+
+  private async runDownload(config: DownloadActionConfig, eventValue?: unknown): Promise<void> {
+    let request: DownloadRequest | undefined;
+    try {
+      request = this.buildDownloadRequest(config, eventValue);
+      if (!this.downloadHandler) {
+        throw new Error(
+          '"download" actions are disabled by default - pass downloadHandler to ActionInterpreter/renderUIDocument/UIDocumentRenderer to handle host downloads',
+        );
+      }
+
+      const data = await this.downloadHandler(request);
+      if (config.resultPath) this.stateStore?.setState(config.resultPath, data);
+      if (config.errorPath) this.stateStore?.setState(config.errorPath, undefined);
+      if (config.statusPath) this.stateStore?.setState(config.statusPath, "success");
+
+      const response: DownloadResponse = { success: true, request, data };
+      this.eventBus.emit("download-response", response);
+      if (config.onSuccess) {
+        this.executeAction(config.onSuccess, data);
+      }
+    } catch (error) {
+      const normalized = normalizeMutationError(error);
+      if (config.statusPath) this.stateStore?.setState(config.statusPath, "error");
+      if (config.errorPath) this.stateStore?.setState(config.errorPath, normalized.message);
+
+      const response: DownloadResponse = {
+        success: false,
+        ...(request ? { request } : {}),
+        error: normalized.message,
+        ...(normalized.code ? { code: normalized.code } : {}),
+        ...(normalized.fields ? { fields: normalized.fields } : {}),
+      };
+      this.eventBus.emit("download-response", response);
+      this.eventBus.emit("snackbar", { message: normalized.message, duration: 5000 });
+      if (config.onError) {
+        this.executeAction(config.onError, response);
+      }
+    }
+  }
+
+  private buildDownloadRequest(config: DownloadActionConfig, eventValue?: unknown): DownloadRequest {
+    const scope = this.buildScope();
+    const request: DownloadRequest = {
+      url: requireResolvedString(resolveActionValue(config.url, eventValue, scope), "download.url"),
+    };
+    const filename = optionalResolvedString(
+      resolveActionValue(config.filename, eventValue, scope),
+      "download.filename",
+    );
+    if (filename !== undefined) request.filename = filename;
+    return request;
+  }
+
+  private executeQuery(config: QueryActionConfig, eventValue?: unknown): void {
+    void this.runQuery(config, eventValue);
+  }
+
+  /**
+   * Re-runs one declared `$query` data source on demand (the refresh seam behind `query` actions).
+   * Results land in `state.$data.<target>.{status,rows,total,error}` via the shared
+   * `runDataSources` runner — the same shape as the renderer's mount/refresh loop, so a widget
+   * bound to `$data.<target>.rows` sees no difference between a mount fetch, a params-change
+   * refetch, and an explicit `query` action. Fail-closed: no adapter, no store, or a target that
+   * is not a declared `$query` source is a reported failure, never a silent no-op.
+   */
+  private async runQuery(config: QueryActionConfig, eventValue?: unknown): Promise<void> {
+    const respond = (response: QueryResponse) => {
+      this.eventBus.emit("query-response", response);
+      if (!response.success) {
+        this.eventBus.emit("snackbar", { message: response.error ?? 'Unknown "query" failure', duration: 5000 });
+      }
+    };
+
+    try {
+      const scope = this.buildScope();
+      const target = resolveActionValue(config.target, eventValue, scope);
+      if (typeof target !== "string" || target.length === 0) {
+        throw new Error('"query" action requires a non-empty target string');
+      }
+
+      if (!this.stateStore) {
+        throw new Error('"query" action requires a state store to write results into');
+      }
+      if (!this.dataSources || !isQueryDataSource(this.dataSources[target])) {
+        throw new Error(`"query" action target "${target}" is not a declared $query data source`);
+      }
+      if (!this.dataAdapter) {
+        throw new Error('"query" actions are disabled by default - pass dataAdapter to ActionInterpreter/renderUIDocument/UIDocumentRenderer to re-run $query sources');
+      }
+
+      await runDataSources(this.dataSources, { adapter: this.dataAdapter, stateStore: this.stateStore, session: this.session }, [target]);
+
+      const status = this.stateStore.getValue(`$data.${target}.status`);
+      if (status === "success") {
+        const rows = this.stateStore.getValue(`$data.${target}.rows`);
+        respond({ success: true, target });
+        if (config.onSuccess) this.executeAction(config.onSuccess, rows);
+      } else {
+        const error = this.stateStore.getValue(`$data.${target}.error`);
+        const message = error && typeof error === "object" && "message" in error
+          ? String((error as { message: unknown }).message)
+          : `"query" action target "${target}" failed`;
+        respond({ success: false, target, error: message });
+        if (config.onError) this.executeAction(config.onError, { target, error: message });
+      }
+    } catch (error) {
+      const normalized = normalizeMutationError(error);
+      respond({ success: false, target: config.target, ...(normalized.code ? { code: normalized.code } : {}), error: normalized.message });
+      if (config.onError) this.executeAction(config.onError, normalized);
+    }
   }
 
   private executeApi(config: { url: string; method: string; body?: Record<string, unknown>; dataSource?: string }): void {

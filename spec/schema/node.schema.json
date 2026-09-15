@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/node.schema.json",
+  "title": "UIDL Node",
+  "description": "A node in the UIDL document tree. Mirrors the reference runtime's NodeSchema: `type`-driven, strict about id/type, permissive about the rest. The behaviour of bindings/events/visibility/repeat is described by the semantics docs and validated by the focused schemas below (expression/binding/action), not re-enforced here.",
+  "type": "object",
+  "required": ["id", "type"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string" },
+    "type": { "type": "string" },
+    "name": { "type": "string" },
+    "props": {
+      "type": "object",
+      "description": "Component props as plain values.",
+      "additionalProperties": true
+    },
+    "style": {
+      "description": "Presentation overrides for this node; meaning defined by the renderer (see semantics/style.md).",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "children": {
+      "type": "array",
+      "items": { "$ref": "node.schema.json" }
+    },
+    "slots": {
+      "type": "object",
+      "additionalProperties": { "type": "array", "items": { "$ref": "node.schema.json" } }
+    },
+    "bindings": {
+      "description": "Map of prop name to a binding/expression node resolved at render time. Values are accepted permissively here; the strict contract is expression.schema.json / binding.schema.json.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "events": {
+      "description": "Map of event name to an action list (see semantics/events.md). Accepts the runtime's full action vocabulary; the focused action.schema.json stays strict.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "visibility": {
+      "description": "Visibility rule: a condition expression plus optional breakpoints.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "repeat": {
+      "description": "Repeater: `dataSource` (array of rows or a binding path, see semantics/queries.md), item name, index flag.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "responsive": {
+      "description": "DEPRECATED in the runtime; preserved for backward compatibility. Prefer style values.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "ref": { "type": "string" },
+    "componentId": { "type": "string" },
+    "themeRef": { "type": "string" },
+    "testId": { "type": "string" }
+  }
+}

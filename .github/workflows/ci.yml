@@ -47,6 +47,9 @@ jobs:
       - name: Validate example documents
         run: npm run validate:examples
 
+      - name: Validate specification and conformance cases
+        run: npm run validate:spec
+
       - name: Architecture, maturity and balanced-GL gates
         run: npm run audit:reference
 

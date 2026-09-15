@@ -236,4 +236,33 @@ describe("action interpreter", () => {
     });
     expect(snackbars[0]).toMatchObject({ duration: 5000 });
   });
+
+  describe("run() reports", () => {
+    it("returns { ok: true } for a recognised action", () => {
+      const store = createDocumentState({ count: 0 });
+      const interpreter = new ActionInterpreter({ stateStore: store.getState() });
+
+      const report = interpreter.run({ setState: { path: "count", value: 1 } });
+
+      expect(report).toEqual({ ok: true, action: { setState: { path: "count", value: 1 } } });
+      expect(store.getState().state.count).toBe(1);
+    });
+
+    it("returns { ok: false, code: UNKNOWN_ACTION } for an unrecognised action type", () => {
+      const interpreter = new ActionInterpreter();
+      const action = { type: "teleport", to: "void" } as never;
+
+      const report = interpreter.run(action);
+
+      expect(report.ok).toBe(false);
+      expect(report.error).toMatchObject({ code: "UNKNOWN_ACTION" });
+      expect(report.error?.message).toContain("no handler for");
+      expect(report.error?.message).toContain('"teleport"');
+    });
+
+    it("execute() still swallows an unknown action instead of throwing", () => {
+      const interpreter = new ActionInterpreter();
+      expect(() => interpreter.execute({ type: "teleport", to: "void" } as never)).not.toThrow();
+    });
+  });
 });
