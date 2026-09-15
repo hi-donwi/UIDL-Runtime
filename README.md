@@ -138,9 +138,11 @@ dispatches to run from the default branch, validates the requested version again
 `package.json`, and refuses to publish a version that already exists on npm.
 
 The GitHub Packages mirror is published separately by
-`.github/workflows/publish-github-packages.yml` from the same GitHub release. After a
-release, run the manual `Verify npm package` and `Verify GitHub Packages mirror` workflows
-with the released version.
+`.github/workflows/publish-github-packages.yml` from the same GitHub release. The mirror
+workflow waits for the same version to become available on public npm before it publishes,
+and it refuses to overwrite an existing mirror version. After a release, run the manual
+`Verify npm package` and `Verify GitHub Packages mirror` workflows with the released
+version.
 
 ## Commands
 
