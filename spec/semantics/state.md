@@ -53,8 +53,12 @@ spec 1.x's data contract.
 1. Start with the query results for this document → `data` (+ envelope freshness in
    `state.$data` for recipes).
 2. Attach the **host-supplied** `route` params (read-only) — the standard render paths
-   resolve a `route.*` binding against the route object the host provides through the
-   render scope; a host that doesn't supply one leaves `route` empty.
+   (`renderUIDocument` / `<UIDocumentRenderer />`) accept a `route` option and resolve a
+   `route.*` binding or `$expr` reference against it in the render scope (*and* in the
+   action interpreter's scope, so `navigate` payloads and action expressions can read
+   the current route); a host that doesn't supply one leaves `route` empty. A
+   `navigate` action emits the target through `onRouteChange` for the host to adopt as
+   the next `route`.
 3. Attach the session context → `session` (read-only).
 4. Initialize `state` from `initialState` (see `document.schema.json`); the runtime
    pre-populates the `$data` sub-namespace.
