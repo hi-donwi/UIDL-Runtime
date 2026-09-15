@@ -63,6 +63,18 @@ const CommandActionSchema = z.object({
   }),
 });
 
+const DownloadActionSchema = z.object({
+  download: z.object({
+    url: ResolvableStringSchema,
+    filename: ResolvableStringSchema.optional(),
+    resultPath: z.string().optional(),
+    errorPath: z.string().optional(),
+    statusPath: z.string().optional(),
+    onSuccess: z.lazy(() => ActionSchema).optional(),
+    onError: z.lazy(() => ActionSchema).optional(),
+  }),
+});
+
 const ShowSnackbarActionSchema = z.object({
   showSnackbar: z.object({
     message: z.string(),
@@ -95,12 +107,22 @@ const IfActionSchema = z.object({
   }),
 });
 
+const QueryActionSchema = z.object({
+  query: z.object({
+    target: z.string(),
+    onSuccess: z.lazy(() => ActionSchema).optional(),
+    onError: z.lazy(() => ActionSchema).optional(),
+  }),
+});
+
 export const ActionSchema: z.ZodType<Action> = z.union([
   SetStateActionSchema,
   NavigateActionSchema,
   ApiActionSchema,
   MutationActionSchema,
   CommandActionSchema,
+  DownloadActionSchema,
+  QueryActionSchema,
   ShowSnackbarActionSchema,
   ShowDialogActionSchema,
   ValidateActionSchema,

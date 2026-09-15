@@ -6,6 +6,7 @@ import { normalizeNodeResponsive } from "../utils/responsive";
 import { resolveClassName, resolveVisibility as resolveBreakpointVisibility } from "../utils/tailwind";
 import { cn } from "../utils/cn";
 import { evaluate, type RenderScope as ExprRenderScope } from "../expr/evaluate";
+import { isBindPath, resolvePath } from "../state/bindings";
 import type { ActionInterpreter } from "../actions/interpreter";
 import type { Action } from "../types/actions";
 import { instantiateComponent } from "./instantiateComponent";
@@ -208,30 +209,11 @@ function resolveDataSourceProps(
 }
 
 function resolveBinding(path: string, scope: RenderScope): unknown {
-  if (path.startsWith("local.") && scope.local) {
-    const localKey = path.replace("local.", "");
-    return getByPath(scope.local, localKey);
-  }
-  if (path.startsWith("state.") && scope.state) {
-    const stateKey = path.replace("state.", "");
-    return getByPath(scope.state, stateKey);
-  }
-  if (path.startsWith("session.") && scope.session) {
-    const sessionKey = path.replace("session.", "");
-    return getByPath(scope.session, sessionKey);
-  }
-  if (path.startsWith("route.") && scope.route) {
-    const routeKey = path.replace("route.", "");
-    return getByPath(scope.route, routeKey);
-  }
-  if (path.startsWith("data.") && scope.data) {
-    const dataKey = path.replace("data.", "");
-    return getByPath(scope.data, dataKey);
-  }
-  if (process.env.NODE_ENV !== "production") {
+  const resolved = resolvePath(path, scope);
+  if (process.env.NODE_ENV !== "production" && !isBindPath(path)) {
     console.warn(`[uidl-runtime] Unrecognized binding prefix in path: ${path}`);
   }
-  return undefined;
+  return resolved;
 }
 
 function resolveVisibility(node: UIDLNode, scope: RenderScope): boolean {
@@ -319,19 +301,4 @@ function getValueExtractor(nodeType: string): ((e: React.ChangeEvent) => unknown
     default:
       return undefined;
   }
-}
-
-function getByPath(obj: Record<string, unknown>, path: string): unknown {
-  const keys = path.split(".");
-  let current: unknown = obj;
-
-  for (const key of keys) {
-    if (current && typeof current === "object" && key in (current as Record<string, unknown>)) {
-      current = (current as Record<string, unknown>)[key];
-    } else {
-      return undefined;
-    }
-  }
-
-  return current;
 }

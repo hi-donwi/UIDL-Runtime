@@ -26,3 +26,4 @@ An ADR with no rejected alternatives records a preference, not a decision.
 | [0006](0006-events-approved.md) | Approve the events semantics (events.md) | Accepted | 2026-09-15 |
 | [0007](0007-state-semantics-approved.md) | Approve the state semantics + `$data` envelope (state.md) | Accepted | 2026-09-15 |
 | [0008](0008-queries-approved.md) | Approve the queries semantics (queries.md) | Accepted | 2026-09-15 |
+| [0009](0009-style-approved.md) | Approve the style semantics (style.md) | Accepted | 2026-09-15 |

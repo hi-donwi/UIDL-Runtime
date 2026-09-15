@@ -100,6 +100,64 @@ export interface CommandResponse {
 
 export type CommandHandler = (request: CommandRequest) => Promise<unknown> | unknown;
 
+export interface DownloadActionConfig {
+  /** The address of the file to download — a literal URL or a resolvable value. */
+  url: ResolvableActionValue<string>;
+  /** Optional suggested save name; the host handler owns any path/sanitisation rules. */
+  filename?: ResolvableActionValue<string>;
+  resultPath?: string;
+  errorPath?: string;
+  statusPath?: string;
+  /** Runs only after the host downloadHandler resolves successfully. */
+  onSuccess?: Action;
+  /** Runs only after the host downloadHandler rejects or request validation fails. */
+  onError?: Action;
+}
+
+export interface DownloadAction {
+  download: DownloadActionConfig;
+}
+
+export interface DownloadRequest {
+  url: string;
+  filename?: string;
+}
+
+export interface DownloadResponse {
+  success: boolean;
+  request?: DownloadRequest;
+  data?: unknown;
+  error?: string;
+  code?: string;
+}
+
+/** Host-owned download capability; unset means `download` actions are disabled. */
+export type DownloadHandler = (request: DownloadRequest) => Promise<unknown> | unknown;
+
+export interface QueryActionConfig {
+  /**
+   * The name of a declared `$query` data source (`dataSources`, `queries.md`). The source must
+   * exist and be a `$query` (not an inline array) entry; re-running writes into
+   * `state.$data.<target>.{status,rows,total,error}` through the shared data-source runner.
+   */
+  target: string;
+  /** Runs after the target source resolves successfully; `eventValue` is the new rows. */
+  onSuccess?: Action;
+  /** Runs after the target source fails, or the re-run is refused (no adapter/missing target). */
+  onError?: Action;
+}
+
+export interface QueryAction {
+  query: QueryActionConfig;
+}
+
+export interface QueryResponse {
+  success: boolean;
+  target: string;
+  error?: string;
+  code?: string;
+}
+
 export interface ShowSnackbarAction {
   showSnackbar: {
     message: string;
@@ -138,6 +196,8 @@ export type Action =
   | ApiAction
   | MutationAction
   | CommandAction
+  | DownloadAction
+  | QueryAction
   | ShowSnackbarAction
   | ShowDialogAction
   | ValidateAction
