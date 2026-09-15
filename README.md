@@ -34,6 +34,25 @@ is hand-built page markup.
 npm install uidl-runtime
 ```
 
+### GitHub Packages mirror
+
+The public npm package above is the primary distribution. A GitHub Packages mirror is
+published as `@hi-donwi/uidl-runtime`, because GitHub Packages requires npm packages to
+use a scope.
+
+```ini
+@hi-donwi:registry=https://npm.pkg.github.com
+```
+
+```bash
+npm install @hi-donwi/uidl-runtime
+```
+
+```tsx
+import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "@hi-donwi/uidl-runtime";
+import "@hi-donwi/uidl-runtime/style.css";
+```
+
 ```tsx
 import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "uidl-runtime";
 import "uidl-runtime/style.css";
