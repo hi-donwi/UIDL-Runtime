@@ -118,6 +118,30 @@ npm run mock:api            # mock API on port 8787
 npm run dev:reference:http
 ```
 
+## Release Automation
+
+The public npm package is published from `.github/workflows/publish-npm.yml` using npm
+Trusted Publishing with GitHub Actions OIDC. Configure the `uidl-runtime` package on
+npmjs.com with this trusted publisher before cutting the next release:
+
+```text
+Publisher: GitHub Actions
+Organization or user: hi-donwi
+Repository: UIDL-Runtime
+Workflow filename: publish-npm.yml
+Allowed action: npm publish
+```
+
+No `NPM_TOKEN` repository secret is required for the public npm publish path. The workflow
+uses Node.js 24, disables package-manager cache in the release job, requires manual publish
+dispatches to run from the default branch, validates the requested version against
+`package.json`, and refuses to publish a version that already exists on npm.
+
+The GitHub Packages mirror is published separately by
+`.github/workflows/publish-github-packages.yml` from the same GitHub release. After a
+release, run the manual `Verify npm package` and `Verify GitHub Packages mirror` workflows
+with the released version.
+
 ## Commands
 
 | Command | Purpose |

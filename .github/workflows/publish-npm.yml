@@ -1,4 +1,4 @@
-name: Publish GitHub Packages mirror
+name: Publish npm package
 
 on:
   release:
@@ -12,10 +12,10 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  id-token: write
 
 concurrency:
-  group: github-packages-mirror-${{ github.ref }}
+  group: npm-publish-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -27,9 +27,8 @@ jobs:
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
-          registry-url: https://npm.pkg.github.com
-          scope: "@hi-donwi"
+          node-version: 24
+          registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
       - run: npm ci
@@ -55,6 +54,14 @@ jobs:
             exit 1
           fi
 
+      - name: Check package version is not already on npm
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if npm view "uidl-runtime@${version}" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "uidl-runtime@${version} is already published on npm."
+            exit 1
+          fi
+
       - name: Type-check
         run: npm run typecheck
 
@@ -76,10 +83,5 @@ jobs:
       - name: Build and smoke-test package artifact
         run: npm run smoke:package
 
-      - name: Rename package for GitHub Packages
-        run: npm pkg set name=@hi-donwi/uidl-runtime
-
-      - name: Publish mirror to GitHub Packages
+      - name: Publish to npm
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
