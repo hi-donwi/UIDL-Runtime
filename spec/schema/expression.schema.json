@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/expression.schema.json",
+  "title": "UIDL Expression",
+  "description": "An expression node: literals, binding leaves, canonical op nodes, legacy operator shapes, and aggregations. Tolerant superset of the grammar in spec/semantics/expressions.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "oneOf": [
+    { "$ref": "#/$defs/literal" },
+    { "$ref": "#/$defs/bind" },
+    { "$ref": "#/$defs/path" },
+    { "$ref": "#/$defs/wrapped" },
+    { "$ref": "#/$defs/agg" },
+    { "$ref": "#/$defs/legacy_binary" },
+    { "$ref": "#/$defs/legacy_unary" },
+    { "$ref": "#/$defs/legacy_if" },
+    { "$ref": "#/$defs/legacy_coalesce" },
+    { "$ref": "#/$defs/op" }
+  ],
+  "$defs": {
+    "expr": { "$ref": "expression.schema.json" },
+    "literal": {
+      "type": "object",
+      "required": ["literal"],
+      "additionalProperties": false,
+      "properties": { "literal": {} }
+    },
+    "bind": {
+      "type": "object",
+      "required": ["$bind"],
+      "additionalProperties": false,
+      "properties": { "$bind": { "$ref": "binding.schema.json" } }
+    },
+    "path": {
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": { "path": { "type": "string" } }
+    },
+    "wrapped": {
+      "type": "object",
+      "required": ["$expr"],
+      "additionalProperties": false,
+      "properties": { "$expr": { "$ref": "#/$defs/expr" } }
+    },
+    "agg": {
+      "type": "object",
+      "required": ["agg", "over"],
+      "additionalProperties": false,
+      "properties": {
+        "agg": { "enum": ["sum", "count", "avg"] },
+        "over": { "$ref": "binding.schema.json" },
+        "field": { "type": "string" }
+      }
+    },
+    "op": {
+      "type": "object",
+      "required": ["op"],
+      "properties": {
+        "op": { "enum": ["eq","neq","gt","gte","lt","lte","and","or","not","if","add","subtract","multiply","divide","contains","startsWith","coalesce"] },
+        "left": { "$ref": "#/$defs/expr" },
+        "right": { "$ref": "#/$defs/expr" },
+        "v": { "$ref": "#/$defs/expr" },
+        "test": { "$ref": "#/$defs/expr" },
+        "then": { "$ref": "#/$defs/expr" },
+        "else": { "$ref": "#/$defs/expr" }
+      }
+    },
+    "binary_left_right": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "#/$defs/expr" }
+    },
+    "legacy_binary": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["=="], "properties": { "==": { "$ref": "#/$defs/binary_left_right" } } },
+        { "required": ["!="], "properties": { "!=": { "$ref": "#/$defs/binary_left_right" } } },
+        { "required": ["and"], "properties": { "and": { "$ref": "#/$defs/binary_left_right" } } },
+        { "required": ["or"], "properties": { "or": { "$ref": "#/$defs/binary_left_right" } } }
+      ]
+    },
+    "legacy_unary": {
+      "type": "object",
+      "required": ["not"],
+      "additionalProperties": false,
+      "properties": { "not": { "$ref": "#/$defs/expr" } }
+    },
+    "legacy_if": {
+      "type": "object",
+      "required": ["if"],
+      "additionalProperties": false,
+      "properties": {
+        "if": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/expr" } }
+      }
+    },
+    "legacy_coalesce": {
+      "type": "object",
+      "required": ["??"],
+      "additionalProperties": false,
+      "properties": { "??": { "$ref": "#/$defs/binary_left_right" } }
+    }
+  }
+}

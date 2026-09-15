@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/query.schema.json",
+  "title": "UIDL Query Descriptor",
+  "description": "The $query shape a dataSources entry may carry (see spec/semantics/queries.md). Strict: mirrors the runtime's QueryDataSource. All fields resolve $bind against state/session before the adapter is called.",
+  "type": "object",
+  "required": ["$query"],
+  "additionalProperties": false,
+  "properties": {
+    "$query": {
+      "type": "object",
+      "required": ["collection"],
+      "additionalProperties": false,
+      "properties": {
+        "collection": { "type": "string" },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "op", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "field": { "type": "string" },
+              "op": { "enum": ["eq", "ne", "in", "gt", "gte", "lt", "lte", "like", "between"] },
+              "value": {}
+            }
+          }
+        },
+        "sort": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "dir"],
+            "additionalProperties": false,
+            "properties": {
+              "field": { "type": "string" },
+              "dir": { "enum": ["asc", "desc"] }
+            }
+          }
+        },
+        "page": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "number": { "type": "integer" },
+            "size": { "type": "integer" }
+          }
+        },
+        "search": {},
+        "fields": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

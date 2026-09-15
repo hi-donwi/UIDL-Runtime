@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/document.schema.json",
+  "title": "UIDL Document",
+  "description": "The top-level contract for a UIDL screen: one page of declarative UI. Mirrors the reference runtime's DocumentSchema and is deliberately permissive about the data-bearing fields so every shipped document validates; strictness lives in the focused expression/binding/action schemas and conformance fixtures.",
+  "type": "object",
+  "required": ["version", "id", "name", "root"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "description": "Identifier for the schema a document was written against; informational, never fetched.",
+      "type": "string"
+    },
+    "version": {
+      "$ref": "version.schema.json"
+    },
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "route": {
+      "description": "The route this document serves (see semantics/navigation.md).",
+      "type": "string"
+    },
+    "theme": {
+      "description": "A theme preset name (string) or an inline theme object (see schema/theme.schema.json).",
+      "anyOf": [{ "type": "string" }, { "$ref": "theme.schema.json" }]
+    },
+    "state": {
+      "description": "Initial values for the `state` scope (see semantics/state.md).",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "dataSources": {
+      "description": "Declared datasets: `data.<key>` names to inline arrays or `$query` descriptors (see semantics/queries.md).",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "definitions": {
+      "description": "Reusable node fragments referenced by tree nodes.",
+      "type": "object",
+      "additionalProperties": { "$ref": "node.schema.json" }
+    },
+    "root": {
+      "$ref": "node.schema.json"
+    }
+  }
+}
