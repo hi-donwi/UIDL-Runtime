@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-15
+
 ### Added
 - Manual GitHub Actions smoke test for installing and importing the GitHub Packages mirror.
 - GitHub Actions workflow for publishing the public npm package with npm Trusted Publishing
@@ -55,6 +57,7 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.1
 [0.1.0]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.0
