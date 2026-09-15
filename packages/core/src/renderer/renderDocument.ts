@@ -7,8 +7,9 @@ import type { DocumentStateStore } from "../state/createDocumentState";
 import { isQueryDataSource } from "../state/dataSources";
 import { createEventBus, type EventBus } from "../actions/eventBus";
 import { ActionInterpreter, type ApiAllowlist } from "../actions/interpreter";
+import { assertSupportedDocumentVersion } from "../version";
 import type { DataAdapter } from "../data/types";
-import type { CommandHandler, MutationHandler } from "../types/actions";
+import type { CommandHandler, DownloadHandler, MutationHandler } from "../types/actions";
 
 export interface RenderOptions {
   theme?: Theme;
@@ -31,6 +32,8 @@ export interface RenderOptions {
   mutationHandler?: MutationHandler;
   /** Host-owned handler for UIDL `command` actions. Unset means commands are disabled. */
   commandHandler?: CommandHandler;
+  /** Host-owned handler for UIDL `download` actions. Unset means downloads are disabled. */
+  downloadHandler?: DownloadHandler;
   onRouteChange?: (route: string | Record<string, unknown>) => void;
   registry?: ComponentRegistry;
   /**
@@ -61,6 +64,7 @@ export interface RenderContext {
  * `showSnackbar` actions can actually show something — see UIDocumentRenderer.tsx).
  */
 export function createRenderContext(document: UIDLDocument, options: RenderOptions = {}): RenderContext {
+  assertSupportedDocumentVersion(document.version);
   const theme = options.theme ?? getTheme(document.theme ?? "");
   const stateStore = options.stateStore;
   const dataSources = options.dataSources ?? document.dataSources;
@@ -98,6 +102,9 @@ export function createRenderContext(document: UIDLDocument, options: RenderOptio
     eventBus,
     mutationHandler: options.mutationHandler,
     commandHandler: options.commandHandler,
+    downloadHandler: options.downloadHandler,
+    dataSources,
+    dataAdapter: options.dataAdapter,
     apiAllowlist: options.apiAllowlist,
     apiMaxResponseBytes: options.apiMaxResponseBytes,
     apiMaxConcurrentCalls: options.apiMaxConcurrentCalls,

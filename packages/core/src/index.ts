@@ -3,7 +3,11 @@ export type { RenderOptions, RenderContext } from "./renderer/renderDocument";
 export { UIDocumentRenderer } from "./renderer/UIDocumentRenderer";
 export type { UIDocumentRendererProps } from "./renderer/UIDocumentRenderer";
 export { createRegistry, defaultRegistry, registerComponent } from "./registry/registry";
-export { UIDL_RUNTIME_VERSION, REGISTRY_VERSION, getRegistryVersion, getRegistryFingerprint, type RegistryVersion } from "./version";
+export { UIDL_RUNTIME_VERSION, UIDL_SPEC_VERSION, REGISTRY_VERSION, getRegistryVersion, getRegistryFingerprint, type RegistryVersion } from "./version";
+export { reportDocumentVersion, assertSupportedDocumentVersion, DocumentVersionError } from "./version";
+export type { DocumentVersionReport, DocumentVersionStatus } from "./version";
+export { resolvePath, isBindPath, RENDER_SCOPE_PREFIXES } from "./state/bindings";
+export type { BindingScope, RenderScopePrefix } from "./state/bindings";
 export type { UIDLDocument, UIDLNode, DesignTokens, WidgetManifest, ComponentRegistry, ComponentPropDescriptor, ComponentPropType, ComponentEventDescriptor, Theme, ThemePreset, PrimitiveTokens, SemanticTokens, TypographyToken, ComponentVariant, StyleIntent, ResponsiveValue } from "./types";
 export type {
   Action,
@@ -15,6 +19,14 @@ export type {
   CommandHandler,
   CommandRequest,
   CommandResponse,
+  DownloadAction,
+  DownloadActionConfig,
+  DownloadHandler,
+  DownloadRequest,
+  DownloadResponse,
+  QueryAction,
+  QueryActionConfig,
+  QueryResponse,
   MutationAction,
   MutationActionConfig,
   MutationHandler,
@@ -82,6 +94,8 @@ export type {
   HttpAdapterOptions,
 } from "./data";
 export { createEventBus, ActionInterpreter } from "./actions";
+export { ERROR_CODES, ERROR_CODE_VALUES } from "./errors/errors";
+export type { ErrorCode } from "./errors/errors";
 export { Editor } from "./editor";
 export type { EditorProps } from "./editor";
 export { QRCodeSVG, BarcodeSVG, DataMatrixSVG } from "./components/BarcodeAndQRCode";

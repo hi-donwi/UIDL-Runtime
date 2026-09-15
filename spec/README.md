@@ -31,10 +31,10 @@ Every file in `spec/` carries a `Status` line in its heading.
 - **`Deprecated`** — still valid but scheduled for removal in a future major.
 
 The `expression`, `binding`, `navigation` (route params only), `versioning`,
-`mutations`, `errors`, `events`, `state`, `queries`, `actions` (twelve fixed kinds,
-`download` and `query` included; extension actions carved out), and `lifecycle` files
-are **`Approved`** for spec 1.x; the runtime already implements them all.
-`style` remains **`Draft`**.
+`mutations`, `errors`, `events`, `state`, `queries`, `style`, `actions` (twelve fixed
+kinds, `download` and `query` included; extension actions carved out), and `lifecycle`
+files are **`Approved`** for spec 1.x; the runtime already implements them all. There
+are **no Draft semantics files** left.
 
 ## Reading order
 

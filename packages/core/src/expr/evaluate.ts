@@ -1,4 +1,4 @@
-import { getByPath } from "../state/createDocumentState";
+import { resolvePath } from "../state/bindings";
 
 export interface RenderScope {
   theme?: unknown;
@@ -60,6 +60,51 @@ export interface AggExpr {
   field?: string;
 }
 
+/**
+ * The canonical expression shape (spec: `spec/semantics/expressions.md`). One `op`, operands
+ * in `left`/`right` (binary) or `test`/`then`/`else`/`v` where the op shape demands it.
+ * `$bind`-wrapped operands resolve against the same render scope as `{path}`.
+ *
+ * The legacy keyed shapes (`{"==": [...]}`, `{"and": [...]}`, …) above remain supported and
+ * are documented aliases of these ops — a runtime accepts either form.
+ */
+export type BinaryOp =
+  | "eq"
+  | "neq"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte"
+  | "and"
+  | "or"
+  | "add"
+  | "subtract"
+  | "multiply"
+  | "divide"
+  | "contains"
+  | "startsWith"
+  | "coalesce";
+
+export interface OpExpr {
+  op: BinaryOp | "not" | "if";
+  left?: Expr;
+  right?: Expr;
+  v?: Expr;
+  test?: Expr;
+  then?: Expr;
+  else?: Expr;
+}
+
+/** A `{"$bind": "<scope>.<path>"}` leaf — resolved against the render scope. */
+export interface BindExpr {
+  $bind: string;
+}
+
+/** A `{"$expr": <Expr>}` leaf — an expression node carrying another expression as its value. */
+export interface WrappedExpr {
+  $expr: Expr;
+}
+
 export type Expr =
   | LiteralExpr
   | PathExpr
@@ -70,64 +115,211 @@ export type Expr =
   | NotExpr
   | IfExpr
   | CoalesceExpr
-  | AggExpr;
+  | AggExpr
+  | OpExpr
+  | BindExpr
+  | WrappedExpr;
 
+/** Hard recursion cap — UIDL is untrusted input; bounded expression depth is a security rule (plan §23). */
+export const MAX_EXPR_DEPTH = 64;
+
+/** Internal marker: a subtree exceeded the depth budget. Only raised inside `evaluateDepth`. */
+class ExpressionDepthError extends Error {}
+
+/**
+ * Evaluates a declarative expression tree to a plain value. Never executes host code.
+ * Deterministic across runtimes for the same input; anything that cannot be computed
+ * (unknown prefix, missing key, non-numeric operand to a numeric op, divide-by-zero,
+ * wrong operand types) resolves to `undefined` or `null`, never a throw. If the tree is
+ * deeper than `MAX_EXPR_DEPTH` the whole expression resolves to `undefined` rather than
+ * recursing unboundedly.
+ */
 export function evaluate(expr: unknown, scope: RenderScope): unknown {
+  try {
+    return evaluateDepth(expr, scope, 0);
+  } catch (error) {
+    if (error instanceof ExpressionDepthError) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(`[uidl-runtime] Expression exceeds maximum depth of ${MAX_EXPR_DEPTH}; aborting evaluation`);
+      }
+      return undefined;
+    }
+    throw error;
+  }
+}
+
+function evaluateDepth(expr: unknown, scope: RenderScope, depth: number): unknown {
+  if (depth > MAX_EXPR_DEPTH) {
+    throw new ExpressionDepthError();
+  }
+
   if (!expr || typeof expr !== "object") {
     return expr;
   }
 
-  if ("literal" in expr) {
-    return (expr as LiteralExpr).literal;
+  const node = expr as Record<string, unknown>;
+
+  if ("literal" in node) {
+    return (node as unknown as LiteralExpr).literal;
   }
 
-  if ("path" in expr) {
-    return resolvePath((expr as PathExpr).path, scope);
+  // Canonical-leaf `{"$bind": "state.x"}` inside an expression tree.
+  if (typeof node.$bind === "string" && Object.keys(node).length === 1) {
+    return resolvePath(node.$bind, scope);
   }
 
-  if ("agg" in expr && "over" in expr) {
-    return evaluateAgg(expr as AggExpr, scope);
+  // Canonical-leaf `{"$expr": <expr>}` — evaluate the wrapped expression.
+  if ("$expr" in node && Object.keys(node).length === 1) {
+    return evaluateDepth(node.$expr, scope, depth + 1);
   }
 
-  if ("==" in expr) {
-    const [left, right] = (expr as EqExpr)["=="];
-    return evaluate(left, scope) === evaluate(right, scope);
+  if ("path" in node && typeof node.path === "string") {
+    return resolvePath(node.path, scope);
   }
 
-  if ("!=" in expr) {
-    const [left, right] = (expr as NeqExpr)["!="];
-    return evaluate(left, scope) !== evaluate(right, scope);
+  if ("agg" in node && "over" in node) {
+    return evaluateAgg(node as unknown as AggExpr, scope);
   }
 
-  if ("and" in expr) {
-    const [left, right] = (expr as AndExpr).and;
-    return Boolean(evaluate(left, scope)) && Boolean(evaluate(right, scope));
+  if ("op" in node) {
+    return evaluateOp(node as unknown as OpExpr, scope, depth);
   }
 
-  if ("or" in expr) {
-    const [left, right] = (expr as OrExpr).or;
-    return Boolean(evaluate(left, scope)) || Boolean(evaluate(right, scope));
+  if ("==" in node) {
+    const [left, right] = (node as unknown as EqExpr)["=="];
+    return evaluateDepth(left, scope, depth + 1) === evaluateDepth(right, scope, depth + 1);
   }
 
-  if ("not" in expr) {
-    return !evaluate((expr as NotExpr).not, scope);
+  if ("!=" in node) {
+    const [left, right] = (node as unknown as NeqExpr)["!="];
+    return evaluateDepth(left, scope, depth + 1) !== evaluateDepth(right, scope, depth + 1);
   }
 
-  if ("if" in expr) {
-    const [cond, trueVal, falseVal] = (expr as IfExpr).if;
-    return evaluate(cond, scope) ? evaluate(trueVal, scope) : evaluate(falseVal, scope);
+  if ("and" in node) {
+    const [left, right] = (node as unknown as AndExpr).and;
+    return Boolean(evaluateDepth(left, scope, depth + 1)) && Boolean(evaluateDepth(right, scope, depth + 1));
   }
 
-  if ("??" in expr) {
-    const [left, right] = (expr as CoalesceExpr)["??"];
-    const leftVal = evaluate(left, scope);
+  if ("or" in node) {
+    const [left, right] = (node as unknown as OrExpr).or;
+    return Boolean(evaluateDepth(left, scope, depth + 1)) || Boolean(evaluateDepth(right, scope, depth + 1));
+  }
+
+  if ("not" in node) {
+    return !evaluateDepth((node as unknown as NotExpr).not, scope, depth + 1);
+  }
+
+  if ("if" in node) {
+    const [cond, trueVal, falseVal] = (node as unknown as IfExpr).if;
+    return evaluateDepth(cond, scope, depth + 1)
+      ? evaluateDepth(trueVal, scope, depth + 1)
+      : evaluateDepth(falseVal, scope, depth + 1);
+  }
+
+  if ("??" in node) {
+    const [left, right] = (node as unknown as CoalesceExpr)["??"];
+    const leftVal = evaluateDepth(left, scope, depth + 1);
     if (leftVal !== undefined && leftVal !== null) {
       return leftVal;
     }
-    return evaluate(right, scope);
+    return evaluateDepth(right, scope, depth + 1);
   }
 
   return undefined;
+}
+
+function evaluateOp(node: OpExpr, scope: RenderScope, depth: number): unknown {
+  const op = node.op;
+
+  switch (op) {
+    case "eq":
+      return evalOperand(node.left, scope, depth) === evalOperand(node.right, scope, depth);
+    case "neq":
+      return evalOperand(node.left, scope, depth) !== evalOperand(node.right, scope, depth);
+    case "gt":
+      return numericCompare(node.left, node.right, scope, depth, (a, b) => a > b);
+    case "gte":
+      return numericCompare(node.left, node.right, scope, depth, (a, b) => a >= b);
+    case "lt":
+      return numericCompare(node.left, node.right, scope, depth, (a, b) => a < b);
+    case "lte":
+      return numericCompare(node.left, node.right, scope, depth, (a, b) => a <= b);
+    case "and":
+      return Boolean(evalOperand(node.left, scope, depth)) && Boolean(evalOperand(node.right, scope, depth));
+    case "or":
+      return Boolean(evalOperand(node.left, scope, depth)) || Boolean(evalOperand(node.right, scope, depth));
+    case "not":
+      return !evalOperand(node.v, scope, depth);
+    case "add":
+      return arithmetic(node.left, node.right, scope, depth, (a, b) => a + b);
+    case "subtract":
+      return arithmetic(node.left, node.right, scope, depth, (a, b) => a - b);
+    case "multiply":
+      return arithmetic(node.left, node.right, scope, depth, (a, b) => a * b);
+    case "divide":
+      return arithmetic(node.left, node.right, scope, depth, (a, b) => (b === 0 ? null : a / b));
+    case "contains":
+      return contains(evalOperand(node.left, scope, depth), evalOperand(node.right, scope, depth));
+    case "startsWith":
+      return startsWith(evalOperand(node.left, scope, depth), evalOperand(node.right, scope, depth));
+    case "coalesce": {
+      const left = evalOperand(node.left, scope, depth);
+      if (left !== undefined && left !== null) return left;
+      return evalOperand(node.right, scope, depth);
+    }
+    case "if": {
+      const test = evalOperand(node.test, scope, depth);
+      return test ? evalOperand(node.then, scope, depth) : evalOperand(node.else, scope, depth);
+    }
+    default:
+      return undefined;
+  }
+}
+
+function evalOperand(operand: Expr | undefined, scope: RenderScope, depth: number): unknown {
+  return evaluateDepth(operand, scope, depth + 1);
+}
+
+function numericCompare(
+  left: Expr | undefined,
+  right: Expr | undefined,
+  scope: RenderScope,
+  depth: number,
+  compare: (a: number, b: number) => boolean,
+): boolean | null {
+  const a = toFiniteNumber(evalOperand(left, scope, depth));
+  const b = toFiniteNumber(evalOperand(right, scope, depth));
+  if (a === null || b === null) return null;
+  return compare(a, b);
+}
+
+function arithmetic(
+  left: Expr | undefined,
+  right: Expr | undefined,
+  scope: RenderScope,
+  depth: number,
+  apply: (a: number, b: number) => number | null,
+): number | null {
+  const a = toFiniteNumber(evalOperand(left, scope, depth));
+  const b = toFiniteNumber(evalOperand(right, scope, depth));
+  if (a === null || b === null) return null;
+  return apply(a, b);
+}
+
+function toFiniteNumber(value: unknown): number | null {
+  const asNumber = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(asNumber) ? asNumber : null;
+}
+
+function contains(container: unknown, value: unknown): boolean | null {
+  if (Array.isArray(container)) return container.includes(value);
+  if (typeof container === "string" && typeof value === "string") return container.includes(value);
+  return null;
+}
+
+function startsWith(string: unknown, prefix: unknown): boolean | null {
+  if (typeof string !== "string" || typeof prefix !== "string") return null;
+  return string.startsWith(prefix);
 }
 
 function evaluateAgg(expr: AggExpr, scope: RenderScope): number {
@@ -147,23 +339,4 @@ function evaluateAgg(expr: AggExpr, scope: RenderScope): number {
   const total = values.reduce((sum, value) => sum + value, 0);
   if (expr.agg === "sum") return total;
   return values.length === 0 ? 0 : total / values.length;
-}
-
-function resolvePath(path: string, scope: RenderScope): unknown {
-  if (path.startsWith("local.") && scope.local) {
-    return getByPath(scope.local, path.replace("local.", ""));
-  }
-  if (path.startsWith("state.") && scope.state) {
-    return getByPath(scope.state, path.replace("state.", ""));
-  }
-  if (path.startsWith("session.") && scope.session) {
-    return getByPath(scope.session, path.replace("session.", ""));
-  }
-  if (path.startsWith("route.") && scope.route) {
-    return getByPath(scope.route, path.replace("route.", ""));
-  }
-  if (path.startsWith("data.") && scope.data) {
-    return getByPath(scope.data, path.replace("data.", ""));
-  }
-  return undefined;
 }
