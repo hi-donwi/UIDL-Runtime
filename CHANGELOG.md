@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versioning follows
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Manual GitHub Actions smoke test for installing and importing the GitHub Packages mirror.
+
+### Changed
+- GitHub Packages mirror publishing now requires an explicit version on manual dispatch.
+- Documented npm authentication for installing the GitHub Packages mirror.
+
+### Fixed
+- Renamed the ESLint flat config to `eslint.config.mjs` so lint runs without Node module-type
+  warnings while preserving the package's CommonJS-compatible publish shape.
+
 ## [0.1.1] - 2026-09-13
 
 ### Added
@@ -34,5 +47,6 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.1...HEAD
 [0.1.1]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.1
 [0.1.0]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.0
