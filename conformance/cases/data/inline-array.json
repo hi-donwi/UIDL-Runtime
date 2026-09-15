@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"data-inline-array","class":"data","status":"active","spec":"v1","input":{"key":"rows","config":[1,2,3]},"context":{},"expected":[1,2,3]}

@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"condition-gt","class":"condition","status":"active","spec":"v1","input":{"op":"gt","left":{"literal":5},"right":{"literal":3}},"context":{},"expected":true}

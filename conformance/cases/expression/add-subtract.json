@@ -1,0 +1,14 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "id": "add-subtract",
+  "class": "expression",
+  "status": "active",
+  "spec": "v1",
+  "input": {
+    "op": "subtract",
+    "left": {"op": "add", "left": {"literal": 10}, "right": {"literal": 5}},
+    "right": {"literal": 3}
+  },
+  "context": {},
+  "expected": 12
+}

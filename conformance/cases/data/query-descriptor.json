@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"data-query-descriptor","class":"data","status":"active","spec":"v1","input":{"key":"invoices","config":{"$query":{"collection":"SalesInvoice","filters":[{"field":"status","op":"eq","value":"active"}],"sort":[{"field":"date","dir":"desc"}],"page":{"number":1,"size":20}}}},"context":{},"expected":[]}
