@@ -38,19 +38,35 @@ npm install uidl-runtime
 
 The public npm package above is the primary distribution. A GitHub Packages mirror is
 published as `@hi-donwi/uidl-runtime`, because GitHub Packages requires npm packages to
-use a scope.
+use a scope. GitHub Packages requires authentication even for public packages.
 
 ```ini
 @hi-donwi:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
 ```bash
-npm install @hi-donwi/uidl-runtime
+NODE_AUTH_TOKEN="$(gh auth token)" npm install @hi-donwi/uidl-runtime
 ```
 
 ```tsx
 import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "@hi-donwi/uidl-runtime";
 import "@hi-donwi/uidl-runtime/style.css";
+```
+
+To test the mirror without writing a token to your repository, use a temporary npm config:
+
+```bash
+tmpdir="$(mktemp -d)"
+printf '%s\n' \
+  '@hi-donwi:registry=https://npm.pkg.github.com' \
+  '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' \
+  > "$tmpdir/.npmrc"
+
+NODE_AUTH_TOKEN="$(gh auth token)" \
+  npm --userconfig "$tmpdir/.npmrc" \
+  view @hi-donwi/uidl-runtime@0.1.1 version \
+  --registry=https://npm.pkg.github.com
 ```
 
 ```tsx
