@@ -55,6 +55,32 @@ jobs:
             exit 1
           fi
 
+      - name: Check public npm package is published first
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          for attempt in $(seq 1 30); do
+            if npm view "uidl-runtime@${version}" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+              echo "uidl-runtime@${version} is available on public npm."
+              exit 0
+            fi
+
+            echo "uidl-runtime@${version} is not available on public npm yet (attempt ${attempt}/30)."
+            sleep 20
+          done
+
+          echo "Publish uidl-runtime@${version} to public npm before publishing the GitHub Packages mirror."
+          exit 1
+
+      - name: Check mirror version is not already published
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if npm view "@hi-donwi/uidl-runtime@${version}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "@hi-donwi/uidl-runtime@${version} is already published on GitHub Packages."
+            exit 1
+          fi
+
       - name: Type-check
         run: npm run typecheck
 
