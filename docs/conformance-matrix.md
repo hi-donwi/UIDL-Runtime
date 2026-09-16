@@ -27,7 +27,7 @@ Action fixtures assert vocabulary/schema accept, not execution. Render fixtures:
 
 ## 1.1 Widget capability matrix
 
-Honest coverage of the 37 React `defaultWidgets` types. Native columns mean “the type is registered and renders without falling through to unknown-widget”. ListView/GridView/DataTable/Chart and the code-graphics (QR/Barcode/DataMatrix) are **structural**, not pixel-identical to React.
+Honest coverage of the 37 React `defaultWidgets` types. Native columns mean the type is registered and exposes the same document data (labels, rows, titles, encoded values). Pixel-identical React charts/QR encoders are still out of scope. ListView/GridView match React: they are child containers, not DataTable.
 
 | Widget | Web / React | Flutter | Android Compose tree |
 |---|---|---|---|
@@ -50,24 +50,24 @@ Honest coverage of the 37 React `defaultWidgets` types. Native columns mean “t
 | Textarea | implemented | implemented | implemented |
 | RadioGroup | implemented | implemented | implemented |
 | Form | implemented | implemented | implemented |
-| ListView | implemented | partial | partial |
-| GridView | implemented | partial | partial |
-| DataTable | implemented | implemented | partial |
+| ListView | implemented | implemented | implemented |
+| GridView | implemented | implemented | implemented |
+| DataTable | implemented | implemented | implemented |
 | PageBar | implemented | implemented | implemented |
-| Chart | implemented | implemented | partial |
-| KanbanBoard | implemented | implemented | partial |
-| TreeView | implemented | implemented | partial |
+| Chart | implemented | implemented | implemented |
+| KanbanBoard | implemented | implemented | implemented |
+| TreeView | implemented | implemented | implemented |
 | Sidebar | implemented | implemented | implemented |
 | Navbar | implemented | implemented | implemented |
 | Toolbar | implemented | implemented | implemented |
 | Drawer | implemented | implemented | partial |
 | Panel | implemented | implemented | implemented |
 | Popover | implemented | implemented | implemented |
-| Dialog | implemented | implemented | partial |
+| Dialog | implemented | implemented | implemented |
 | Snackbar | implemented | implemented | implemented |
-| QRCode | implemented | implemented | partial |
-| Barcode | implemented | implemented | partial |
-| DataMatrix | implemented | implemented | partial |
+| QRCode | implemented | implemented | implemented |
+| Barcode | implemented | implemented | implemented |
+| DataMatrix | implemented | implemented | implemented |
 
 ---
 

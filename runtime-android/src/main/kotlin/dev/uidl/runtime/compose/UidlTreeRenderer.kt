@@ -109,6 +109,104 @@ object UidlTreeRenderer {
         for (type in CATALOG_WIDGET_TYPES) {
             if (type in LAYOUT_TYPES) registerLayout(type) else registerLeaf(type)
         }
+
+        fun text(id: String, value: String) =
+            UidlRenderedNode(id = id, type = "Text", props = mapOf("value" to value))
+
+        fun mapsOf(value: Any?): List<Map<*, *>> {
+            val list = value as? List<*> ?: return emptyList()
+            return list.filterIsInstance<Map<*, *>>()
+        }
+
+        registry.register("DataTable") { node, _ ->
+            val columns = mapsOf(node.props["columns"])
+            val rows = mapsOf(node.props["rows"])
+            val texts = mutableListOf<UidlRenderedNode>()
+            columns.forEachIndexed { i, column ->
+                val label = column["label"]?.toString() ?: column["key"]?.toString() ?: ""
+                texts.add(text("${node.id}-col-$i", label))
+            }
+            rows.forEachIndexed { r, row ->
+                columns.forEachIndexed { c, column ->
+                    val key = column["key"]
+                    texts.add(text("${node.id}-cell-$r-$c", "${row[key] ?: ""}"))
+                }
+            }
+            UidlRenderedNode(id = node.id, type = "DataTable", props = node.props, children = texts)
+        }
+
+        registry.register("Chart") { node, _ ->
+            val xKey = node.props["xKey"]?.toString() ?: "x"
+            val rows = mapsOf(node.props["rows"])
+            val texts = mutableListOf<UidlRenderedNode>()
+            node.props["title"]?.toString()?.takeIf { it.isNotEmpty() }?.let {
+                texts.add(text("${node.id}-title", it))
+            }
+            rows.forEachIndexed { i, row ->
+                texts.add(text("${node.id}-x-$i", row[xKey]?.toString() ?: ""))
+            }
+            UidlRenderedNode(id = node.id, type = "Chart", props = node.props, children = texts)
+        }
+
+        registry.register("Dialog") { node, context ->
+            if (node.props["open"] == false) {
+                return@register UidlRenderedNode(id = node.id, type = "Dialog", props = node.props)
+            }
+            val texts = mutableListOf<UidlRenderedNode>()
+            node.props["title"]?.toString()?.takeIf { it.isNotEmpty() }?.let {
+                texts.add(text("${node.id}-title", it))
+            }
+            node.props["content"]?.toString()?.takeIf { it.isNotEmpty() }?.let {
+                texts.add(text("${node.id}-content", it))
+            }
+            texts.addAll(node.children.map { child -> renderNode(child, context, registry) })
+            UidlRenderedNode(id = node.id, type = "Dialog", props = node.props, children = texts)
+        }
+
+        registry.register("KanbanBoard") { node, _ ->
+            val columns = mapsOf(node.props["columns"])
+            val rows = mapsOf(node.props["rows"])
+            val texts = mutableListOf<UidlRenderedNode>()
+            node.props["title"]?.toString()?.takeIf { it.isNotEmpty() }?.let {
+                texts.add(text("${node.id}-title", it))
+            }
+            columns.forEachIndexed { i, column ->
+                texts.add(text("${node.id}-col-$i", column["title"]?.toString() ?: column["id"]?.toString() ?: ""))
+                rows.filter { it["columnId"] == column["id"] }.forEachIndexed { j, card ->
+                    texts.add(text("${node.id}-card-$i-$j", card["title"]?.toString() ?: card["label"]?.toString() ?: ""))
+                }
+            }
+            UidlRenderedNode(id = node.id, type = "KanbanBoard", props = node.props, children = texts)
+        }
+
+        registry.register("TreeView") { node, _ ->
+            val items = mapsOf(node.props["items"]).ifEmpty { mapsOf(node.props["rows"]) }
+            val texts = mutableListOf<UidlRenderedNode>()
+            node.props["title"]?.toString()?.takeIf { it.isNotEmpty() }?.let {
+                texts.add(text("${node.id}-title", it))
+            }
+            fun walk(nodes: List<Map<*, *>>, prefix: String) {
+                nodes.forEachIndexed { i, item ->
+                    val label = item["title"]?.toString() ?: item["label"]?.toString() ?: item["id"]?.toString() ?: ""
+                    texts.add(text("$prefix-$i", label))
+                    walk(mapsOf(item["children"]), "$prefix-$i")
+                }
+            }
+            walk(items, "${node.id}-n")
+            UidlRenderedNode(id = node.id, type = "TreeView", props = node.props, children = texts)
+        }
+
+        fun registerCode(kind: String) {
+            registry.register(kind) { node, _ ->
+                val value = node.props["value"]?.toString() ?: ""
+                val children = if (value.isEmpty()) emptyList() else listOf(text("${node.id}-value", value))
+                UidlRenderedNode(id = node.id, type = kind, props = node.props, children = children)
+            }
+        }
+        registerCode("QRCode")
+        registerCode("Barcode")
+        registerCode("DataMatrix")
+
         return registry
     }
 
