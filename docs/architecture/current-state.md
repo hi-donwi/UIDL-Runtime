@@ -6,7 +6,7 @@
 
 ## 1. Repo shape at a glance
 
-Monorepo (`npm workspaces`), published package `uidl-runtime` (v0.1.2).
+Monorepo (`npm workspaces`), published package `uidl-runtime` (v0.1.3).
 
 | Path | Responsibility |
 |---|---|
@@ -132,7 +132,7 @@ From `types/actions.ts` + `schemas/actions.ts`: `setState`, `navigate`, `api`,
 ## 8. Versioning today
 
 - `UIDL_RUNTIME_VERSION = "1.1.0"` (`version.ts`) — the **runtime** version.
-- `package.json version = 0.1.2` — the **package** version.
+- `package.json version = 0.1.3` — the **package** version.
 - `DocumentSchema.version: z.string()` — required, but **not validated against a
   supported range**. Nothing checks major/minor compatibility today (plan §6/§25 gap:
   `UNSUPPORTED_VERSION` does not exist).
