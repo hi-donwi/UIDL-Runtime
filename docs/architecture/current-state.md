@@ -174,22 +174,20 @@ expression ops with a depth bound, error taxonomy (`ERROR_CODES`), 55 shared
 conformance fixtures, AI pipeline (`validateAndSanitizeUidl`), Java generator +
 Quarkus compile/validate, Flutter and Android semantic cores.
 
-Still open:
+Still open (optional / future-major, not 1.x leftovers):
 
-1. **Native visual fidelity.** All 37 React catalog types are registered on
-   Flutter and the Android host-agnostic tree. ListView/GridView/DataTable/Chart,
-   overlays, and QR/Barcode/DataMatrix are structural mappings, not pixel-identical
-   React widgets. JVM tests cannot depend on AndroidX Compose.
-2. **Conformance depth.** Action fixtures are schema/kind-accept (`expected: true`),
-   not execution outcomes. Flutter `unknown-action` and `text-column` render now
-   dispatch/paint. Remaining error cases still assert “any exception” on the parser.
-   Java generator “conformance” is compiler tests, not the 55 fixtures.
-3. **Style/theme language is still web-flavored in the React runtime** (Tailwind
-   class strings, CSS vars). `StyleIntent` is Approved; native mapping is renderer
-   work.
-4. **Extension actions** remain a future-major carve-out.
-5. **Component model** (`spec/components`, `packages/uidl-component`) is Planned.
-6. **`packages/react-native` does not exist** (stale mention in `spec/README.md`).
+1. **AndroidX Compose UI.** `runtime-android` is a JVM tree + tests. It does not
+   ship `@Composable` widgets or an Android APK.
+2. **ISO QR / Recharts-level charts.** Flutter paints document data; encoding is
+   not a standards QR/barcode library.
+3. **StyleIntent on native.** React still uses Tailwind class strings.
+4. **Extension actions** and **`spec/components`** stay Planned / future-major.
+5. Remaining `error` parser cases still assert “any exception” except
+   `unknown-action`. Java generator tests are compiler tests, not the shared suite.
+
+Closed in follow-up: `action-exec` cases execute `setState` (write + `$data`
+reject) on React, Flutter, and Android. The same `$query` document renders through
+`HttpAdapter` + mock HTTP server. `spec/README.md` no longer claims React Native.
 
 ## 12. What NOT to break
 
