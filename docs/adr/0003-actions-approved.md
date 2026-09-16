@@ -1,7 +1,7 @@
 # ADR-0003: Approve the action vocabulary (actions.md) — add `download`
 
 * **Status:** Accepted (2026-09-15)
-* **Deciders:** PT Mumpuni Kolaborasi Teknologia
+* **Deciders:** Project maintainers
 * **Project:** uidl-runtime
 
 ## Context
