@@ -56,11 +56,100 @@ class UidlTreeRendererTest {
         assertThat(textValue(session.render(), "count_display")).isEqualTo(2)
     }
 
+    @Test
+    fun rowAndContainerRenderChildren() {
+        val document = UidlDocument.fromMap(
+            mapOf(
+                "version" to "1.0.0",
+                "id" to "layout-screen",
+                "name" to "Layout Screen",
+                "root" to mapOf(
+                    "id" to "root",
+                    "type" to "Row",
+                    "children" to listOf(
+                        mapOf(
+                            "id" to "box",
+                            "type" to "Container",
+                            "children" to listOf(
+                                mapOf(
+                                    "id" to "label",
+                                    "type" to "Text",
+                                    "props" to mapOf("value" to "hello")
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        val tree = UidlDocumentSession(document).render()
+        assertThat(tree.type).isEqualTo("Row")
+        assertThat(tree.children).hasSize(1)
+        assertThat(tree.children[0].type).isEqualTo("Container")
+        assertThat(tree.children[0].children[0].id).isEqualTo("label")
+        assertThat(tree.children[0].children[0].props["value"]).isEqualTo("hello")
+    }
+
+    @Test
+    fun textFieldOnChangeWritesBoundState() {
+        val document = UidlDocument.fromMap(
+            mapOf(
+                "version" to "1.0.0",
+                "id" to "form-screen",
+                "name" to "Form Screen",
+                "initialState" to mapOf("name" to ""),
+                "root" to mapOf(
+                    "id" to "root",
+                    "type" to "Column",
+                    "children" to listOf(
+                        mapOf(
+                            "id" to "name_field",
+                            "type" to "TextField",
+                            "props" to mapOf("value" to mapOf("\$bind" to "state.name")),
+                            "events" to mapOf(
+                                "onChange" to mapOf(
+                                    "setState" to mapOf(
+                                        "path" to "name",
+                                        "value" to mapOf("\$bind" to "event")
+                                    )
+                                )
+                            )
+                        ),
+                        mapOf(
+                            "id" to "name_display",
+                            "type" to "Text",
+                            "props" to mapOf("value" to mapOf("\$bind" to "state.name"))
+                        )
+                    )
+                )
+            )
+        )
+
+        val session = UidlDocumentSession(document)
+        assertThat(textValue(session.render(), "name_display")).isEqualTo("")
+        assertThat(propValue(session.render(), "name_field", "value")).isEqualTo("")
+
+        session.change("name_field", "Ada")
+        val after = session.render()
+        assertThat(propValue(after, "name_field", "value")).isEqualTo("Ada")
+        assertThat(textValue(after, "name_display")).isEqualTo("Ada")
+    }
+
     private fun textValue(
         tree: dev.uidl.runtime.compose.UidlRenderedNode,
         id: String
     ): Any? {
         if (tree.id == id) return tree.props["value"]
         return tree.children.firstNotNullOfOrNull { textValue(it, id) }
+    }
+
+    private fun propValue(
+        tree: dev.uidl.runtime.compose.UidlRenderedNode,
+        id: String,
+        prop: String
+    ): Any? {
+        if (tree.id == id) return tree.props[prop]
+        return tree.children.firstNotNullOfOrNull { propValue(it, id, prop) }
     }
 }
