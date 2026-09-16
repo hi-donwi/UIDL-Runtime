@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../model/node.dart';
 import '../theme/theme_resolver.dart';
+import '../widgets/data_widgets.dart';
 
 typedef WidgetBuilderFn = Widget Function(
   BuildContext context,
@@ -239,7 +240,7 @@ class ComponentRegistry {
     });
 
     register('DataTable', (context, node, props, children, onEvent) {
-      return _childColumn(children, key: ValueKey(node.id));
+      return buildDataTable(id: node.id, props: props);
     });
 
     register('PageBar', (context, node, props, children, onEvent) {
@@ -247,7 +248,7 @@ class ComponentRegistry {
     });
 
     register('Chart', (context, node, props, children, onEvent) {
-      return SizedBox(key: ValueKey(node.id), height: 120, child: _childColumn(children));
+      return buildChart(id: node.id, props: props);
     });
 
     register('KanbanBoard', (context, node, props, children, onEvent) {
@@ -283,7 +284,7 @@ class ComponentRegistry {
     });
 
     register('Dialog', (context, node, props, children, onEvent) {
-      return _childColumn(children, key: ValueKey(node.id));
+      return buildDialog(id: node.id, props: props, children: children);
     });
 
     register('Snackbar', (context, node, props, children, onEvent) {
@@ -291,23 +292,14 @@ class ComponentRegistry {
       return Text(message, key: ValueKey(node.id));
     });
 
-    Widget marked(String type, UidlNode node, List<Widget> children) {
-      return SizedBox(
-        key: ValueKey(node.id),
-        width: 48,
-        height: 48,
-        child: children.isEmpty ? Text(type) : _childColumn(children),
-      );
-    }
-
     register('QRCode', (context, node, props, children, onEvent) {
-      return marked('QRCode', node, children);
+      return buildCodeMark(id: node.id, kind: 'QRCode', props: props);
     });
     register('Barcode', (context, node, props, children, onEvent) {
-      return marked('Barcode', node, children);
+      return buildCodeMark(id: node.id, kind: 'Barcode', props: props);
     });
     register('DataMatrix', (context, node, props, children, onEvent) {
-      return marked('DataMatrix', node, children);
+      return buildCodeMark(id: node.id, kind: 'DataMatrix', props: props);
     });
   }
 
