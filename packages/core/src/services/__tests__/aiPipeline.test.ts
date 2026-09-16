@@ -263,7 +263,7 @@ describe("AI UIDL Generation & Validation Pipeline", () => {
           events: {
             onClick: {
               executeArbitraryScript: "eval('malicious')", // Unallowlisted action!
-            } as any,
+            } as unknown as never,
           },
         },
       };
