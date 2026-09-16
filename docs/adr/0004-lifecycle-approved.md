@@ -1,7 +1,7 @@
 # ADR-0004: Approve the document lifecycle (lifecycle.md)
 
 * **Status:** Accepted (2026-09-15)
-* **Deciders:** PT Mumpuni Kolaborasi Teknologia
+* **Deciders:** Project maintainers
 * **Project:** uidl-runtime
 
 ## Context

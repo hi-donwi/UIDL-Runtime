@@ -1,7 +1,7 @@
 # ADR-0006: Approve the events semantics (events.md)
 
 * **Status:** Accepted (2026-09-15)
-* **Deciders:** PT Mumpuni Kolaborasi Teknologia
+* **Deciders:** Project maintainers
 * **Project:** uidl-runtime
 
 ## Context

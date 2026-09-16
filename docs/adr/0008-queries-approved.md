@@ -1,7 +1,7 @@
 # ADR-0008: Approve the queries semantics (queries.md)
 
 * **Status:** Accepted (2026-09-15)
-* **Deciders:** PT Mumpuni Kolaborasi Teknologia
+* **Deciders:** Project maintainers
 * **Project:** uidl-runtime
 
 ## Context
