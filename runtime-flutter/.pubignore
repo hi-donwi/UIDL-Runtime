@@ -1,0 +1,11 @@
+# IDE / tooling / local build
+*.iml
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
+# Conformance tests need the monorepo sibling ../conformance/cases
+test/conformance_test.dart
+

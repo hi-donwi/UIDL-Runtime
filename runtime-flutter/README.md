@@ -17,8 +17,7 @@ Add `uidl_flutter` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  uidl_flutter:
-    path: path/to/runtime-flutter
+  uidl_flutter: ^0.1.4
 ```
 
 ## Usage
