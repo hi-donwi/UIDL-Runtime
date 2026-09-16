@@ -136,6 +136,51 @@ class UidlTreeRendererTest {
         assertThat(textValue(after, "name_display")).isEqualTo("Ada")
     }
 
+    @Test
+    fun remainingFlutterDefaultsRender() {
+        val document = UidlDocument.fromMap(
+            mapOf(
+                "version" to "1.0.0",
+                "id" to "rest-screen",
+                "name" to "Rest Screen",
+                "root" to mapOf(
+                    "id" to "root",
+                    "type" to "Column",
+                    "children" to listOf(
+                        mapOf("id" to "gap", "type" to "Spacer"),
+                        mapOf("id" to "rule", "type" to "Divider"),
+                        mapOf(
+                            "id" to "photo",
+                            "type" to "Image",
+                            "props" to mapOf("src" to "https://example.com/a.png")
+                        ),
+                        mapOf(
+                            "id" to "items",
+                            "type" to "ListView",
+                            "children" to listOf(
+                                mapOf(
+                                    "id" to "item_0",
+                                    "type" to "Text",
+                                    "props" to mapOf("value" to "one")
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        val tree = UidlDocumentSession(document).render()
+        assertThat(tree.children.map { it.type }).containsExactly(
+            "Spacer",
+            "Divider",
+            "Image",
+            "ListView"
+        )
+        assertThat(propValue(tree, "photo", "src")).isEqualTo("https://example.com/a.png")
+        assertThat(tree.children[3].children[0].props["value"]).isEqualTo("one")
+    }
+
     private fun textValue(
         tree: dev.uidl.runtime.compose.UidlRenderedNode,
         id: String

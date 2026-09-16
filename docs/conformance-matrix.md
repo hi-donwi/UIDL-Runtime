@@ -35,11 +35,11 @@ Honest coverage of the 38 React widget types. Flutter `ListView` is a children l
 | Row | implemented | implemented | implemented |
 | Column | implemented | implemented | implemented |
 | Stack | implemented | missing | missing |
-| Spacer | implemented | implemented | missing |
-| Divider | implemented | implemented | missing |
+| Spacer | implemented | implemented | implemented |
+| Divider | implemented | implemented | implemented |
 | Text | implemented | implemented | implemented |
 | Icon | implemented | missing | missing |
-| Image | implemented | implemented | missing |
+| Image | implemented | implemented | implemented |
 | Button | implemented | implemented | implemented |
 | Badge | implemented | missing | missing |
 | TextField | implemented | implemented | implemented |
@@ -50,7 +50,7 @@ Honest coverage of the 38 React widget types. Flutter `ListView` is a children l
 | Textarea | implemented | missing | missing |
 | RadioGroup | implemented | missing | missing |
 | Form | implemented | missing | missing |
-| ListView | implemented | partial | missing |
+| ListView | implemented | partial | partial |
 | GridView | implemented | missing | missing |
 | DataTable | implemented | missing | missing |
 | PageBar | implemented | missing | missing |
