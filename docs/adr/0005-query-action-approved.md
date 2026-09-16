@@ -1,7 +1,7 @@
 # ADR-0005: Add and approve the `query` action
 
 * **Status:** Accepted (2026-09-15)
-* **Deciders:** PT Mumpuni Kolaborasi Teknologia
+* **Deciders:** Project maintainers
 * **Project:** uidl-runtime
 
 ## Context

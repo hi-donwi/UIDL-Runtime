@@ -1,7 +1,7 @@
 # ADR-0007: Approve the state semantics (state.md) — the data surface contract
 
 * **Status:** Accepted (2026-09-15)
-* **Deciders:** PT Mumpuni Kolaborasi Teknologia
+* **Deciders:** Project maintainers
 * **Project:** uidl-runtime
 
 ## Context

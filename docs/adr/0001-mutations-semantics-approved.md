@@ -2,7 +2,7 @@
 
 - **Date:** 2026-09-15
 - **Status:** Accepted
-- **Deciders:** PT Mumpuni Kolaborasi Teknologia
+- **Deciders:** Project maintainers
 - **Project:** uidl-runtime
 
 ## Context
