@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { createDocumentState } from "../../state/createDocumentState";
 import { createInMemoryAdapter } from "../../data/adapters/inMemory";
+import { createHttpAdapter } from "../../data/adapters/http";
+import { startMockHttpServer } from "../../data/testing/mockHttpServer";
 import type { UIDLDocument } from "../../types";
 import { UIDocumentRenderer } from "../UIDocumentRenderer";
 import { renderUIDocument } from "../renderDocument";
@@ -66,6 +68,27 @@ describe("UIDocumentRenderer · $query dataSources", () => {
 
     await waitFor(() => expect(screen.getByText("SINV-001")).toBeInTheDocument());
     expect(screen.queryByText("SINV-002")).not.toBeInTheDocument();
+  });
+
+  it("resolves the same document through HttpAdapter against a mock server", async () => {
+    const server = await startMockHttpServer({ seed: seedInvoices() });
+    try {
+      const adapter = createHttpAdapter({ baseUrl: `${server.url}/api` });
+      const store = createDocumentState({ statusFilter: "Overdue" }).getState();
+      const doc = invoiceListDocument();
+      render(
+        <UIDocumentRenderer
+          document={doc}
+          stateStore={store}
+          dataSources={doc.dataSources}
+          dataAdapter={adapter}
+        />,
+      );
+      await waitFor(() => expect(screen.getByText("SINV-001")).toBeInTheDocument());
+      expect(screen.queryByText("SINV-002")).not.toBeInTheDocument();
+    } finally {
+      await server.close();
+    }
   });
 
   it("refetches when the $bind filter input changes, and reflects the new rows", async () => {

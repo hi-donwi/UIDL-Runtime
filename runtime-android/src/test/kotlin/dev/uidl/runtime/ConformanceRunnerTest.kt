@@ -84,6 +84,31 @@ class ConformanceRunnerTest {
                             .isEqualTo(expected)
                     }
 
+                    "action-exec" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        val initial = ((context["state"] as? Map<*, *>) ?: emptyMap<String, Any?>())
+                            .entries
+                            .associate { it.key.toString() to it.value }
+                            .toMutableMap()
+                        @Suppress("UNCHECKED_CAST")
+                        val expectedMap = expected as Map<String, Any?>
+                        val dispatcher = ActionDispatcher(initial, mapOf("state" to initial))
+                        if (expectedMap["ok"] == true) {
+                            dispatcher.execute(input)
+                        } else {
+                            var code: String? = null
+                            try {
+                                dispatcher.execute(input)
+                            } catch (error: UidlException) {
+                                code = error.code
+                            }
+                            assertThat(code)
+                                .withFailMessage("Case $id: expected error ${expectedMap["code"]}")
+                                .isEqualTo(expectedMap["code"])
+                        }
+                        assertResultEquals(initial, expectedMap["state"], id)
+                    }
+
                     "error" -> {
                         var threw = false
                         try {

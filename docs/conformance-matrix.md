@@ -19,7 +19,9 @@ The UIDL specification guarantees deterministic, identical behavior across web, 
 | **UI Rendering Engine** | React 18/19 + Tailwind v4 | Jetpack Compose abstraction | Flutter Widget Tree | N/A (JSON emitter) |
 | **Telemetry & Metrics** | `MetricsCollector` (p50/p95) | Microbenchmark harness | Latency and frame timers | Quarkus Micrometer / OTel |
 | **Conformance Test Runner** | Vitest (`conformance.test.ts`) | JUnit 5 (`ConformanceRunnerTest.kt`) | Flutter Test (`conformance_test.dart`) | JUnit 5 (`ConformanceRunnerTest.java`) |
-| **Conformance Pass Rate** | **55 / 55 (100%)** | **55 / 55 (100%)** | **55 / 55 (100%)** | **29 / 29 Model Tests (100%)** — not the 55-case suite |
+| **Conformance Pass Rate** | **57 / 57** | **57 / 57** | **57 / 57** | compiler tests, not the shared suite |
+
+Existing `action` cases remain schema-accept. Additive `action-exec` cases (2) execute `setState` write and `$data` reject.
 
 Action fixtures assert vocabulary/schema accept, not execution. Render fixtures: React produces an element; Flutter constructs a document; Android Compose produces a `UidlRenderedNode` tree for `Column`/`Text`.
 

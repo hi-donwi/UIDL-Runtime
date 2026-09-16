@@ -69,6 +69,39 @@ void main() {
       }
     });
 
+    group('action-exec', () {
+      final execCases = activeCases.where((c) => c['class'] == 'action-exec');
+      for (final c in execCases) {
+        test('executes ${c['id']}', () async {
+          final context = c['context'] as Map<String, dynamic>? ?? {};
+          final rawState = context['state'];
+          final initial = rawState is Map
+              ? Map<String, dynamic>.from(rawState)
+              : <String, dynamic>{};
+          final dispatcher = ActionDispatcher(
+            state: initial,
+            scope: <String, dynamic>{'state': initial},
+          );
+          final expected = c['expected'] as Map<String, dynamic>;
+          if (expected['ok'] == true) {
+            await dispatcher.execute(c['input']);
+          } else {
+            await expectLater(
+              dispatcher.execute(c['input']),
+              throwsA(
+                isA<UidlException>().having(
+                  (error) => error.code,
+                  'code',
+                  expected['code'],
+                ),
+              ),
+            );
+          }
+          expect(initial, expected['state']);
+        });
+      }
+    });
+
     group('error', () {
       final errorCases = activeCases.where((c) => c['class'] == 'error');
       for (final c in errorCases) {

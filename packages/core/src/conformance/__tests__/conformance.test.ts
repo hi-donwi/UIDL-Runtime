@@ -9,6 +9,7 @@ import { DocumentSchema } from "../../schemas/document";
 import { ActionSchema } from "../../schemas/actions";
 import { assertSupportedDocumentVersion, DocumentVersionError } from "../../version";
 import { ActionInterpreter } from "../../actions/interpreter";
+import { createDocumentState } from "../../state/createDocumentState";
 import { renderUIDocument, createRenderContext } from "../../renderer/renderDocument";
 import type { UIDLDocument } from "../../types";
 import type { Action } from "../../types/actions";
@@ -28,7 +29,7 @@ function* walk(dir: string): Iterable<string> {
 
 interface ConformanceCase {
   id: string;
-  class: "expression" | "binding" | "condition" | "render" | "data" | "error" | "action";
+  class: "expression" | "binding" | "condition" | "render" | "data" | "error" | "action" | "action-exec";
   status: "active" | "planned";
   spec: string;
   input: unknown;
@@ -73,6 +74,22 @@ describe("conformance (spec v1)", () => {
       it(`accepts ${c.id}`, () => {
         const parsed = ActionSchema.safeParse(c.input);
         expect(parsed.success, `expected action ${c.id} to match the v1 action vocabulary`).toBe(c.expected);
+      });
+    }
+  });
+
+  describe("action-exec", () => {
+    for (const c of active.filter((c) => c.class === "action-exec")) {
+      it(`executes ${c.id}`, () => {
+        const initial = { ...((c.context.state as Record<string, unknown> | undefined) ?? {}) };
+        const store = createDocumentState(initial);
+        const report = new ActionInterpreter({ stateStore: store.getState() }).run(c.input as Action);
+        const expected = c.expected as { ok: boolean; code?: string; state: Record<string, unknown> };
+        expect(report.ok).toBe(expected.ok);
+        if (!expected.ok) {
+          expect(report.error?.code).toBe(expected.code);
+        }
+        expect(store.getState().state).toEqual(expected.state);
       });
     }
   });

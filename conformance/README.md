@@ -15,6 +15,7 @@ conformance/
     binding/      ← resolvePath() over a partial scope → expected value
     condition/    ← evaluate() treated as a boolean → expected true/false
     action/       ← ActionSchema must accept the action (the runtime's fixed vocabulary)
+    action-exec/  ← document setState is executed; expected is {ok, state, code?}
     error/        ← input that must fail, mapped to an error code (document validation and the
                     version guard are active; unknown-action is active via ActionInterpreter.run)
     render/       ← renderUIDocument() must produce a valid element from the document
@@ -50,7 +51,9 @@ conformance/
   `DocumentVersionError.code`; `UNKNOWN_ACTION` runs the action through
   `ActionInterpreter.run` and asserts `ok: false` with code `UNKNOWN_ACTION`.
 - `action`-class active cases assert `ActionSchema` (the runtime's fixed vocabulary)
-  accepts `input`.
+  accepts `input`. They do **not** execute the action.
+- `action-exec`-class active cases run `input` against `context.state` and compare
+  `{ ok, state, code? }`. Existing `action` fixtures stay schema-accept.
 - `data`-class active cases take `input: {key, config}` and assert `createRenderContext`
   resolves the dataSource to `expected` (inline array → as-is; a `$query` that has never
   started → `[]`).
