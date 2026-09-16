@@ -102,7 +102,10 @@ class ActionDispatcher(
                     val p = payload as Map<String, Any?>
                     val targetPath = p["path"] as? String
                     val value = p["value"]
-                    val resolvedValue = BindingResolver.resolveBinding(value, scope)
+                    val mergedScope = scope.toMutableMap().apply {
+                        if (eventPayload != null) put("event", eventPayload)
+                    }
+                    val resolvedValue = ExpressionEvaluator.evaluate(value, mergedScope)
                     if (targetPath != null) {
                         if (isReservedDataEnvelopePath(targetPath)) {
                             throw UidlException(

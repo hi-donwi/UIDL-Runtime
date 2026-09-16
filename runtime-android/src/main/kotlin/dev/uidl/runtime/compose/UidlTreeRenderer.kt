@@ -1,5 +1,7 @@
 package dev.uidl.runtime.compose
 
+import dev.uidl.runtime.actions.ActionDispatcher
+import dev.uidl.runtime.evaluator.ExpressionEvaluator
 import dev.uidl.runtime.model.UidlDocument
 import dev.uidl.runtime.model.UidlNode
 import dev.uidl.runtime.spec.UidlErrorCodes
@@ -15,6 +17,50 @@ data class UidlRenderedNode(
     val props: Map<String, Any?> = emptyMap(),
     val children: List<UidlRenderedNode> = emptyList()
 )
+
+/**
+ * Stateful view of one document: render the tree, then dispatch node events
+ * (for example Button `onClick`) through [ActionDispatcher].
+ */
+class UidlDocumentSession(private val document: UidlDocument) {
+    private val state: MutableMap<String, Any?> = document.initialState.toMutableMap()
+    private val scope: MutableMap<String, Any?> = mutableMapOf(
+        "state" to state,
+        "data" to mutableMapOf<String, Any?>(),
+        "session" to mutableMapOf<String, Any?>(),
+        "route" to mutableMapOf<String, Any?>()
+    )
+    private val dispatcher = ActionDispatcher(state, scope)
+
+    fun render(): UidlRenderedNode {
+        val context = UidlRenderContext(
+            state = state,
+            scope = scope,
+            onEvent = { nodeId, eventName, payload -> dispatch(nodeId, eventName, payload) }
+        )
+        return UidlTreeRenderer.render(document, context = context)
+    }
+
+    fun click(nodeId: String) {
+        dispatch(nodeId, "onClick", null)
+    }
+
+    private fun dispatch(nodeId: String, eventName: String, payload: Any?) {
+        val node = findNode(document.root, nodeId)
+            ?: throw IllegalArgumentException("No node with id '$nodeId'")
+        val action = node.events?.get(eventName)
+            ?: throw IllegalArgumentException("Node '$nodeId' has no '$eventName' handler")
+        dispatcher.execute(action, payload)
+    }
+
+    private fun findNode(node: UidlNode, id: String): UidlNode? {
+        if (node.id == id) return node
+        for (child in node.children) {
+            findNode(child, id)?.let { return it }
+        }
+        return null
+    }
+}
 
 object UidlTreeRenderer {
     fun defaultRegistry(): UidlComponentRegistry<UidlRenderedNode> {
@@ -34,19 +80,27 @@ object UidlTreeRenderer {
                 props = node.props
             )
         }
+        registry.register("Button") { node, _ ->
+            UidlRenderedNode(
+                id = node.id,
+                type = "Button",
+                props = node.props
+            )
+        }
         return registry
     }
 
     fun render(
         document: UidlDocument,
-        registry: UidlComponentRegistry<UidlRenderedNode> = defaultRegistry()
+        registry: UidlComponentRegistry<UidlRenderedNode> = defaultRegistry(),
+        context: UidlRenderContext? = null
     ): UidlRenderedNode {
-        val context = UidlRenderContext(
+        val ctx = context ?: UidlRenderContext(
             state = document.initialState,
-            scope = emptyMap(),
+            scope = mapOf("state" to document.initialState),
             onEvent = { _, _, _ -> }
         )
-        return renderNode(document.root, context, registry)
+        return renderNode(document.root, ctx, registry)
     }
 
     fun renderNode(
@@ -59,6 +113,11 @@ object UidlTreeRenderer {
                 code = UidlErrorCodes.UNKNOWN_COMPONENT,
                 message = "No renderer registered for node type '${node.type}'"
             )
-        return renderer.render(node, context)
+        val resolved = node.copy(
+            props = node.props.mapValues { (_, value) ->
+                ExpressionEvaluator.evaluate(value, context.scope)
+            }
+        )
+        return renderer.render(resolved, context)
     }
 }
