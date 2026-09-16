@@ -68,10 +68,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Test Java UIDL Generator
+      - name: Test and install Java UIDL Generator
         run: |
           chmod +x ./mvnw
-          ./mvnw test
+          ./mvnw install
         working-directory: server/uidl-generator
 
       - name: Test Quarkus Server REST API
