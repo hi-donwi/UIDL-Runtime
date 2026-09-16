@@ -207,6 +207,13 @@ object UidlTreeRenderer {
         registerCode("Barcode")
         registerCode("DataMatrix")
 
+        registry.register("Drawer") { node, context ->
+            val title = node.props["title"]?.toString() ?: "Drawer"
+            val texts = mutableListOf(text("${node.id}-title", title))
+            texts.addAll(node.children.map { child -> renderNode(child, context, registry) })
+            UidlRenderedNode(id = node.id, type = "Drawer", props = node.props, children = texts)
+        }
+
         return registry
     }
 

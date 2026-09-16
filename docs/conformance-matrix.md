@@ -60,7 +60,7 @@ Honest coverage of the 37 React `defaultWidgets` types. Native columns mean the 
 | Sidebar | implemented | implemented | implemented |
 | Navbar | implemented | implemented | implemented |
 | Toolbar | implemented | implemented | implemented |
-| Drawer | implemented | implemented | partial |
+| Drawer | implemented | implemented | implemented |
 | Panel | implemented | implemented | implemented |
 | Popover | implemented | implemented | implemented |
 | Dialog | implemented | implemented | implemented |
