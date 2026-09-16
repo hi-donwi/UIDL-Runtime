@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-09-16
+
+### Added
+- Additive `action-exec` conformance cases that execute `setState` (write and `$data` reject) on React, Flutter, and Android.
+- HttpAdapter host proof: the same `$query` invoice-list document renders against the mock HTTP server.
+- Flutter DataTable, Chart, Dialog, KanbanBoard, TreeView, Drawer, and code marks from document props.
+- Android host-agnostic tree exposing DataTable/Chart/Dialog/Kanban/Tree/QR/Drawer text for JVM tests.
+- Full 37-widget catalog registration on Flutter and the Android tree.
+
+### Changed
+- Conformance corpus is 57 active cases. Existing `action` fixtures remain schema-accept.
+- `spec/README.md` no longer claims a `packages/react-native` package.
+
+### Fixed
+- Document `setState` targeting `$data.*` is rejected with `INVALID_STATE` (store API still writable for the query runner).
+- Flutter `unknown-action` asserts `UNKNOWN_ACTION`.
+- Publish workflows build the library before tests (GitHub Packages v0.1.3 mirror timeout).
+
 ## [0.1.3] - 2026-09-16
 
 ### Added
@@ -72,7 +90,8 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.1
