@@ -15,6 +15,7 @@ import { createDocumentState } from "~/state/createDocumentState";
 import { PlaygroundRoute } from "./PlaygroundRoute";
 import { CommandPalette } from "./CommandPalette";
 import { GalleryRoute } from "./gallery/GalleryRoute";
+import { ConformanceRoute } from "./conformance/ConformanceRoute";
 import { exportToCsv, exportToJson, parseCsvFile, parseJsonFile } from "@uidl-runtime/templates/utils/exportImport";
 import { FloatingToolsMenu } from "./FloatingToolsMenu";
 import { dataAdapter, mutationHandler } from "@uidl-runtime/templates/config/data.config";
@@ -426,6 +427,18 @@ export function ReferenceApp() {
       );
     }
 
+    if (path.startsWith("/conformance")) {
+      return (
+        <ConformanceRoute
+          onNavigate={navigate}
+          onBack={() => navigate("/")}
+          isDark={themeMode === "dark"}
+          onToggleTheme={toggleTheme}
+          initialDomain={parseAppRoute(path).conformanceDomain}
+        />
+      );
+    }
+
     if (path.startsWith("/meridian")) {
       return <MeridianReferenceRoute path={path} onNavigate={navigate} onBack={() => navigate("/")} isDark={themeMode === "dark"} />;
     }
@@ -582,6 +595,7 @@ export function ReferenceApp() {
         <CatalogLanding
           onOpen={(reference) => navigate(defaultCompanyPath(reference))}
           onOpenMeridian={() => navigate("/meridian/dashboard")}
+          onOpenConformance={() => navigate("/conformance")}
           isDark={themeMode === "dark"}
           onToggleTheme={toggleTheme}
           language={language}
@@ -748,6 +762,7 @@ export function ReferenceApp() {
 function CatalogLanding({
   onOpen,
   onOpenMeridian,
+  onOpenConformance,
   isDark = false,
   onToggleTheme,
   language = "id",
@@ -755,6 +770,7 @@ function CatalogLanding({
 }: {
   onOpen: (reference: CompanyDemo) => void;
   onOpenMeridian?: () => void;
+  onOpenConformance?: () => void;
   isDark?: boolean;
   onToggleTheme?: () => void;
   language?: "id" | "en";
@@ -807,6 +823,34 @@ function CatalogLanding({
             )}
           </div>
         </div>
+
+        {/* Multi-Platform Conformance Spec Banner */}
+        {onOpenConformance && (
+          <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-lg border border-emerald-200 bg-emerald-50/80 p-4 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/30">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="rounded bg-emerald-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                  SPECIFICATION V1
+                </span>
+                <span className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">
+                  Multi-Platform Conformance: 55 / 55 Active Fixtures Passing (100%)
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-emerald-800 dark:text-emerald-300">
+                {language === "id"
+                  ? "Arsitektur deterministik terverifikasi di 4 runtime resmi: Web (React/TS), Android Native (Kotlin), Flutter (Dart), dan Server (Java 21 Quarkus)."
+                  : "Deterministic cross-platform behavior verified across 4 official runtimes: Web (React/TS), Android Native (Kotlin), Flutter (Dart), and Server (Java 21 Quarkus)."}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenConformance}
+              className="shrink-0 flex h-8 items-center justify-center gap-1.5 rounded-md bg-emerald-700 px-4 text-xs font-semibold text-white hover:bg-emerald-800 transition dark:bg-emerald-600 dark:hover:bg-emerald-500"
+            >
+              <span>{language === "id" ? "Buka Conformance Explorer" : "Open Conformance Explorer"}</span>
+            </button>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {companies.map((company) => (
