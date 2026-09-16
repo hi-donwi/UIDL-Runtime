@@ -68,11 +68,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Unit and integration tests
-        run: npm test
-
       - name: Build library and schemas
         run: npm run build
+
+      - name: Unit and integration tests
+        run: npm test
 
       - name: Validate example documents
         run: npm run validate:examples
