@@ -2,14 +2,14 @@
 
 > Stage A snapshot, refreshed after stages B–N. Spec 1.x, the React reference,
 > semantic-core Flutter/Android runtimes, the Java generator, Quarkus compile/validate,
-> and v0.1.3 exist. The target-state proof — the same UIDL document reasonably
+> and v0.1.4 exist. The target-state proof — the same UIDL document reasonably
 > rendered by React, Flutter, and Compose — is **not** met. Compose has default
 > renderers only for `Column` and `Text` (the `text-column` fixture). Flutter
 > renders a 10-widget subset. React remains the only runtime that can render Meridian.
 
 ## 1. Repo shape at a glance
 
-Monorepo (`npm workspaces`), published package `uidl-runtime` (v0.1.3).
+Monorepo (`npm workspaces`), published package `uidl-runtime` (v0.1.4).
 
 | Path | Responsibility |
 |---|---|
@@ -135,7 +135,7 @@ From `types/actions.ts` + `schemas/actions.ts`: `setState`, `navigate`, `api`,
 ## 8. Versioning today
 
 - `UIDL_RUNTIME_VERSION = "1.1.0"` (`version.ts`) — the **runtime** version.
-- `package.json version = 0.1.3` — the **package** version.
+- `package.json version = 0.1.4` — the **package** version.
 - `DocumentSchema.version: z.string()` — required, but **not validated against a
   supported range**. Nothing checks major/minor compatibility today (plan §6/§25 gap:
   `UNSUPPORTED_VERSION` does not exist).
