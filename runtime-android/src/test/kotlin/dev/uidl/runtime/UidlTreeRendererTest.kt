@@ -230,4 +230,80 @@ class UidlTreeRendererTest {
         if (tree.id == id) return tree.props[prop]
         return tree.children.firstNotNullOfOrNull { propValue(it, id, prop) }
     }
+
+    private fun textValues(tree: dev.uidl.runtime.compose.UidlRenderedNode): List<Any?> {
+        val values = mutableListOf<Any?>()
+        fun walk(node: dev.uidl.runtime.compose.UidlRenderedNode) {
+            if (node.type == "Text") values.add(node.props["value"])
+            node.children.forEach(::walk)
+        }
+        walk(tree)
+        return values
+    }
+
+    @Test
+    fun dataTableExposesColumnAndRowText() {
+        val document = UidlDocument.fromMap(
+            mapOf(
+                "version" to "1.0.0",
+                "id" to "table-screen",
+                "name" to "Table",
+                "root" to mapOf(
+                    "id" to "table",
+                    "type" to "DataTable",
+                    "props" to mapOf(
+                        "columns" to listOf(
+                            mapOf("key" to "name", "label" to "Name"),
+                            mapOf("key" to "qty", "label" to "Qty")
+                        ),
+                        "rows" to listOf(mapOf("name" to "Nails", "qty" to 12))
+                    )
+                )
+            )
+        )
+        val values = textValues(UidlDocumentSession(document).render())
+        assertThat(values).contains("Name", "Qty", "Nails", "12")
+    }
+
+    @Test
+    fun chartExposesTitleAndXLabels() {
+        val document = UidlDocument.fromMap(
+            mapOf(
+                "version" to "1.0.0",
+                "id" to "chart-screen",
+                "name" to "Chart",
+                "root" to mapOf(
+                    "id" to "chart",
+                    "type" to "Chart",
+                    "props" to mapOf(
+                        "title" to "Sales",
+                        "xKey" to "month",
+                        "yKey" to "value",
+                        "rows" to listOf(
+                            mapOf("month" to "Apr", "value" to 10),
+                            mapOf("month" to "May", "value" to 20)
+                        )
+                    )
+                )
+            )
+        )
+        assertThat(textValues(UidlDocumentSession(document).render())).contains("Sales", "Apr", "May")
+    }
+
+    @Test
+    fun dialogExposesTitleWhenOpen() {
+        val document = UidlDocument.fromMap(
+            mapOf(
+                "version" to "1.0.0",
+                "id" to "dialog-screen",
+                "name" to "Dialog",
+                "root" to mapOf(
+                    "id" to "dlg",
+                    "type" to "Dialog",
+                    "props" to mapOf("open" to true, "title" to "Confirm", "content" to "Delete this row?")
+                )
+            )
+        )
+        assertThat(textValues(UidlDocumentSession(document).render())).contains("Confirm", "Delete this row?")
+    }
 }
