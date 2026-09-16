@@ -119,6 +119,94 @@ Widget buildDialog({
   );
 }
 
+Widget buildKanban({
+  required String id,
+  required Map<String, dynamic> props,
+}) {
+  final columns = mapsOf(props['columns']);
+  final rows = mapsOf(props['rows']);
+  final title = props['title']?.toString();
+  return Column(
+    key: ValueKey(id),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      if (title != null && title.isNotEmpty) Text(title),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final column in columns)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(column['title']?.toString() ?? column['id']?.toString() ?? ''),
+                  for (final row in rows.where((card) => card['columnId'] == column['id']))
+                    Text(row['title']?.toString() ?? row['label']?.toString() ?? ''),
+                ],
+              ),
+            ),
+        ],
+      ),
+    ],
+  );
+}
+
+Widget buildTreeView({
+  required String id,
+  required Map<String, dynamic> props,
+}) {
+  final items = mapsOf(props['items']).isNotEmpty ? mapsOf(props['items']) : mapsOf(props['rows']);
+  final title = props['title']?.toString();
+  List<Widget> walk(List<Map<dynamic, dynamic>> nodes, int level) {
+    final out = <Widget>[];
+    for (final node in nodes) {
+      final label = node['title']?.toString() ?? node['label']?.toString() ?? node['id']?.toString() ?? '';
+      out.add(Padding(
+        padding: EdgeInsets.only(left: 16.0 * level),
+        child: Text(label),
+      ));
+      final children = mapsOf(node['children']);
+      if (children.isNotEmpty) {
+        out.addAll(walk(children, level + 1));
+      }
+    }
+    return out;
+  }
+
+  return Column(
+    key: ValueKey(id),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      if (title != null && title.isNotEmpty) Text(title),
+      ...walk(items, 0),
+    ],
+  );
+}
+
+Widget buildDrawer({
+  required String id,
+  required Map<String, dynamic> props,
+  required List<Widget> children,
+}) {
+  final title = props['title']?.toString() ?? 'Drawer';
+  return Material(
+    key: ValueKey(id),
+    elevation: 2,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title),
+        if (children.isEmpty)
+          const SizedBox.shrink()
+        else if (children.length == 1)
+          children.first
+        else
+          Column(children: children),
+      ],
+    ),
+  );
+}
+
 class _BarPainter extends CustomPainter {
   _BarPainter(this.values);
 
