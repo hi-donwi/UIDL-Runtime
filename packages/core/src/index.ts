@@ -198,3 +198,9 @@ export type {
   ValidateResult,
   RemoteHealthResult,
 } from "./compiler/remoteCompiler.js";
+export { MetricsCollector } from "./telemetry/metrics.js";
+export type {
+  CompilationMetric,
+  DedupMetric,
+  TelemetrySummary,
+} from "./telemetry/metrics.js";

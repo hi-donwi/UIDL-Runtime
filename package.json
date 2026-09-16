@@ -49,6 +49,7 @@
     "validate:examples": "node bin/validate.mjs packages/templates/src/documents/*.json",
     "validate:spec": "node scripts/validate-spec.mjs",
     "audit:reference": "tsx scripts/audit-reference-coverage.mts",
+    "bench:compilers": "tsx scripts/benchmark-compilers.mts",
     "test:reference": "playwright test e2e/real-reference-acceptance.spec.ts",
     "test:reference:visual": "playwright test e2e/visual-regression.spec.ts e2e/meridian-reference.spec.ts --grep \"visual baseline|matches its visual baseline\"",
     "test:reference:update": "playwright test e2e/visual-regression.spec.ts e2e/meridian-reference.spec.ts --grep \"visual baseline|matches its visual baseline\" --update-snapshots",
