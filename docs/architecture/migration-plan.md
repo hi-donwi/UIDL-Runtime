@@ -124,8 +124,7 @@ diagnostics), documentation site, ecosystem.
 4. Backward-compat obligations from `current-state.md §12`: the published package,
    in-memory + HTTP modes, Meridian invariant + audit gates, the 11 verticals, the
    `uidl-validate` CLI.
-5. Promote decisions to `context/memory/projects/uidl-runtime/decisions.md` and
-   `docs/adr/` for genuinely architectural choices.
+5. Promote genuinely architectural choices to `docs/adr/`.
 
 ## Open decisions (resolve before Slice E)
 
