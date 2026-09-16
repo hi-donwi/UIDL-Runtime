@@ -23,8 +23,35 @@ interface SearchResponseItem {
 }
 
 export function WorkspaceControlApp() {
-  const [serverUrl] = useState("http://127.0.0.1:8765");
-  const [token, setToken] = useState(() => sessionStorage.getItem("ws_token") || "");
+  const [serverUrl, setServerUrl] = useState(() => {
+    if (typeof window !== "undefined") {
+      const param = new URLSearchParams(window.location.search).get("server");
+      if (param) return param.replace(/\/+$/, "");
+      const origin = window.location.origin;
+      if (origin && origin.startsWith("http")) {
+        // If served from ws_web directly (e.g. port 8765 or root)
+        const port = window.location.port;
+        if (!port || port === "8765" || !port.startsWith("517")) {
+          return origin.replace(/\/+$/, "");
+        }
+      }
+    }
+    return "http://127.0.0.1:8765";
+  });
+
+  const [token, setToken] = useState(() => {
+    if (typeof window !== "undefined") {
+      const param = new URLSearchParams(window.location.search).get("token");
+      if (param) {
+        sessionStorage.setItem("ws_token", param);
+        return param;
+      }
+      return sessionStorage.getItem("ws_token") || "";
+    }
+    return "";
+  });
+
+  const [isConnected, setIsConnected] = useState(false);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"board" | "backlog" | "activity" | "commits">("board");
@@ -112,25 +139,29 @@ export function WorkspaceControlApp() {
 
   // Fetch projects on mount or when token changes
   useEffect(() => {
+    if (!token) return;
     let cancelled = false;
     api<{ projects: ProjectItem[] }>("/api/projects")
       .then((data) => {
         if (cancelled) return;
         const list = data.projects || [];
         setProjects(list);
+        setIsConnected(true);
+        setError(null);
         if (list.length > 0) {
           setSelectedProject((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0].key));
         }
       })
       .catch((err: unknown) => {
         if (cancelled) return;
+        setIsConnected(false);
         const msg = err instanceof Error ? err.message : String(err);
         setError(`Failed to connect to Agent Workspace server: ${msg}`);
       });
     return () => {
       cancelled = true;
     };
-  }, [api]);
+  }, [api, token]);
 
   // Reload document when project or tab changes
   useEffect(() => {
@@ -290,6 +321,35 @@ export function WorkspaceControlApp() {
   function handleSaveToken(newToken: string) {
     setToken(newToken);
     sessionStorage.setItem("ws_token", newToken);
+    if (!newToken.trim()) {
+      setIsConnected(false);
+      setProjects([]);
+      setDocument(null);
+    }
+  }
+
+  function handleConnect() {
+    if (!token.trim()) return;
+    setLoading(true);
+    setError(null);
+    api<{ projects: ProjectItem[] }>("/api/projects")
+      .then((data) => {
+        const list = data.projects || [];
+        setProjects(list);
+        setIsConnected(true);
+        setError(null);
+        if (list.length > 0) {
+          setSelectedProject((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0].key));
+        }
+      })
+      .catch((err: unknown) => {
+        setIsConnected(false);
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(`Failed to connect to Agent Workspace server: ${msg}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
@@ -303,6 +363,13 @@ export function WorkspaceControlApp() {
             </span>
             <span className="font-bold text-sm tracking-tight text-white">Agent Workspace Control</span>
             <span className="text-xs text-[#8b949e]">powered by uidl-runtime</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-[#0d1117] border-[#30363d]">
+            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-[#3fb950]" : "bg-[#8b949e]"}`} />
+            <span className={isConnected ? "text-[#3fb950]" : "text-[#8b949e]"}>
+              {isConnected ? "Connected" : "Disconnected"}
+            </span>
           </div>
 
           <nav className="flex gap-1 ml-4 bg-[#0d1117] p-1 rounded-md border border-[#30363d]">
@@ -353,13 +420,18 @@ export function WorkspaceControlApp() {
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            className="bg-[#0d1117] border border-[#30363d] text-xs text-[#f0f6fc] rounded px-3 py-1.5 focus:outline-none focus:border-[#58a6ff]"
+            disabled={!isConnected || projects.length === 0}
+            className="bg-[#0d1117] border border-[#30363d] text-xs text-[#f0f6fc] rounded px-3 py-1.5 focus:outline-none focus:border-[#58a6ff] disabled:opacity-50"
           >
-            {projects.map((p) => (
-              <option key={p.key} value={p.key}>
-                {p.key} ({p.client})
-              </option>
-            ))}
+            {projects.length === 0 ? (
+              <option value="">No Projects</option>
+            ) : (
+              projects.map((p) => (
+                <option key={p.key} value={p.key}>
+                  {p.key} ({p.client})
+                </option>
+              ))
+            )}
           </select>
 
           <input
@@ -367,12 +439,26 @@ export function WorkspaceControlApp() {
             placeholder="Bearer token..."
             value={token}
             onChange={(e) => handleSaveToken(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleConnect();
+            }}
             className="bg-[#0d1117] border border-[#30363d] text-xs text-[#f0f6fc] rounded px-3 py-1.5 w-36 focus:outline-none focus:border-[#58a6ff]"
           />
 
+          {!isConnected && (
+            <button
+              onClick={handleConnect}
+              disabled={!token.trim() || loading}
+              className="bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded font-medium transition-colors"
+            >
+              Connect
+            </button>
+          )}
+
           <button
             onClick={() => setIsNewTaskOpen(true)}
-            className="bg-[#238636] hover:bg-[#2ea043] text-white text-xs px-3 py-1.5 rounded font-medium transition-colors"
+            disabled={!isConnected || !selectedProject}
+            className="bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded font-medium transition-colors"
           >
             + New Task
           </button>
@@ -380,7 +466,8 @@ export function WorkspaceControlApp() {
           {(activeTab === "board" || activeTab === "backlog") && (
             <button
               onClick={() => setIsMoveOpen(true)}
-              className="bg-[#21262d] hover:bg-[#30363d] text-[#58a6ff] text-xs px-3 py-1.5 rounded border border-[#30363d] transition-colors"
+              disabled={!isConnected || !selectedProject}
+              className="bg-[#21262d] hover:bg-[#30363d] disabled:opacity-50 text-[#58a6ff] text-xs px-3 py-1.5 rounded border border-[#30363d] transition-colors"
             >
               Move Card
             </button>
@@ -391,7 +478,8 @@ export function WorkspaceControlApp() {
               type="checkbox"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
-              className="rounded bg-[#0d1117] border-[#30363d] text-[#58a6ff] cursor-pointer"
+              disabled={!isConnected}
+              className="rounded bg-[#0d1117] border-[#30363d] text-[#58a6ff] cursor-pointer disabled:opacity-50"
             />
             Auto 10s
           </label>
@@ -403,7 +491,7 @@ export function WorkspaceControlApp() {
               </span>
               <button
                 onClick={() => handleClockAction("out")}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isConnected}
                 className="bg-[#da3633] hover:bg-[#f85149] text-white text-xs px-2.5 py-1.5 rounded font-medium transition-colors disabled:opacity-50"
               >
                 Clock Out
@@ -412,7 +500,7 @@ export function WorkspaceControlApp() {
           ) : (
             <button
               onClick={() => handleClockAction("in")}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isConnected || !selectedProject}
               className="bg-[#21262d] hover:bg-[#30363d] text-[#58a6ff] text-xs px-2.5 py-1.5 rounded border border-[#30363d] transition-colors disabled:opacity-50"
             >
               Clock In
@@ -421,7 +509,8 @@ export function WorkspaceControlApp() {
 
           <button
             onClick={handleRefresh}
-            className="bg-[#21262d] hover:bg-[#30363d] text-xs px-3 py-1.5 rounded border border-[#30363d] transition-colors"
+            disabled={!isConnected || !selectedProject}
+            className="bg-[#21262d] hover:bg-[#30363d] disabled:opacity-50 text-xs px-3 py-1.5 rounded border border-[#30363d] transition-colors"
           >
             Refresh
           </button>
@@ -439,6 +528,69 @@ export function WorkspaceControlApp() {
         {loading && (
           <div className="text-center py-12 text-[#8b949e] text-sm font-mono">
             Compiling and rendering UIDL document...
+          </div>
+        )}
+
+        {!isConnected && projects.length === 0 && !loading && (
+          <div className="max-w-xl mx-auto mt-10 p-8 bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-[#1f6feb]/20 border border-[#388bfd]/40 flex items-center justify-center text-[#58a6ff] font-mono font-bold text-sm">
+                WS
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-white">Connect to Agent Workspace</h2>
+                <p className="text-xs text-[#8b949e]">Bidirectional Kanban board synchronization and activity clock metrics</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#c9d1d9] leading-relaxed mb-6">
+              Workspace Control pairs with your local workspace daemon to inspect real-time project backlogs, track active clocks, and manage tasks.
+            </p>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1.5">Workspace Backend URL</label>
+                <input
+                  type="text"
+                  value={serverUrl}
+                  onChange={(e) => setServerUrl(e.target.value)}
+                  placeholder="http://127.0.0.1:8765"
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-xs text-[#f0f6fc] font-mono focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1.5">Bearer Token</label>
+                <input
+                  type="password"
+                  value={token}
+                  onChange={(e) => handleSaveToken(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleConnect();
+                  }}
+                  placeholder="Paste your workspace bearer token..."
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-xs text-[#f0f6fc] font-mono focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+
+              <button
+                onClick={handleConnect}
+                disabled={!token.trim() || loading}
+                className="w-full py-2.5 px-4 bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white font-medium text-xs rounded-md transition-colors"
+              >
+                Connect to Workspace
+              </button>
+            </div>
+
+            <div className="pt-5 border-t border-[#30363d] text-xs text-[#8b949e] space-y-2">
+              <div className="font-semibold text-[#c9d1d9]">Quick Start:</div>
+              <div className="font-mono bg-[#0d1117] p-2.5 rounded border border-[#30363d] text-[#79c0ff] text-xs select-all">
+                ws web --runtime uidl
+              </div>
+              <p className="text-[11px] leading-normal text-[#8b949e]">
+                When started, ws web prints the local server URL and your bearer token. You can also append <span className="text-[#f0f6fc] font-mono">?token=...</span> to the URL to authenticate automatically.
+              </p>
+            </div>
           </div>
         )}
 
