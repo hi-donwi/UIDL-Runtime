@@ -9,7 +9,7 @@
 
 ## 1. Repo shape at a glance
 
-Monorepo (`npm workspaces`), published package `uidl-runtime` (v0.1.4).
+Monorepo (`npm workspaces`). Published packages: npm `uidl-runtime` v0.1.4 and pub.dev `uidl_flutter` v0.1.4.
 
 | Path | Responsibility |
 |---|---|
