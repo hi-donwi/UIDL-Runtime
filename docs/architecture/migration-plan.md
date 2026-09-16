@@ -9,16 +9,21 @@
 
 | Stage | Deliverable | Landmark |
 |---|---|---|
-| A | `docs/architecture/{current,target,migration-plan}.md` | ✅ this repo state |
-| B | `spec/` JSON schemas + docs + versioning | **next** |
-| C | `spec/semantics/*.md` (formal semantics) | with B |
-| D | `conformance/` shared fixtures | with B/C |
-| E | React runtime → full conformance | runtime refactor |
-| F–G | Flutter runtime + conformance | new `runtimes/flutter` |
-| H–I | Compose runtime + conformance | new `runtimes/android-compose` |
-| J | Server-side UIDL generation contracts | `server/` |
-| K | AI UIDL generation + validation pipeline | wire `aiPromptGenerator` |
-| L | Performance, security, docs, ecosystem | ongoing |
+| A | `docs/architecture/{current,target,migration-plan}.md` | ✅ (refresh 2026-09-16) |
+| B | `spec/` JSON schemas + docs + versioning | ✅ |
+| C | `spec/semantics/*.md` (formal semantics) | ✅ Approved for 1.x |
+| D | `conformance/` shared fixtures | ✅ 55 cases; action/render still shallow |
+| E | React runtime → full conformance | ✅ schema-level for actions |
+| F–G | Flutter runtime + conformance | ✅ `runtime-flutter/` (10 widgets) |
+| H–I | Compose runtime + conformance | ✅ `runtime-android/` semantic core; **next** = `Column`/`Text` tree + further widgets |
+| J | Server-side UIDL generation contracts | ✅ `server/uidl-generator`, `server/uidl-server` |
+| K | AI UIDL generation + validation pipeline | ✅ `aiPipeline.ts` |
+| L | Performance, security, docs, ecosystem | ✅ telemetry + benches; no new telemetry without a consumer |
+
+Do **not** restructure onto `runtimes/flutter` / `runtimes/android-compose` as a
+prerequisite. The directories `runtime-flutter/` and `runtime-android/` already
+exist. Next native proof is rendering `conformance/cases/render/text-column.json`
+on Compose (host-agnostic tree in the JVM harness), then Button + setState.
 
 ## Slice B1 — Spec scaffold + versioning (this run)
 
