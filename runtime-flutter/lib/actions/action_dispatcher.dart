@@ -44,6 +44,11 @@ class ActionDispatcher {
     'validate',
   };
 
+  static bool isReservedDataEnvelopePath(String path) {
+    final normalized = path.startsWith('state.') ? path.substring(6) : path;
+    return normalized == r'$data' || normalized.startsWith(r'$data.');
+  }
+
   Future<void> execute(dynamic action, [dynamic eventPayload]) async {
     if (action == null) return;
 
@@ -110,6 +115,13 @@ class ActionDispatcher {
               : eventPayload;
 
           if (path != null) {
+            if (ActionDispatcher.isReservedDataEnvelopePath(path)) {
+              throw UidlException(
+                code: UidlErrorCodes.invalidState,
+                message:
+                    'setState path "$path" targets the reserved \$data envelope. Documents may read state.\$data.* but must not write it.',
+              );
+            }
             final targetPath = path.startsWith('state.') ? path.substring(6) : path;
             setByPath(state, targetPath, value);
             onStateChanged?.call();
