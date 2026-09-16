@@ -27,47 +27,47 @@ Action fixtures assert vocabulary/schema accept, not execution. Render fixtures:
 
 ## 1.1 Widget capability matrix
 
-Honest coverage of the 38 React widget types. Flutter `ListView` is a children list, not the React list/data-source widget.
+Honest coverage of the 37 React `defaultWidgets` types. Native columns mean “the type is registered and renders without falling through to unknown-widget”. ListView/GridView/DataTable/Chart and the code-graphics (QR/Barcode/DataMatrix) are **structural**, not pixel-identical to React.
 
 | Widget | Web / React | Flutter | Android Compose tree |
 |---|---|---|---|
 | Container | implemented | implemented | implemented |
 | Row | implemented | implemented | implemented |
 | Column | implemented | implemented | implemented |
-| Stack | implemented | missing | missing |
+| Stack | implemented | implemented | implemented |
 | Spacer | implemented | implemented | implemented |
 | Divider | implemented | implemented | implemented |
 | Text | implemented | implemented | implemented |
-| Icon | implemented | missing | missing |
+| Icon | implemented | implemented | implemented |
 | Image | implemented | implemented | implemented |
 | Button | implemented | implemented | implemented |
-| Badge | implemented | missing | missing |
+| Badge | implemented | implemented | implemented |
 | TextField | implemented | implemented | implemented |
-| Checkbox | implemented | missing | missing |
-| Switch | implemented | missing | missing |
-| Slider | implemented | missing | missing |
-| Select | implemented | missing | missing |
-| Textarea | implemented | missing | missing |
-| RadioGroup | implemented | missing | missing |
-| Form | implemented | missing | missing |
+| Checkbox | implemented | implemented | implemented |
+| Switch | implemented | implemented | implemented |
+| Slider | implemented | implemented | implemented |
+| Select | implemented | implemented | implemented |
+| Textarea | implemented | implemented | implemented |
+| RadioGroup | implemented | implemented | implemented |
+| Form | implemented | implemented | implemented |
 | ListView | implemented | partial | partial |
-| GridView | implemented | missing | missing |
-| DataTable | implemented | missing | missing |
-| PageBar | implemented | missing | missing |
-| Chart | implemented | missing | missing |
-| KanbanBoard | implemented | missing | missing |
-| TreeView | implemented | missing | missing |
-| Sidebar | implemented | missing | missing |
-| Navbar | implemented | missing | missing |
-| Toolbar | implemented | missing | missing |
-| Drawer | implemented | missing | missing |
-| Panel | implemented | missing | missing |
-| Popover | implemented | missing | missing |
-| Dialog | implemented | missing | missing |
-| Snackbar | implemented | missing | missing |
-| QRCode | implemented | missing | missing |
-| Barcode | implemented | missing | missing |
-| DataMatrix | implemented | missing | missing |
+| GridView | implemented | partial | partial |
+| DataTable | implemented | partial | partial |
+| PageBar | implemented | implemented | implemented |
+| Chart | implemented | partial | partial |
+| KanbanBoard | implemented | partial | partial |
+| TreeView | implemented | partial | partial |
+| Sidebar | implemented | implemented | implemented |
+| Navbar | implemented | implemented | implemented |
+| Toolbar | implemented | implemented | implemented |
+| Drawer | implemented | partial | partial |
+| Panel | implemented | implemented | implemented |
+| Popover | implemented | implemented | implemented |
+| Dialog | implemented | partial | partial |
+| Snackbar | implemented | implemented | implemented |
+| QRCode | implemented | partial | partial |
+| Barcode | implemented | partial | partial |
+| DataMatrix | implemented | partial | partial |
 
 ---
 

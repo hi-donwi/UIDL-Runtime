@@ -67,6 +67,24 @@ class UidlDocumentSession(private val document: UidlDocument) {
 }
 
 object UidlTreeRenderer {
+    /** React `defaultWidgets` types. Native trees must register every name. */
+    val CATALOG_WIDGET_TYPES: List<String> = listOf(
+        "Container", "Row", "Column", "Stack", "Spacer", "Divider",
+        "Text", "Icon", "Image", "Button", "Badge",
+        "TextField", "Checkbox", "Switch", "Slider", "Select", "Textarea", "RadioGroup", "Form",
+        "ListView", "GridView", "DataTable", "PageBar", "Chart", "KanbanBoard", "TreeView",
+        "Sidebar", "Navbar", "Toolbar",
+        "Drawer", "Panel", "Popover", "Dialog", "Snackbar",
+        "QRCode", "Barcode", "DataMatrix"
+    )
+
+    private val LAYOUT_TYPES = setOf(
+        "Container", "Row", "Column", "Stack", "Form",
+        "ListView", "GridView", "DataTable", "PageBar", "Chart", "KanbanBoard", "TreeView",
+        "Sidebar", "Navbar", "Toolbar",
+        "Drawer", "Panel", "Popover", "Dialog", "Snackbar"
+    )
+
     fun defaultRegistry(): UidlComponentRegistry<UidlRenderedNode> {
         val registry = UidlComponentRegistry<UidlRenderedNode>()
         fun registerLayout(type: String) {
@@ -88,16 +106,9 @@ object UidlTreeRenderer {
                 )
             }
         }
-        registerLayout("Column")
-        registerLayout("Row")
-        registerLayout("Container")
-        registerLayout("ListView")
-        registerLeaf("Text")
-        registerLeaf("Button")
-        registerLeaf("TextField")
-        registerLeaf("Spacer")
-        registerLeaf("Divider")
-        registerLeaf("Image")
+        for (type in CATALOG_WIDGET_TYPES) {
+            if (type in LAYOUT_TYPES) registerLayout(type) else registerLeaf(type)
+        }
         return registry
     }
 

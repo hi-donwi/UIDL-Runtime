@@ -1,6 +1,7 @@
 package dev.uidl.runtime
 
 import dev.uidl.runtime.compose.UidlDocumentSession
+import dev.uidl.runtime.compose.UidlTreeRenderer
 import dev.uidl.runtime.model.UidlDocument
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -179,6 +180,38 @@ class UidlTreeRendererTest {
         )
         assertThat(propValue(tree, "photo", "src")).isEqualTo("https://example.com/a.png")
         assertThat(tree.children[3].children[0].props["value"]).isEqualTo("one")
+    }
+
+    @Test
+    fun everyCatalogWidgetTypeRenders() {
+        assertThat(UidlTreeRenderer.defaultRegistry().registeredTypes())
+            .containsExactlyInAnyOrderElementsOf(UidlTreeRenderer.CATALOG_WIDGET_TYPES)
+
+        for (type in UidlTreeRenderer.CATALOG_WIDGET_TYPES) {
+            val document = UidlDocument.fromMap(
+                mapOf(
+                    "version" to "1.0.0",
+                    "id" to "catalog-$type",
+                    "name" to type,
+                    "root" to mapOf(
+                        "id" to "root",
+                        "type" to type,
+                        "props" to mapOf("value" to type, "label" to type, "src" to "https://example.com/a.png"),
+                        "children" to listOf(
+                            mapOf(
+                                "id" to "child",
+                                "type" to "Text",
+                                "props" to mapOf("value" to "child")
+                            )
+                        )
+                    )
+                )
+            )
+            val tree = UidlDocumentSession(document).render()
+            assertThat(tree.type)
+                .withFailMessage("expected catalog type %s to render", type)
+                .isEqualTo(type)
+        }
     }
 
     private fun textValue(
