@@ -55,12 +55,12 @@ Honest coverage of the 37 React `defaultWidgets` types. Native columns mean “t
 | DataTable | implemented | implemented | partial |
 | PageBar | implemented | implemented | implemented |
 | Chart | implemented | implemented | partial |
-| KanbanBoard | implemented | partial | partial |
-| TreeView | implemented | partial | partial |
+| KanbanBoard | implemented | implemented | partial |
+| TreeView | implemented | implemented | partial |
 | Sidebar | implemented | implemented | implemented |
 | Navbar | implemented | implemented | implemented |
 | Toolbar | implemented | implemented | implemented |
-| Drawer | implemented | partial | partial |
+| Drawer | implemented | implemented | partial |
 | Panel | implemented | implemented | implemented |
 | Popover | implemented | implemented | implemented |
 | Dialog | implemented | implemented | partial |

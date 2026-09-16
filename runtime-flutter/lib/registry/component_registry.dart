@@ -252,11 +252,11 @@ class ComponentRegistry {
     });
 
     register('KanbanBoard', (context, node, props, children, onEvent) {
-      return Row(key: ValueKey(node.id), children: children);
+      return buildKanban(id: node.id, props: props);
     });
 
     register('TreeView', (context, node, props, children, onEvent) {
-      return _childColumn(children, key: ValueKey(node.id));
+      return buildTreeView(id: node.id, props: props);
     });
 
     register('Sidebar', (context, node, props, children, onEvent) {
@@ -272,7 +272,7 @@ class ComponentRegistry {
     });
 
     register('Drawer', (context, node, props, children, onEvent) {
-      return _childColumn(children, key: ValueKey(node.id));
+      return buildDrawer(id: node.id, props: props, children: children);
     });
 
     register('Panel', (context, node, props, children, onEvent) {

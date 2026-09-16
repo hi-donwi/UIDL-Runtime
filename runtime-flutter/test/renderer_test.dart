@@ -266,5 +266,62 @@ void main() {
       expect(find.text('1234567890'), findsOneWidget);
       expect(find.text('DM-9'), findsOneWidget);
     });
+
+    testWidgets('KanbanBoard shows column titles and card titles', (tester) async {
+      final doc = UidlDocument(
+        version: '1.0.0',
+        id: 'kanban-screen',
+        name: 'Kanban',
+        root: UidlNode(
+          id: 'board',
+          type: 'KanbanBoard',
+          props: {
+            'title': 'Pipeline',
+            'columns': [
+              {'id': 'todo', 'title': 'Todo'},
+              {'id': 'doing', 'title': 'Doing'},
+            ],
+            'rows': [
+              {'columnId': 'todo', 'title': 'Fix login'},
+            ],
+          },
+        ),
+      );
+
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      expect(find.text('Pipeline'), findsOneWidget);
+      expect(find.text('Todo'), findsOneWidget);
+      expect(find.text('Doing'), findsOneWidget);
+      expect(find.text('Fix login'), findsOneWidget);
+    });
+
+    testWidgets('TreeView shows nested item titles', (tester) async {
+      final doc = UidlDocument(
+        version: '1.0.0',
+        id: 'tree-screen',
+        name: 'Tree',
+        root: UidlNode(
+          id: 'tree',
+          type: 'TreeView',
+          props: {
+            'title': 'Accounts',
+            'items': [
+              {
+                'id': 'root-a',
+                'title': 'Assets',
+                'children': [
+                  {'id': 'cash', 'title': 'Cash'},
+                ],
+              },
+            ],
+          },
+        ),
+      );
+
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      expect(find.text('Accounts'), findsOneWidget);
+      expect(find.text('Assets'), findsOneWidget);
+      expect(find.text('Cash'), findsOneWidget);
+    });
   });
 }
