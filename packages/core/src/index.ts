@@ -204,3 +204,19 @@ export type {
   DedupMetric,
   TelemetrySummary,
 } from "./telemetry/metrics.js";
+export { Tracer, getTracer, resetTracer } from "./telemetry/tracing.js";
+export type {
+  SpanKind,
+  BaseSpan,
+  CompilationSpan,
+  ExpressionSpan,
+  RenderSpan,
+  BindingSpan,
+  ActionSpan,
+  ValidationSpan,
+  Span,
+  SpanStats,
+  TraceSummary,
+} from "./telemetry/tracing.js";
+export { timeSync, timeAsync, Stopwatch, performanceNow } from "./telemetry/timer.js";
+export type { TimerResult } from "./telemetry/timer.js";
