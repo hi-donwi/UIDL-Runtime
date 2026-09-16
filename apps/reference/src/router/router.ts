@@ -137,7 +137,20 @@ export function parseAppRoute(
     };
   }
 
-  // 4. Canonical /app/:company/... routes
+  // 4. Conformance Matrix & Multi-Runtime Explorer
+  if (pathname === "/conformance" || pathname.startsWith("/conformance/")) {
+    const domainFromPath = pathname.replace(/^\/conformance\/?/, "");
+    const domain = queryParams.domain || domainFromPath || "all";
+    return {
+      kind: "conformance",
+      path: pathname,
+      conformanceDomain: domain,
+      queryParams,
+      rawQuery,
+    };
+  }
+
+  // 5. Canonical /app/:company/... routes
   if (pathname.startsWith("/app/")) {
     const segments = pathname.replace(/^\/app\//, "").split("/").filter(Boolean);
     const company = segments[0];
