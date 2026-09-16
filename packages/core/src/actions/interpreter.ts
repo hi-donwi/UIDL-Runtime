@@ -68,6 +68,27 @@ class UnknownActionError extends Error {
   }
 }
 
+/**
+ * Raised when a document `setState` targets the runtime-owned `$data` envelope.
+ * The query runner still writes that envelope through `DocumentStateStore.setState`.
+ */
+class InvalidStateError extends Error {
+  readonly code = ERROR_CODES.INVALID_STATE;
+
+  constructor(path: string) {
+    super(
+      `Action execution failed: setState path "${path}" targets the reserved $data envelope. Documents may read state.$data.* but must not write it.`,
+    );
+    this.name = "InvalidStateError";
+  }
+}
+
+/** True when a document `setState` path names the reserved query envelope. */
+export function isReservedDataEnvelopePath(path: string): boolean {
+  const normalized = path.startsWith("state.") ? path.slice("state.".length) : path;
+  return normalized === "$data" || normalized.startsWith("$data.");
+}
+
 function isBoundActionValue(value: unknown): value is { $bind: string } {
   return isRecord(value) && typeof value.$bind === "string";
 }
@@ -292,6 +313,9 @@ export class ActionInterpreter {
 
     if ("setState" in action) {
       const { path, value } = action.setState;
+      if (isReservedDataEnvelopePath(path)) {
+        throw new InvalidStateError(path);
+      }
       const scope = this.buildScope();
       let resolvedValue: unknown;
 

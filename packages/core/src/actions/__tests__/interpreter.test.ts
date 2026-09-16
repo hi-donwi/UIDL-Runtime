@@ -26,6 +26,39 @@ describe("action interpreter", () => {
     expect((store.getState().state.user as Record<string, string>).name).toBe("Bob");
   });
 
+  it("rejects document setState targeting the reserved $data envelope", () => {
+    const store = createDocumentState({ count: 0 });
+    const interpreter = new ActionInterpreter({ stateStore: store.getState() });
+
+    const report = interpreter.run({
+      setState: { path: "$data.invoices.status", value: "success" },
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.error?.code).toBe("INVALID_STATE");
+    expect(store.getState().state.$data).toBeUndefined();
+    expect(store.getState().state.count).toBe(0);
+  });
+
+  it("rejects document setState targeting $data even with a state. prefix", () => {
+    const store = createDocumentState({});
+    const interpreter = new ActionInterpreter({ stateStore: store.getState() });
+
+    const report = interpreter.run({
+      setState: { path: "state.$data.rows", value: [] },
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.error?.code).toBe("INVALID_STATE");
+    expect(store.getState().state.$data).toBeUndefined();
+  });
+
+  it("still allows the runtime store to write $data for the query runner", () => {
+    const store = createDocumentState({});
+    store.getState().setState("$data.invoices.status", "loading");
+    expect(store.getState().getValue("$data.invoices.status")).toBe("loading");
+  });
+
   it("executes sequence of actions", () => {
     const store = createDocumentState({ a: 1, b: 2 });
     const interpreter = new ActionInterpreter({ stateStore: store.getState() });

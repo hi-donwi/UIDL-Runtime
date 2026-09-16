@@ -36,6 +36,11 @@ class ActionDispatcher(
             "showDialog",
             "validate"
         )
+
+        fun isReservedDataEnvelopePath(path: String): Boolean {
+            val normalized = if (path.startsWith("state.")) path.substring("state.".length) else path
+            return normalized == "\$data" || normalized.startsWith("\$data.")
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -97,8 +102,17 @@ class ActionDispatcher(
                     val p = payload as Map<String, Any?>
                     val targetPath = p["path"] as? String
                     val value = p["value"]
-                    val resolvedValue = BindingResolver.resolveBinding(value, scope)
+                    val mergedScope = scope.toMutableMap().apply {
+                        if (eventPayload != null) put("event", eventPayload)
+                    }
+                    val resolvedValue = ExpressionEvaluator.evaluate(value, mergedScope)
                     if (targetPath != null) {
+                        if (isReservedDataEnvelopePath(targetPath)) {
+                            throw UidlException(
+                                code = UidlErrorCodes.INVALID_STATE,
+                                message = "setState path \"$targetPath\" targets the reserved \$data envelope. Documents may read state.\$data.* but must not write it."
+                            )
+                        }
                         BindingResolver.setByPath(state, targetPath, resolvedValue)
                         onStateChanged?.invoke()
                     }

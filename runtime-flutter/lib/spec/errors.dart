@@ -4,6 +4,7 @@ class UidlErrorCodes {
   static const String invalidDocument = 'INVALID_DOCUMENT';
   static const String unknownAction = 'UNKNOWN_ACTION';
   static const String unknownComponent = 'UNKNOWN_COMPONENT';
+  static const String invalidState = 'INVALID_STATE';
   static const String evaluationError = 'EVALUATION_ERROR';
 }
 
