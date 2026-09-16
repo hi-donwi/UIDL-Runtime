@@ -5,6 +5,7 @@ import {
   buildBacklogDocument,
   buildActivityDocument,
   buildCommitsDocument,
+  buildTableDocument,
   type BoardData,
   type ActivityData,
   type ActiveClocks,
@@ -21,6 +22,31 @@ interface ProjectItem {
 interface SearchResponseItem {
   task: TaskItem;
 }
+
+type Tab =
+  | "overview"
+  | "clients"
+  | "board"
+  | "backlog"
+  | "plans"
+  | "activity"
+  | "commits"
+  | "health"
+  | "settings";
+
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: "overview", label: "Overview" },
+  { id: "clients", label: "Clients" },
+  { id: "board", label: "Board" },
+  { id: "backlog", label: "Backlog" },
+  { id: "plans", label: "Plans" },
+  { id: "activity", label: "Activity" },
+  { id: "commits", label: "Commits" },
+  { id: "health", label: "Health" },
+  { id: "settings", label: "Settings" },
+];
+
+const TABS_WITHOUT_PROJECT = new Set<Tab>(["overview", "clients", "health", "settings"]);
 
 export function WorkspaceControlApp() {
   const [serverUrl, setServerUrl] = useState(() => {
@@ -54,7 +80,7 @@ export function WorkspaceControlApp() {
   const [isConnected, setIsConnected] = useState(false);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"board" | "backlog" | "activity" | "commits">("board");
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [document, setDocument] = useState<UIDLDocument | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +129,112 @@ export function WorkspaceControlApp() {
       project: string,
       tab: string,
     ): Promise<{ doc: UIDLDocument; tasks: TaskItem[]; clocks?: ActiveClocks | null }> => {
-      if (tab === "board") {
+      if (tab === "overview") {
+        const data = await api<{ clients: Array<{ key: string; projects: ProjectItem[] }> }>("/api/overview");
+        const rows = (data.clients || []).flatMap((c) =>
+          (c.projects || []).map((p) => ({ client: c.key, key: p.key, description: p.description })),
+        );
+        return {
+          doc: buildTableDocument({
+            id: "overview",
+            title: "Workspace overview",
+            columns: [
+              { key: "client", title: "Client" },
+              { key: "key", title: "Project" },
+              { key: "description", title: "Description" },
+            ],
+            rows,
+            emptyMessage: "No projects registered",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "clients") {
+        const data = await api<{ clients: Array<{ key: string; summary: string; projects: ProjectItem[] }> }>("/api/clients");
+        const rows = (data.clients || []).map((c) => ({
+          key: c.key,
+          projects: (c.projects || []).map((p) => p.key).join(", "),
+          summary: (c.summary || "").split("\n")[0] || "",
+        }));
+        return {
+          doc: buildTableDocument({
+            id: "clients",
+            title: "Clients",
+            columns: [
+              { key: "key", title: "Client" },
+              { key: "projects", title: "Projects" },
+              { key: "summary", title: "Summary" },
+            ],
+            rows,
+            emptyMessage: "No clients",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "plans") {
+        const q = project ? `?project=${encodeURIComponent(project)}` : "";
+        const data = await api<{ plans: Array<{ title: string; project: string; path: string; run: string }> }>(
+          `/api/plans${q}`,
+        );
+        return {
+          doc: buildTableDocument({
+            id: "plans",
+            title: "Plans",
+            columns: [
+              { key: "project", title: "Project" },
+              { key: "title", title: "Title" },
+              { key: "run", title: "Run" },
+              { key: "path", title: "Path" },
+            ],
+            rows: data.plans || [],
+            emptyMessage: "No plan.md files",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "health") {
+        const data = await api<{ checks: Array<{ id: string; ok: boolean; detail: string }> }>("/api/health");
+        return {
+          doc: buildTableDocument({
+            id: "health",
+            title: "Local health",
+            columns: [
+              { key: "id", title: "Check" },
+              { key: "ok", title: "OK" },
+              { key: "detail", title: "Detail" },
+            ],
+            rows: (data.checks || []).map((c) => ({ ...c, ok: c.ok ? "yes" : "no" })),
+            emptyMessage: "No checks",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "settings") {
+        const data = await api<{
+          identity: Record<string, string>;
+          root_name: string;
+          runtime: string;
+          loopback: boolean;
+        }>("/api/settings");
+        const identity = data.identity || {};
+        const rows = [
+          { key: "root", value: data.root_name },
+          { key: "org_name", value: identity.org_name },
+          { key: "packs", value: identity.packs },
+          { key: "context_remote", value: identity.context_remote || "(local-only)" },
+          { key: "runtime", value: data.runtime },
+          { key: "loopback", value: data.loopback ? "yes" : "no" },
+        ];
+        return {
+          doc: buildTableDocument({
+            id: "settings",
+            title: "Settings",
+            columns: [
+              { key: "key", title: "Setting" },
+              { key: "value", title: "Value" },
+            ],
+            rows,
+            emptyMessage: "No settings",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "board") {
         const boardData = await api<BoardData>(`/api/projects/${encodeURIComponent(project)}/board`);
         const allBoardTasks: TaskItem[] = [];
         if (boardData.columns) {
@@ -165,7 +296,7 @@ export function WorkspaceControlApp() {
 
   // Reload document when project or tab changes
   useEffect(() => {
-    if (!selectedProject) return;
+    if (!TABS_WITHOUT_PROJECT.has(activeTab) && !selectedProject) return;
     let cancelled = false;
     fetchViewData(selectedProject, activeTab)
       .then(({ doc, tasks, clocks }) => {
@@ -372,47 +503,20 @@ export function WorkspaceControlApp() {
             </span>
           </div>
 
-          <nav className="flex gap-1 ml-4 bg-[#0d1117] p-1 rounded-md border border-[#30363d]">
-            <button
-              onClick={() => setActiveTab("board")}
-              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                activeTab === "board"
-                  ? "bg-[#21262d] text-[#58a6ff] border border-[#30363d]"
-                  : "text-[#8b949e] hover:text-[#f0f6fc]"
-              }`}
-            >
-              Kanban Board
-            </button>
-            <button
-              onClick={() => setActiveTab("backlog")}
-              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                activeTab === "backlog"
-                  ? "bg-[#21262d] text-[#58a6ff] border border-[#30363d]"
-                  : "text-[#8b949e] hover:text-[#f0f6fc]"
-              }`}
-            >
-              Backlog
-            </button>
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                activeTab === "activity"
-                  ? "bg-[#21262d] text-[#58a6ff] border border-[#30363d]"
-                  : "text-[#8b949e] hover:text-[#f0f6fc]"
-              }`}
-            >
-              Activity & Metrics
-            </button>
-            <button
-              onClick={() => setActiveTab("commits")}
-              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                activeTab === "commits"
-                  ? "bg-[#21262d] text-[#58a6ff] border border-[#30363d]"
-                  : "text-[#8b949e] hover:text-[#f0f6fc]"
-              }`}
-            >
-              Commits
-            </button>
+          <nav className="flex gap-1 ml-4 bg-[#0d1117] p-1 rounded-md border border-[#30363d] flex-wrap">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                  activeTab === tab.id
+                    ? "bg-[#21262d] text-[#58a6ff] border border-[#30363d]"
+                    : "text-[#8b949e] hover:text-[#f0f6fc]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </nav>
         </div>
 

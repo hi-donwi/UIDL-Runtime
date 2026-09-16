@@ -367,3 +367,48 @@ export function buildCommitsDocument(projectKey: string, commits: CommitItem[]):
     },
   };
 }
+
+export function buildTableDocument(opts: {
+  id: string;
+  title: string;
+  columns: Array<{ key: string; title: string }>;
+  rows: Array<Record<string, unknown>>;
+  emptyMessage: string;
+}): UIDLDocument {
+  return {
+    version: "1.0.0",
+    id: opts.id,
+    name: opts.title,
+    theme: "meridian-dark",
+    root: {
+      id: `${opts.id}-root`,
+      type: "Column",
+      style: { gap: "1.25rem", padding: "1rem" },
+      children: [
+        {
+          id: `${opts.id}-navbar`,
+          type: "Navbar",
+          slots: {
+            title: [
+              {
+                id: `${opts.id}-title`,
+                type: "Text",
+                props: { value: opts.title },
+                style: { fontSize: "1.25rem", fontWeight: "700" },
+              },
+            ],
+          },
+        },
+        {
+          id: `${opts.id}-table`,
+          type: "DataTable",
+          props: {
+            columns: opts.columns,
+            rows: opts.rows,
+            emptyMessage: opts.emptyMessage,
+          },
+        },
+      ],
+    },
+  };
+}
