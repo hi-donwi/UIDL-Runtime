@@ -88,16 +88,17 @@ export function App() {
 
 ## Status
 
-The runtime and its reference suite are functional and covered by tests. **This is not a
-production-ready product.** The reference applications are executable blueprints, not
-certified systems — read the maturity table below before treating any of them as finished.
+The runtime and its reference suite are functional, extensively tested, and automated across multi-platform CI gates. The reference applications are executable blueprints, not certified systems — read the maturity table below before treating any of them as finished.
 
-- **Web / TypeScript**: 131 test files, 1,176 tests, one typecheck, one lint pass
-- **Android Native (Kotlin 2.1 / Java 21)**: 69 tests covering parser, expression evaluator, binding resolver, and conformance
-- **Flutter Native (Dart 3.7 / Flutter 3.29)**: 73 tests covering widget rendering, expression evaluator, and conformance
+- **Web / TypeScript**: 143 test files, 1,312 tests, one typecheck, one lint pass
+- **Android Native (Kotlin 2.1 / Java 21)**: 69 tests covering parser, expression evaluator, binding resolver, and Compose widget abstractions
+- **Flutter Native (Dart 3.7 / Flutter 3.29)**: 73 tests covering widget rendering, expression evaluator, and native widget tree
 - **Server Generator & REST API (Java 21 / Quarkus)**: 43 tests across model generators and REST endpoints
 - **Multi-Platform Conformance Suite**: 55 / 55 active fixtures passing across all 4 runtimes (100% pass rate)
+- **Interactive Conformance Explorer**: In-browser test evaluator and multi-runtime showcase at `/conformance`
+- **Workspace Control Companion**: Real-time bidirectional synchronization with `ws_web.py` for Kanban boards, backlogs, and activity clocks
 - **Benchmarked Compiler Throughput**: >350,000 ops/sec across canonical page recipes with sub-millisecond p50/p95 latency
+- **Automated Multi-Platform CI Matrix**: GitHub Actions pipeline executing TypeScript, Java/Quarkus, Android Kotlin, and Flutter Dart suites
 - 11 industry reference consoles plus a full double-entry accounting reference
 - Every financial posting satisfies `sum(debit) === sum(credit)`, checked by an audit gate
 
@@ -114,7 +115,7 @@ UIDL provides native runtimes across web, mobile, and server platforms sharing t
 | **Flutter Native** | `runtime-flutter/` | Dart 3.7, Flutter 3.29 | `uidl_flutter` (`pubspec.yaml`) |
 | **Server Generator** | `server/uidl-generator/` | Java 21, Jackson, Maven | `dev.uidl:uidl-generator:1.0.0-SNAPSHOT` |
 | **Quarkus Server** | `server/uidl-server/` | Java 21, Quarkus 3.x, RESTEasy | Microservice executable |
-| **Companion App** | `apps/workspace-control/` | React 19, Vite, Tailwind v4 | Workspace control desk |
+| **Companion App** | `apps/workspace-control/` | React 19, Vite, Tailwind v4 | Live workspace control desk |
 | **CLI Compiler** | `bin/` | Node.js 22+ | `npx uidl-compile`, `npx uidl-validate` |
 
 See the complete specification compliance breakdown in [docs/conformance-matrix.md](docs/conformance-matrix.md).
@@ -201,14 +202,31 @@ UIDLDocument doc = UIDLDocumentBuilder.create("invoice-form")
 String jsonOutput = doc.toJson();
 ```
 
+### 5. Workspace Control Companion Desk
+
+The companion application pairs directly with the local Agent Workspace daemon (`ws_web.py`) for live Kanban boards, backlog grooming, and activity tracking:
+
+```bash
+# Start local workspace backend with the UIDL runtime
+python3 .agents/bin/ws_web.py --runtime uidl --port 8765
+
+# Or start the companion app in standalone development mode
+npm run dev:workspace-control
+```
+
 ---
 
+## Development Setup
 
 The rest of this document is for working on `uidl-runtime` itself — the runtime, the
 reference suite, and the build. If you only want to consume the library, `npm install
 uidl-runtime` above is all you need.
 
-Node.js LTS and npm.
+### Prerequisites
+
+- Node.js LTS (>= 20.11) and npm
+- Java 21 JDK (for server generator and Quarkus server)
+- Flutter SDK (for mobile runtime development)
 
 ```bash
 git clone https://github.com/hi-donwi/UIDL-Runtime.git
@@ -256,12 +274,15 @@ version.
 |---|---|
 | `npm run dev` | Start the reference application suite in memory |
 | `npm run dev:reference:http` | Start the suite with `VITE_DATA_MODE=http` |
+| `npm run dev:workspace-control` | Start the companion workspace control desk (port 5174) |
 | `npm run mock:api` | Start the local mock API on port 8787 |
 | `npm run typecheck` | Type-check all workspaces |
 | `npm run lint` | Run ESLint |
 | `npm test` | Run Vitest unit and integration tests |
 | `npm run build` | Build the public library and JSON schemas |
 | `npm run build:reference` | Build the reference application suite |
+| `npm run build:workspace-control` | Build the companion app production bundle |
+| `npm run bench:compilers` | Benchmark compiler throughput across all 7 canonical recipes |
 | `npm run audit:reference` | Architecture, maturity and balanced-GL gates |
 | `npm run test:reference` | Playwright acceptance tests, in memory |
 | `npm run test:reference:visual` | Playwright visual baseline tests |
@@ -269,6 +290,7 @@ version.
 | `npm run test:reference:http` | Playwright acceptance tests over HTTP |
 | `npm run smoke:package` | Pack and consume the public npm artifact |
 | `npm run validate:examples` | Validate the example UIDL documents |
+| `npm run validate:spec` | Validate the UIDL specification schemas |
 
 ## How it works
 
