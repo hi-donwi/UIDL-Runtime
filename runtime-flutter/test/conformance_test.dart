@@ -71,8 +71,25 @@ void main() {
     group('error', () {
       final errorCases = activeCases.where((c) => c['class'] == 'error');
       for (final c in errorCases) {
-        test('rejects ${c['id']} with expected error', () {
+        test('rejects ${c['id']} with expected error', () async {
           final input = c['input'];
+          if (c['id'] == 'unknown-action') {
+            final dispatcher = ActionDispatcher(
+              state: <String, dynamic>{},
+              scope: <String, dynamic>{},
+            );
+            await expectLater(
+              dispatcher.execute(input),
+              throwsA(
+                isA<UidlException>().having(
+                  (error) => error.code,
+                  'code',
+                  c['expected'],
+                ),
+              ),
+            );
+            return;
+          }
           expect(
             () => UidlParser.parse(input),
             throwsA(isA<UidlException>()),
