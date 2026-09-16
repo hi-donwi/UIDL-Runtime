@@ -1,6 +1,6 @@
 {
   "name": "uidl-runtime",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "./dist/uidl-runtime.js",
   "module": "./dist/uidl-runtime.mjs",
   "types": "./dist/index.d.ts",
