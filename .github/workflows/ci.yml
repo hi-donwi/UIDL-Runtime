@@ -56,6 +56,48 @@ jobs:
       - name: Build reference application
         run: npm run build:reference
 
+      - name: Build companion workspace control app
+        run: npm run build:workspace-control
+
+      - name: Compiler benchmarks sanity verification
+        run: npm run bench:compilers
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Test and install Java UIDL Generator
+        run: |
+          chmod +x ./mvnw
+          ./mvnw install
+        working-directory: server/uidl-generator
+
+      - name: Test Quarkus Server REST API
+        run: |
+          chmod +x ./mvnw
+          ./mvnw test
+        working-directory: server/uidl-server
+
+      - name: Test Android Native Runtime
+        run: |
+          chmod +x ./mvnw
+          ./mvnw test
+        working-directory: runtime-android
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Test Flutter Native Runtime
+        run: |
+          flutter pub get
+          flutter test
+        working-directory: runtime-flutter
+
   visual-reference:
     runs-on: ubuntu-latest
 
