@@ -45,6 +45,10 @@ class UidlDocumentSession(private val document: UidlDocument) {
         dispatch(nodeId, "onClick", null)
     }
 
+    fun change(nodeId: String, value: Any?) {
+        dispatch(nodeId, "onChange", value)
+    }
+
     private fun dispatch(nodeId: String, eventName: String, payload: Any?) {
         val node = findNode(document.root, nodeId)
             ?: throw IllegalArgumentException("No node with id '$nodeId'")
@@ -65,14 +69,19 @@ class UidlDocumentSession(private val document: UidlDocument) {
 object UidlTreeRenderer {
     fun defaultRegistry(): UidlComponentRegistry<UidlRenderedNode> {
         val registry = UidlComponentRegistry<UidlRenderedNode>()
-        registry.register("Column") { node, context ->
-            UidlRenderedNode(
-                id = node.id,
-                type = "Column",
-                props = node.props,
-                children = node.children.map { child -> renderNode(child, context, registry) }
-            )
+        fun registerLayout(type: String) {
+            registry.register(type) { node, context ->
+                UidlRenderedNode(
+                    id = node.id,
+                    type = type,
+                    props = node.props,
+                    children = node.children.map { child -> renderNode(child, context, registry) }
+                )
+            }
         }
+        registerLayout("Column")
+        registerLayout("Row")
+        registerLayout("Container")
         registry.register("Text") { node, _ ->
             UidlRenderedNode(
                 id = node.id,
@@ -84,6 +93,13 @@ object UidlTreeRenderer {
             UidlRenderedNode(
                 id = node.id,
                 type = "Button",
+                props = node.props
+            )
+        }
+        registry.register("TextField") { node, _ ->
+            UidlRenderedNode(
+                id = node.id,
+                type = "TextField",
                 props = node.props
             )
         }

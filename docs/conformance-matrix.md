@@ -31,8 +31,8 @@ Honest coverage of the 38 React widget types. Flutter `ListView` is a children l
 
 | Widget | Web / React | Flutter | Android Compose tree |
 |---|---|---|---|
-| Container | implemented | implemented | missing |
-| Row | implemented | implemented | missing |
+| Container | implemented | implemented | implemented |
+| Row | implemented | implemented | implemented |
 | Column | implemented | implemented | implemented |
 | Stack | implemented | missing | missing |
 | Spacer | implemented | implemented | missing |
@@ -42,7 +42,7 @@ Honest coverage of the 38 React widget types. Flutter `ListView` is a children l
 | Image | implemented | implemented | missing |
 | Button | implemented | implemented | implemented |
 | Badge | implemented | missing | missing |
-| TextField | implemented | implemented | missing |
+| TextField | implemented | implemented | implemented |
 | Checkbox | implemented | missing | missing |
 | Switch | implemented | missing | missing |
 | Slider | implemented | missing | missing |
