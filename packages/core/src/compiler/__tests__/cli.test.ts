@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { execFileSync } from "node:child_process";
+import { beforeAll, describe, expect, it } from "vitest";
+import { execFileSync, execSync } from "node:child_process";
 import { writeFileSync, readFileSync, unlinkSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -7,6 +7,13 @@ import { DocumentSchema } from "../../schemas/document.js";
 
 describe("uidl-compile CLI binary", () => {
   const binPath = join(process.cwd(), "bin/compile.mjs");
+
+  beforeAll(() => {
+    const distPath = join(process.cwd(), "dist/uidl-runtime.js");
+    if (!existsSync(distPath)) {
+      execSync("npm run build", { stdio: "ignore" });
+    }
+  }, 30000);
 
   it("compiles a list recipe file to stdout", () => {
     const tempInput = join(tmpdir(), `test-recipe-${Date.now()}.json`);

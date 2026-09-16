@@ -1,7 +1,17 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { compilePage, CapabilityValidationError, DocumentSchema } from "../dist/uidl-runtime.js";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const distPath = resolve(__dirname, "../dist/uidl-runtime.js");
+
+if (!existsSync(distPath)) {
+  const { execSync } = await import("node:child_process");
+  execSync("npm run build", { cwd: resolve(__dirname, ".."), stdio: ["ignore", "ignore", "inherit"] });
+}
+
+const { compilePage, CapabilityValidationError, DocumentSchema } = await import(pathToFileURL(distPath).href);
 
 const args = process.argv.slice(2);
 
