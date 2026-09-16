@@ -1,6 +1,6 @@
 export { createEventBus } from "./eventBus";
 export type { EventBus, EventBusListener } from "./eventBus";
-export { ActionInterpreter } from "./interpreter";
+export { ActionInterpreter, isReservedDataEnvelopePath } from "./interpreter";
 export type { ActionContext, ApiAllowlist, ActionReport, ActionErrorReport } from "./interpreter";
 export type {
   CommandHandler,
