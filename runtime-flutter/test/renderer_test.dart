@@ -136,5 +136,41 @@ void main() {
       expect(find.text('Public Info'), findsOneWidget);
       expect(find.text('Top Secret'), findsNothing);
     });
+
+    for (final type in ComponentRegistry.catalogWidgetTypes) {
+      testWidgets('catalog type $type renders without unknown-widget fallback', (tester) async {
+        final doc = UidlDocument(
+          version: '1.0.0',
+          id: 'catalog-$type',
+          name: type,
+          root: UidlNode(
+            id: 'root',
+            type: 'Column',
+            children: [
+              UidlNode(
+                id: 'under_test',
+                type: type,
+                props: {
+                  'value': 0,
+                  'label': type,
+                  'src': '',
+                },
+              ),
+            ],
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: UidlRenderer(document: doc),
+            ),
+          ),
+        );
+
+        expect(find.textContaining('Unknown widget'), findsNothing);
+        expect(ComponentRegistry().registeredTypes, contains(type));
+      });
+    }
   });
 }

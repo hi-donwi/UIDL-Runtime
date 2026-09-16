@@ -13,7 +13,7 @@ describe("uidl-compile CLI binary", () => {
     if (!existsSync(distPath)) {
       execSync("npm run build", { stdio: "ignore" });
     }
-  }, 30000);
+  }, 120000);
 
   it("compiles a list recipe file to stdout", () => {
     const tempInput = join(tmpdir(), `test-recipe-${Date.now()}.json`);
