@@ -8,6 +8,8 @@ test-results/
 playwright-report/
 blob-report/
 coverage/
+target/
+**/.mvn/wrapper/maven-wrapper.jar
 
 # Local environment and editor state
 .env
