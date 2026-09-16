@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"bind-session","class":"binding","status":"active","spec":"v1","input":{"$bind":"session.token"},"context":{"session":{"token":"xyz"}},"expected":"xyz"}
