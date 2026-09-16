@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-16
+
+### Added
+- Native Android Kotlin runtime (`runtime-android/`) implementing offline AST parsing, dot-notation `BindingResolver`, depth-limited `ExpressionEvaluator` with reference equality and numeric normalization, `ActionDispatcher`, and Jetpack Compose component contracts.
+- Native Flutter runtime (`runtime-flutter/`) with reactive state binding, dynamic widget renderer, and cross-platform conformance suite.
+- Java UIDL generator library (`server/uidl-generator/`) supporting 7 canonical page recipes, capability validator, and semantic ID generation.
+- Quarkus REST server (`server/uidl-server/`) providing HTTP compilation, validation, and health check endpoints.
+- AI UIDL generation and validation pipeline with semantic bounds and safety checks (`validateSemantic.ts`, `aiPipeline.ts`).
+- Standalone CLI compiler binary `bin/compile.mjs` (`uidl-compile`).
+- Telemetry metrics collector (`MetricsCollector`) for compiler execution latency, percentile calculations (p50/p95), AST node counts, hierarchy depth, and in-flight query deduplication hit ratios.
+- Compiler performance and throughput benchmarking harness (`scripts/benchmark-compilers.mts`) verifying >350,000 ops/sec across all 7 page recipes (`npm run bench:compilers`).
+- Automated multi-platform test matrix in GitHub Actions CI testing Node.js, Java, Quarkus, Android Kotlin, and Flutter runtimes.
+- Companion workspace control application (`apps/workspace-control`).
+- Cross-platform conformance suite expanded to 55 test cases across 7 domains.
+
 ## [0.1.2] - 2026-09-15
 
 ### Added
@@ -57,7 +72,8 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.1
 [0.1.0]: https://github.com/hi-donwi/UIDL-Runtime/releases/tag/v0.1.0
