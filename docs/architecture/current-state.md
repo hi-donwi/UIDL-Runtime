@@ -1,8 +1,11 @@
-# Current State — UIDL Runtime (audit, 2026-09-15)
+# Current State — UIDL Runtime (re-audit, 2026-09-16)
 
-> Stage A deliverable. Snapshot of the repository **as it is**, before the
-> spec-first refactor. What lives where, which seams are already framework-agnostic,
-> where React leaks through, and what must stay backward compatible.
+> Stage A snapshot, refreshed after stages B–N. Spec 1.x, the React reference,
+> semantic-core Flutter/Android runtimes, the Java generator, Quarkus compile/validate,
+> and v0.1.3 exist. The target-state proof — the same UIDL document reasonably
+> rendered by React, Flutter, and Compose — is **not** met. Compose has default
+> renderers only for `Column` and `Text` (the `text-column` fixture). Flutter
+> renders a 10-widget subset. React remains the only runtime that can render Meridian.
 
 ## 1. Repo shape at a glance
 
@@ -18,8 +21,8 @@ Monorepo (`npm workspaces`), published package `uidl-runtime` (v0.1.3).
 | `docs/product/` | Background product notes (not a status authority) |
 | `dist/`, `bin/` | Build output, `uidl-validate` CLI |
 
-Test/code scale: 131 test files, 1176 tests, one typecheck, one lint pass, one
-Playwright acceptance suite.
+Test/code scale (TypeScript, 2026-09-16): 145 test files, 1337 tests, one typecheck, one lint pass, one
+Playwright acceptance suite. Native runtimes add their own JUnit/Flutter suites.
 
 ## 2. The document model (already framework-agnostic)
 
@@ -165,22 +168,29 @@ From `types/actions.ts` + `schemas/actions.ts`: `setState`, `navigate`, `api`,
 
 ## 11. Architecture gaps vs. the target platform
 
-1. **No neutral spec artifact.** Single-source-of-truth is TS/Zod, which non-TS hosts
-   (Flutter/Dart, Compose/Kotlin) cannot import.
-2. **Expression grammar untyped and incomplete** (`$expr` is `z.unknown()`); no
-   `gt/lte/arithmetic/contains`; no bounded-complexity rules.
-3. **Versioning not enforced** (`version` opaque; no `UNSUPPORTED_VERSION` handling).
-4. **No conformance suite.** Compatibility is asserted only by the React tests.
-5. **No documented error model.** Errors are ad-hoc `DataError`, `console.warn`, and
-   throw paths; no deterministic `INVALID_*`/`BINDING_NOT_FOUND` codes.
-6. **`event.*` binding is dual and undocumented** (render `$bind` vs action `event`).
-7. **Style/theme language is web-flavored** (tailwind classes, CSS vars, breakpoint names).
-8. **`navigate` target = route object/string with no semantic `target` vocabulary**
-   (plan §14 wants `{target: "orders", params}`).
-9. **Single runtime; no extension model** (plan §16) and no cross-runtime `capabilities`
-   matrix beyond `HostCapabilities` for the compiler.
-10. **AI path exists** (`generateUidlFromPrompt`) but is not wired to schema+semantic
-    validation pipeline (plan §22).
+Closed since the 2026-09-15 snapshot: `spec/` JSON schemas + Approved semantics,
+version enforcement (`UNSUPPORTED_VERSION` / `MALFORMED_VERSION`), canonical
+expression ops with a depth bound, error taxonomy (`ERROR_CODES`), 55 shared
+conformance fixtures, AI pipeline (`validateAndSanitizeUidl`), Java generator +
+Quarkus compile/validate, Flutter and Android semantic cores.
+
+Still open:
+
+1. **Native widget parity.** React has 38 widgets. Flutter defaults cover 10
+   (`Column`, `Row`, `Container`, `Text`, `Button`, `TextField`, `Image`,
+   `ListView`, `Spacer`, `Divider`) — `ListView` is a children list, not React
+   list semantics. Android Compose defaults cover `Column` and `Text` as a
+   host-agnostic render tree (JVM harness cannot depend on AndroidX Compose).
+2. **Conformance depth.** Action fixtures are schema/kind-accept (`expected: true`),
+   not execution outcomes. Flutter `unknown-action` now dispatches; remaining error
+   cases still assert “any exception” on the parser. Java generator “conformance”
+   is compiler tests, not the 55 fixtures.
+3. **Style/theme language is still web-flavored in the React runtime** (Tailwind
+   class strings, CSS vars). `StyleIntent` is Approved; native mapping is renderer
+   work.
+4. **Extension actions** remain a future-major carve-out.
+5. **Component model** (`spec/components`, `packages/uidl-component`) is Planned.
+6. **`packages/react-native` does not exist** (stale mention in `spec/README.md`).
 
 ## 12. What NOT to break
 

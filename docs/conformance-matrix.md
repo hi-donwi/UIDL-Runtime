@@ -19,7 +19,55 @@ The UIDL specification guarantees deterministic, identical behavior across web, 
 | **UI Rendering Engine** | React 18/19 + Tailwind v4 | Jetpack Compose abstraction | Flutter Widget Tree | N/A (JSON emitter) |
 | **Telemetry & Metrics** | `MetricsCollector` (p50/p95) | Microbenchmark harness | Latency and frame timers | Quarkus Micrometer / OTel |
 | **Conformance Test Runner** | Vitest (`conformance.test.ts`) | JUnit 5 (`ConformanceRunnerTest.kt`) | Flutter Test (`conformance_test.dart`) | JUnit 5 (`ConformanceRunnerTest.java`) |
-| **Conformance Pass Rate** | **55 / 55 (100%)** | **55 / 55 (100%)** | **55 / 55 (100%)** | **29 / 29 Model Tests (100%)** |
+| **Conformance Pass Rate** | **55 / 55 (100%)** | **55 / 55 (100%)** | **55 / 55 (100%)** | **29 / 29 Model Tests (100%)** — not the 55-case suite |
+
+Action fixtures assert vocabulary/schema accept, not execution. Render fixtures: React produces an element; Flutter constructs a document; Android Compose produces a `UidlRenderedNode` tree for `Column`/`Text`.
+
+---
+
+## 1.1 Widget capability matrix
+
+Honest coverage of the 38 React widget types. Flutter `ListView` is a children list, not the React list/data-source widget.
+
+| Widget | Web / React | Flutter | Android Compose tree |
+|---|---|---|---|
+| Container | implemented | implemented | missing |
+| Row | implemented | implemented | missing |
+| Column | implemented | implemented | implemented |
+| Stack | implemented | missing | missing |
+| Spacer | implemented | implemented | missing |
+| Divider | implemented | implemented | missing |
+| Text | implemented | implemented | implemented |
+| Icon | implemented | missing | missing |
+| Image | implemented | implemented | missing |
+| Button | implemented | implemented | missing |
+| Badge | implemented | missing | missing |
+| TextField | implemented | implemented | missing |
+| Checkbox | implemented | missing | missing |
+| Switch | implemented | missing | missing |
+| Slider | implemented | missing | missing |
+| Select | implemented | missing | missing |
+| Textarea | implemented | missing | missing |
+| RadioGroup | implemented | missing | missing |
+| Form | implemented | missing | missing |
+| ListView | implemented | partial | missing |
+| GridView | implemented | missing | missing |
+| DataTable | implemented | missing | missing |
+| PageBar | implemented | missing | missing |
+| Chart | implemented | missing | missing |
+| KanbanBoard | implemented | missing | missing |
+| TreeView | implemented | missing | missing |
+| Sidebar | implemented | missing | missing |
+| Navbar | implemented | missing | missing |
+| Toolbar | implemented | missing | missing |
+| Drawer | implemented | missing | missing |
+| Panel | implemented | missing | missing |
+| Popover | implemented | missing | missing |
+| Dialog | implemented | missing | missing |
+| Snackbar | implemented | missing | missing |
+| QRCode | implemented | missing | missing |
+| Barcode | implemented | missing | missing |
+| DataMatrix | implemented | missing | missing |
 
 ---
 
