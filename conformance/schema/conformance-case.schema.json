@@ -9,7 +9,7 @@
   "properties": {
     "$schema": { "const": "https://uidl.dev/schema/v1/conformance-case.schema.json" },
     "id": { "type": "string" },
-    "class": { "enum": ["expression", "binding", "condition", "render", "data", "error", "action"] },
+    "class": { "enum": ["expression", "binding", "condition", "render", "data", "error", "action", "action-exec"] },
     "status": { "enum": ["active", "planned"] },
     "spec": { "const": "v1" },
     "input": {

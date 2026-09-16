@@ -70,6 +70,6 @@ schema cases.
 ## Relationship to the reference runtime
 
 - Everything in this `spec/` directory is the neutral contract.
-- `packages/core` implements it; `packages/react-native` and `packages/templates`
-  consume `packages/core`.
+- `packages/core` implements it; `packages/templates` consumes `packages/core`.
+  There is no `packages/react-native`.
 - Implementation details, CLI commands, and release mechanics live in `docs/`, not here.
