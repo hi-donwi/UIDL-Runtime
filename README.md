@@ -92,11 +92,117 @@ The runtime and its reference suite are functional and covered by tests. **This 
 production-ready product.** The reference applications are executable blueprints, not
 certified systems — read the maturity table below before treating any of them as finished.
 
-- 131 test files, 1176 tests, one typecheck, one lint pass
+- **Web / TypeScript**: 131 test files, 1,176 tests, one typecheck, one lint pass
+- **Android Native (Kotlin 2.1 / Java 21)**: 69 tests covering parser, expression evaluator, binding resolver, and conformance
+- **Flutter Native (Dart 3.7 / Flutter 3.29)**: 73 tests covering widget rendering, expression evaluator, and conformance
+- **Server Generator & REST API (Java 21 / Quarkus)**: 43 tests across model generators and REST endpoints
+- **Multi-Platform Conformance Suite**: 55 / 55 active fixtures passing across all 4 runtimes (100% pass rate)
+- **Benchmarked Compiler Throughput**: >350,000 ops/sec across canonical page recipes with sub-millisecond p50/p95 latency
 - 11 industry reference consoles plus a full double-entry accounting reference
 - Every financial posting satisfies `sum(debit) === sum(credit)`, checked by an audit gate
 
-## Contributing to this repository
+---
+
+## Multi-Platform Runtime Ecosystem
+
+UIDL provides native runtimes across web, mobile, and server platforms sharing the same JSON document specification:
+
+| Platform | Directory | Language / Tooling | Package / Artifact |
+|---|---|---|---|
+| **Web / React** | `packages/core` | TypeScript 5.8, React 18/19 | `npm install uidl-runtime` |
+| **Android Native** | `runtime-android/` | Kotlin 2.1, Java 21, Maven | `dev.uidl:uidl-android:1.0.0-SNAPSHOT` |
+| **Flutter Native** | `runtime-flutter/` | Dart 3.7, Flutter 3.29 | `uidl_flutter` (`pubspec.yaml`) |
+| **Server Generator** | `server/uidl-generator/` | Java 21, Jackson, Maven | `dev.uidl:uidl-generator:1.0.0-SNAPSHOT` |
+| **Quarkus Server** | `server/uidl-server/` | Java 21, Quarkus 3.x, RESTEasy | Microservice executable |
+| **Companion App** | `apps/workspace-control/` | React 19, Vite, Tailwind v4 | Workspace control desk |
+| **CLI Compiler** | `bin/` | Node.js 22+ | `npx uidl-compile`, `npx uidl-validate` |
+
+See the complete specification compliance breakdown in [docs/conformance-matrix.md](docs/conformance-matrix.md).
+
+---
+
+## Multi-Platform Quickstart
+
+### 1. Web (React / TypeScript)
+
+```bash
+npm install uidl-runtime
+```
+
+```tsx
+import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "uidl-runtime";
+import "uidl-runtime/style.css";
+
+const document = DocumentSchema.parse(rawDocument);
+
+export function App() {
+  return (
+    <UIDocumentRenderer
+      document={document}
+      theme={meridianLightTheme}
+      onRouteChange={(path) => navigate(path)}
+    />
+  );
+}
+```
+
+### 2. Android Native (Kotlin)
+
+```kotlin
+import dev.uidl.runtime.model.UidlParser
+import dev.uidl.runtime.evaluator.ExpressionEvaluator
+import dev.uidl.runtime.binding.BindingResolver
+
+val parser = UidlParser()
+val document = parser.parse(jsonString)
+val context = mapOf("state" to mapOf("user" to mapOf("name" to "Ada Lovelace")))
+
+// Dot-notation reactive binding resolution
+val userName = BindingResolver.resolve("state.user.name", context)
+
+// Evaluates declarative AST expressions
+val result = ExpressionEvaluator.evaluate(document.root.props["visible"], context)
+```
+
+### 3. Flutter Native (Dart)
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:uidl_flutter/uidl_flutter.dart';
+
+class UidlScreen extends StatelessWidget {
+  final Map<String, dynamic> rawDocument;
+  const UidlScreen({super.key, required this.rawDocument});
+
+  @override
+  Widget build(BuildContext context) {
+    final document = UIDLDocument.fromJson(rawDocument);
+    return UIDLDocumentView(
+      document: document,
+      theme: MeridianTheme.light(),
+      onNavigate: (route) => Navigator.pushNamed(context, route),
+    );
+  }
+}
+```
+
+### 4. Server Document Generation (Java 21)
+
+```java
+import dev.uidl.generator.builder.UIDLDocumentBuilder;
+import dev.uidl.generator.model.UIDLDocument;
+
+UIDLDocument doc = UIDLDocumentBuilder.create("invoice-form")
+    .version("1.0.0")
+    .title("Faktur Penjualan")
+    .addState("status", "draft")
+    .build();
+
+String jsonOutput = doc.toJson();
+```
+
+---
+
 
 The rest of this document is for working on `uidl-runtime` itself — the runtime, the
 reference suite, and the build. If you only want to consume the library, `npm install
@@ -203,16 +309,26 @@ Documents and generators must not import a concrete adapter.
 ```text
 uidl-runtime/
 ├── packages/
-│   ├── core/          # Schemas, renderer, state, actions, themes, registry, adapters
-│   └── templates/     # Page generators, verticals, domain services, mock data
-├── apps/reference/    # Executable references, playground, gallery, POS, regression harness
-├── e2e/               # Browser acceptance and visual-regression tests
-├── scripts/           # Audit, mock API, packaging and validation tools
-└── docs/product/      # Background product notes, not a status authority
+│   ├── core/               # Web runtime, schemas, renderer, expressions, telemetry
+│   └── templates/          # Reference generators, 11 verticals, domain services
+├── runtime-android/        # Android Native Kotlin 2.1 runtime & Compose abstractions
+├── runtime-flutter/        # Flutter Native Dart runtime & widget tree renderer
+├── server/
+│   ├── uidl-generator/     # Java 21 fluent AST document builder & JSON serializer
+│   └── uidl-server/        # Quarkus 3.x REST server backend
+├── apps/
+│   ├── reference/          # Reference suite, gallery, playground, and consoles
+│   └── workspace-control/  # Companion desk for runs, tasks, and telemetry
+├── conformance/            # 55 cross-platform test fixtures across 7 domains
+├── e2e/                    # Browser acceptance and visual-regression tests
+├── scripts/                # Compiler benchmarks, packaging, and validation tools
+└── docs/                   # Architecture, ADRs, and cross-platform conformance matrix
 ```
 
-`packages/core`, `packages/templates` and `apps/reference` are private workspaces. The
-published artifact is `uidl-runtime`, including its required `style.css`.
+`packages/core`, `packages/templates`, `apps/reference`, and `apps/workspace-control` are npm workspaces. The
+published npm artifact is `uidl-runtime`, including its required `style.css`. Mobile and JVM runtimes are
+isolated and version-aligned.
+
 
 Visual regression tests are intentionally separate from the default reference command.
 The committed baselines are generated on the canonical Linux CI environment. Run

@@ -15,6 +15,7 @@ export type AppRouteKind =
   | "settings"
   | "gallery"
   | "playground"
+  | "conformance"
   | "not-found";
 
 export interface AppRoute {
@@ -28,6 +29,7 @@ export interface AppRoute {
   reportName?: string;
   settingsSection?: string;
   galleryCategory?: string;
+  conformanceDomain?: string;
   queryParams?: Record<string, string>;
   rawQuery?: string;
 }
