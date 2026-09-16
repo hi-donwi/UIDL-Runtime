@@ -52,9 +52,9 @@ Honest coverage of the 37 React `defaultWidgets` types. Native columns mean “t
 | Form | implemented | implemented | implemented |
 | ListView | implemented | partial | partial |
 | GridView | implemented | partial | partial |
-| DataTable | implemented | partial | partial |
+| DataTable | implemented | implemented | partial |
 | PageBar | implemented | implemented | implemented |
-| Chart | implemented | partial | partial |
+| Chart | implemented | implemented | partial |
 | KanbanBoard | implemented | partial | partial |
 | TreeView | implemented | partial | partial |
 | Sidebar | implemented | implemented | implemented |
@@ -63,11 +63,11 @@ Honest coverage of the 37 React `defaultWidgets` types. Native columns mean “t
 | Drawer | implemented | partial | partial |
 | Panel | implemented | implemented | implemented |
 | Popover | implemented | implemented | implemented |
-| Dialog | implemented | partial | partial |
+| Dialog | implemented | implemented | partial |
 | Snackbar | implemented | implemented | implemented |
-| QRCode | implemented | partial | partial |
-| Barcode | implemented | partial | partial |
-| DataMatrix | implemented | partial | partial |
+| QRCode | implemented | implemented | partial |
+| Barcode | implemented | implemented | partial |
+| DataMatrix | implemented | implemented | partial |
 
 ---
 
