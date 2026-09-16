@@ -54,6 +54,8 @@ export { serializeTheme, serializeThemePreset, deserializeTheme, deserializeThem
 export { useElementWidth } from "./hooks/useElementWidth";
 export { normalizeNodeResponsive } from "./utils/responsive";
 export { validateResponsiveValue, validateResponsiveStyle } from "./validate/validateResponsive";
+export { validateUidlSemantic } from "./validate/validateSemantic";
+export type { SemanticIssue, SemanticValidationOptions, SemanticValidationResult } from "./validate/validateSemantic";
 export { createDocumentState, getByPath, setByPath } from "./state/createDocumentState";
 export type { DocumentStateStore } from "./state/createDocumentState";
 export {
@@ -112,6 +114,13 @@ export type { CellFormat, CellFormatOptions } from "./utils/listCell";
 export { t, formatRupiah, formatIndonesianDate, formatTerbilang } from "./utils/i18n";
 export type { Language } from "./utils/i18n";
 export { generateUidlFromPrompt } from "./services/aiPromptGenerator";
+export { executeAiPipeline, validateAndSanitizeUidl } from "./services/aiPipeline";
+export type {
+  AiPipelineIssue,
+  AiPipelineMetrics,
+  AiPipelineResult,
+  AiPipelineOptions,
+} from "./services/aiPipeline";
 export { Drawer, Snackbar, Dialog, Button, Badge } from "./components/primitives";
 export type { DrawerProps, SnackbarProps, DialogProps, ButtonProps, BadgeProps } from "./components/primitives";
 export {
