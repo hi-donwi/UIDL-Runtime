@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart' hide ActionDispatcher;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uidl_flutter/uidl_flutter.dart';
 
@@ -101,10 +102,19 @@ void main() {
     group('render', () {
       final renderCases = activeCases.where((c) => c['class'] == 'render');
       for (final c in renderCases) {
-        test('constructs document for ${c['id']}', () {
+        testWidgets('renders ${c['id']}', (tester) async {
           final doc = UidlDocument.fromJson(c['input'] as Map<String, dynamic>);
-          expect(doc.id, isNotNull);
-          expect(doc.root, isNotNull);
+          await tester.pumpWidget(
+            MaterialApp(
+              home: Scaffold(
+                body: UidlRenderer(document: doc),
+              ),
+            ),
+          );
+          expect(find.textContaining('Unknown widget'), findsNothing);
+          if (c['id'] == 'text-column') {
+            expect(find.text('hello'), findsOneWidget);
+          }
         });
       }
     });

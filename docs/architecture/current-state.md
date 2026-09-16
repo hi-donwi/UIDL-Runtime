@@ -176,15 +176,14 @@ Quarkus compile/validate, Flutter and Android semantic cores.
 
 Still open:
 
-1. **Native widget parity.** React has 38 widgets. Flutter defaults cover 10
-   (`Column`, `Row`, `Container`, `Text`, `Button`, `TextField`, `Image`,
-   `ListView`, `Spacer`, `Divider`) — `ListView` is a children list, not React
-   list semantics. Android Compose defaults cover `Column` and `Text` as a
-   host-agnostic render tree (JVM harness cannot depend on AndroidX Compose).
+1. **Native visual fidelity.** All 37 React catalog types are registered on
+   Flutter and the Android host-agnostic tree. ListView/GridView/DataTable/Chart,
+   overlays, and QR/Barcode/DataMatrix are structural mappings, not pixel-identical
+   React widgets. JVM tests cannot depend on AndroidX Compose.
 2. **Conformance depth.** Action fixtures are schema/kind-accept (`expected: true`),
-   not execution outcomes. Flutter `unknown-action` now dispatches; remaining error
-   cases still assert “any exception” on the parser. Java generator “conformance”
-   is compiler tests, not the 55 fixtures.
+   not execution outcomes. Flutter `unknown-action` and `text-column` render now
+   dispatch/paint. Remaining error cases still assert “any exception” on the parser.
+   Java generator “conformance” is compiler tests, not the 55 fixtures.
 3. **Style/theme language is still web-flavored in the React runtime** (Tailwind
    class strings, CSS vars). `StyleIntent` is Approved; native mapping is renderer
    work.
