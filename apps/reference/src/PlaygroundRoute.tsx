@@ -4,8 +4,158 @@ import { meridianDarkTheme, meridianLightTheme } from "~/theme/meridianPreset";
 import { UIDocumentRenderer } from "~/renderer/UIDocumentRenderer";
 import type { UIDLDocument, UIDLNode } from "~/types";
 import { VisualInspectorPanel } from "./VisualInspectorPanel";
-import { generateUidlFromPrompt } from "~/services/aiPromptGenerator";
+import { executeAiPipeline, type AiPipelineIssue } from "~/services/aiPipeline";
 import { Icon } from "~/components/icons";
+import { compilePage } from "~/compiler/compilePage";
+import type { HostCapabilities } from "~/compiler/types";
+
+const PLAYGROUND_CAPS: HostCapabilities = {
+  collections: ["orders", "users", "items", "categories", "general", "invoices", "patients", "sales"],
+  commands: ["exportReport", "printInvoice"],
+  mutationCollections: ["orders", "users", "items", "categories", "general", "invoices", "patients", "sales"],
+};
+
+const RECIPE_LIST_DOC = compilePage({
+  recipe: "list",
+  meta: {
+    name: "orders",
+    label: { en: "Customer Orders", id: "Daftar Pesanan" },
+    titleField: "orderNumber",
+    fields: [
+      { key: "orderNumber", label: { en: "Order #", id: "No. Pesanan" }, widget: "TextField" },
+      { key: "customer", label: { en: "Customer", id: "Pelanggan" }, widget: "TextField" },
+      { key: "total", label: { en: "Total Amount", id: "Total Bayar" }, widget: "Currency" },
+    ],
+    columns: [
+      { field: "orderNumber" },
+      { field: "customer" },
+      { field: "total" },
+    ],
+    defaultSort: { field: "orderNumber", dir: "desc" },
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+});
+
+const RECIPE_FORM_DOC = compilePage({
+  recipe: "form",
+  meta: {
+    name: "orders",
+    label: { en: "Sales Order Entry", id: "Entri Pesanan Penjualan" },
+    titleField: "orderNumber",
+    fields: [
+      { key: "orderNumber", label: { en: "Order #", id: "No. Pesanan" }, widget: "TextField" },
+      { key: "customer", label: { en: "Customer Name", id: "Nama Pelanggan" }, widget: "TextField" },
+      { key: "total", label: { en: "Total (IDR)", id: "Total (Rp)" }, widget: "Currency" },
+    ],
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+  recordId: "ORD-2026-001",
+});
+
+const RECIPE_REPORT_DOC = compilePage({
+  recipe: "report",
+  meta: {
+    name: "sales",
+    label: { en: "Monthly Revenue Report", id: "Laporan Pendapatan Bulanan" },
+    columns: [
+      { key: "period", label: { en: "Month / Period", id: "Bulan / Periode" } },
+      { key: "revenue", label: { en: "Gross Revenue", id: "Pendapatan Kotor" }, format: "currency" },
+    ],
+    dataSource: [
+      { period: "Januari 2026", revenue: 145000000 },
+      { period: "Februari 2026", revenue: 182500000 },
+      { period: "Maret 2026", revenue: 210000000 },
+    ],
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+});
+
+const RECIPE_DASHBOARD_DOC = compilePage({
+  recipe: "dashboard",
+  meta: {
+    name: "executive-summary",
+    label: { en: "Executive Performance Dashboard", id: "Dashboard Kinerja Eksekutif" },
+    kpis: [
+      { label: { en: "Monthly Revenue", id: "Pendapatan Bulanan" }, value: "Rp 537.500.000" },
+      { label: { en: "Active Customers", id: "Pelanggan Aktif" }, value: "1.420" },
+      { label: { en: "Fulfillment Rate", id: "Tingkat Pemenuhan" }, value: "98.4%" },
+    ],
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+});
+
+const RECIPE_SETTINGS_DOC = compilePage({
+  recipe: "settings",
+  meta: {
+    name: "workspace",
+    label: { en: "Enterprise System Settings", id: "Pengaturan Sistem Perusahaan" },
+    sections: [
+      {
+        id: "general",
+        label: { en: "General Preferences", id: "Preferensi Umum" },
+        fields: [
+          { key: "companyName", label: { en: "Company Legal Name", id: "Nama Legal Perusahaan" }, widget: "TextField" },
+          { key: "defaultCurrency", label: { en: "Base Currency", id: "Mata Uang Dasar" }, widget: "TextField" },
+        ],
+      },
+    ],
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+});
+
+const RECIPE_TREE_DOC = compilePage({
+  recipe: "tree",
+  meta: {
+    name: "categories",
+    label: { en: "Product Category Hierarchy", id: "Hierarki Kategori Produk" },
+    titleField: "name",
+    fields: [
+      { key: "name", label: { en: "Category Name", id: "Nama Kategori" }, widget: "TextField" },
+    ],
+    nodes: [
+      {
+        key: "cat-it",
+        label: { en: "Information Technology", id: "Teknologi Informasi" },
+        children: [
+          { key: "cat-cloud", label: { en: "Cloud & Infrastructure", id: "Cloud & Infrastruktur" } },
+          { key: "cat-software", label: { en: "Enterprise Software", id: "Software Enterprise" } },
+        ],
+      },
+      {
+        key: "cat-ops",
+        label: { en: "Operations & Supply", id: "Operasional & Pasokan" },
+      },
+    ],
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+});
+
+const RECIPE_WIZARD_DOC = compilePage({
+  recipe: "wizard",
+  meta: {
+    name: "vendor-onboarding",
+    label: { en: "Vendor Onboarding Registration", id: "Pendaftaran Vendor Baru" },
+    steps: [
+      {
+        id: "step-company",
+        label: { en: "1. Company Info", id: "1. Info Perusahaan" },
+        fields: [
+          { key: "vendorName", label: { en: "Vendor Name", id: "Nama Vendor" }, widget: "TextField" },
+          { key: "taxId", label: { en: "Tax ID (NPWP)", id: "NPWP" }, widget: "TextField" },
+        ],
+      },
+      {
+        id: "step-contact",
+        label: { en: "2. Contact Person", id: "2. Kontak PIC" },
+        fields: [
+          { key: "picName", label: { en: "PIC Name", id: "Nama PIC" }, widget: "TextField" },
+          { key: "picEmail", label: { en: "PIC Email", id: "Email PIC" }, widget: "TextField" },
+        ],
+      },
+    ],
+  },
+  hostCapabilities: PLAYGROUND_CAPS,
+});
 
 const PLAYGROUND_PRESETS: Record<string, { label: string; document: UIDLDocument }> = {
   healthcare: {
@@ -179,6 +329,34 @@ const PLAYGROUND_PRESETS: Record<string, { label: string; document: UIDLDocument
       },
     },
   },
+  recipe_list: {
+    label: "Recipe: List Page (compilePage)",
+    document: RECIPE_LIST_DOC,
+  },
+  recipe_form: {
+    label: "Recipe: Form Page (compilePage)",
+    document: RECIPE_FORM_DOC,
+  },
+  recipe_report: {
+    label: "Recipe: Report Page (compilePage)",
+    document: RECIPE_REPORT_DOC,
+  },
+  recipe_dashboard: {
+    label: "Recipe: Dashboard Page (compilePage)",
+    document: RECIPE_DASHBOARD_DOC,
+  },
+  recipe_settings: {
+    label: "Recipe: Settings Page (compilePage)",
+    document: RECIPE_SETTINGS_DOC,
+  },
+  recipe_tree: {
+    label: "Recipe: Tree Page (compilePage)",
+    document: RECIPE_TREE_DOC,
+  },
+  recipe_wizard: {
+    label: "Recipe: Wizard Stepper (compilePage)",
+    document: RECIPE_WIZARD_DOC,
+  },
 };
 
 const AI_QUICK_PROMPTS = [
@@ -205,6 +383,7 @@ export function PlaygroundRoute({ onBack, isDark = false, onToggleTheme }: Playg
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [aiPromptInput, setAiPromptInput] = useState("");
+  const [aiIssues, setAiIssues] = useState<AiPipelineIssue[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -268,10 +447,15 @@ export function PlaygroundRoute({ onBack, isDark = false, onToggleTheme }: Playg
 
   const handleGenerateAI = (promptText: string) => {
     if (!promptText.trim()) return;
-    const generatedDoc = generateUidlFromPrompt(promptText);
-    setJsonCode(JSON.stringify(generatedDoc, null, 2));
-    setIsAiModalOpen(false);
-    setAiPromptInput("");
+    const result = executeAiPipeline(promptText);
+    if (result.success && result.document) {
+      setJsonCode(JSON.stringify(result.document, null, 2));
+      setAiIssues([]);
+      setIsAiModalOpen(false);
+      setAiPromptInput("");
+    } else {
+      setAiIssues(result.issues);
+    }
   };
 
   const handleUpdateNode = (updatedNode: UIDLNode) => {
@@ -574,10 +758,33 @@ export function PlaygroundRoute({ onBack, isDark = false, onToggleTheme }: Playg
                 </div>
               </div>
 
+              {aiIssues.length > 0 && (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400 space-y-1">
+                  <div className="font-semibold flex items-center gap-1.5">
+                    <Icon name="close" className="h-4 w-4 text-red-400" />
+                    <span>Validasi AI Pipeline Gagal ({aiIssues.length} issue):</span>
+                  </div>
+                  <ul className="list-disc list-inside space-y-0.5 text-[11px] text-red-300">
+                    {aiIssues.map((issue, idx) => (
+                      <li key={idx}>
+                        <span className="uppercase font-mono text-[10px] bg-red-900/40 px-1 py-0.5 rounded mr-1">
+                          [{issue.phase}]
+                        </span>
+                        {issue.path ? <code className="font-mono text-[10px] text-red-200 mr-1">{issue.path}:</code> : null}
+                        {issue.message}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="flex justify-end gap-2 pt-3">
                 <button
                   type="button"
-                  onClick={() => setIsAiModalOpen(false)}
+                  onClick={() => {
+                    setIsAiModalOpen(false);
+                    setAiIssues([]);
+                  }}
                   className={`rounded-md border px-4 py-2 text-xs font-semibold ${
                     isDark ? "border-gray-700 bg-gray-800 text-gray-300" : "border-gray-300 bg-white text-gray-700"
                   }`}

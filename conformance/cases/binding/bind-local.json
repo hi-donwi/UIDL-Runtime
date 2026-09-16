@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"bind-local","class":"binding","status":"active","spec":"v1","input":{"$bind":"local.row.title"},"context":{"local":{"row":{"title":"Doc"}}},"expected":"Doc"}
