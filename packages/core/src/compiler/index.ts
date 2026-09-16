@@ -77,3 +77,17 @@ export type {
   PageCompiler,
   CapabilityIssue,
 } from "./types.js";
+
+export { compilePage, CapabilityValidationError } from "./compilePage.js";
+
+export {
+  createRemotePageCompiler,
+  RemoteCompilerError,
+} from "./remoteCompiler.js";
+
+export type {
+  RemotePageCompilerOptions,
+  RemotePageCompiler,
+  ValidateResult,
+  RemoteHealthResult,
+} from "./remoteCompiler.js";

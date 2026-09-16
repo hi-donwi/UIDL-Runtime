@@ -374,6 +374,9 @@ export type CompilePageInputFor<R extends PageRecipe> = {
   uiPolicy?: UiPolicy;
   routePolicy?: RoutePolicy;
   responsivePolicy?: ResponsivePolicy;
+  recordId?: string;
+  listRoute?: string;
+  queryParams?: Record<string, string>;
 };
 
 export type CompilePageInput =

@@ -187,3 +187,14 @@ export { compileTreePage } from "./compiler/tree.js";
 export type { CompileTreeOptions } from "./compiler/tree.js";
 export { compileWizardPage } from "./compiler/wizard.js";
 export type { CompileWizardOptions } from "./compiler/wizard.js";
+export { compilePage, CapabilityValidationError } from "./compiler/compilePage.js";
+export {
+  createRemotePageCompiler,
+  RemoteCompilerError,
+} from "./compiler/remoteCompiler.js";
+export type {
+  RemotePageCompilerOptions,
+  RemotePageCompiler,
+  ValidateResult,
+  RemoteHealthResult,
+} from "./compiler/remoteCompiler.js";
