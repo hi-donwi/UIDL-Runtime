@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.uidl.runtime.actions.ActionDispatcher
 import dev.uidl.runtime.binding.BindingResolver
+import dev.uidl.runtime.compose.UidlTreeRenderer
 import dev.uidl.runtime.evaluator.ExpressionEvaluator
 import dev.uidl.runtime.model.UidlDocument
 import dev.uidl.runtime.parser.UidlParser
@@ -108,8 +109,16 @@ class ConformanceRunnerTest {
                     "render" -> {
                         @Suppress("UNCHECKED_CAST")
                         val doc = UidlDocument.fromMap(input as Map<String, Any?>)
-                        assertThat(doc.id).isNotBlank()
-                        assertThat(doc.root.id).isNotBlank()
+                        val tree = UidlTreeRenderer.render(doc)
+                        assertThat(tree.id).isEqualTo(doc.root.id)
+                        assertThat(tree.type).isEqualTo(doc.root.type)
+                        if (doc.root.children.isNotEmpty()) {
+                            assertThat(tree.children).hasSize(doc.root.children.size)
+                            assertThat(tree.children[0].type).isEqualTo(doc.root.children[0].type)
+                            assertThat(tree.children[0].props["value"])
+                                .isEqualTo(doc.root.children[0].props["value"])
+                        }
+                        assertThat(expected).isEqualTo(true)
                     }
 
                     "data" -> {
