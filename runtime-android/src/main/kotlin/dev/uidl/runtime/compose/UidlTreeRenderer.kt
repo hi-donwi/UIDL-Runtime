@@ -79,30 +79,25 @@ object UidlTreeRenderer {
                 )
             }
         }
+        fun registerLeaf(type: String) {
+            registry.register(type) { node, _ ->
+                UidlRenderedNode(
+                    id = node.id,
+                    type = type,
+                    props = node.props
+                )
+            }
+        }
         registerLayout("Column")
         registerLayout("Row")
         registerLayout("Container")
-        registry.register("Text") { node, _ ->
-            UidlRenderedNode(
-                id = node.id,
-                type = "Text",
-                props = node.props
-            )
-        }
-        registry.register("Button") { node, _ ->
-            UidlRenderedNode(
-                id = node.id,
-                type = "Button",
-                props = node.props
-            )
-        }
-        registry.register("TextField") { node, _ ->
-            UidlRenderedNode(
-                id = node.id,
-                type = "TextField",
-                props = node.props
-            )
-        }
+        registerLayout("ListView")
+        registerLeaf("Text")
+        registerLeaf("Button")
+        registerLeaf("TextField")
+        registerLeaf("Spacer")
+        registerLeaf("Divider")
+        registerLeaf("Image")
         return registry
     }
 
