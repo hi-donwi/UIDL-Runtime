@@ -1,6 +1,7 @@
 # uidl-runtime
 
 [![npm version](https://img.shields.io/npm/v/uidl-runtime.svg)](https://www.npmjs.com/package/uidl-runtime)
+[![pub package](https://img.shields.io/pub/v/uidl_flutter.svg)](https://pub.dev/packages/uidl_flutter)
 [![CI](https://github.com/hi-donwi/UIDL-Runtime/actions/workflows/ci.yml/badge.svg)](https://github.com/hi-donwi/UIDL-Runtime/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/npm/l/uidl-runtime.svg)](LICENSE)
 
@@ -33,6 +34,15 @@ is hand-built page markup.
 ```bash
 npm install uidl-runtime
 ```
+
+Flutter (pub.dev):
+
+```yaml
+dependencies:
+  uidl_flutter: ^0.1.4
+```
+
+https://pub.dev/packages/uidl_flutter
 
 ### GitHub Packages mirror
 
@@ -112,7 +122,7 @@ UIDL provides native runtimes across web, mobile, and server platforms sharing t
 |---|---|---|---|
 | **Web / React** | `packages/core` | TypeScript 5.8, React 18/19 | `npm install uidl-runtime` |
 | **Android Native** | `runtime-android/` | Kotlin 2.1, Java 21, Maven | `dev.uidl:uidl-android:1.0.0-SNAPSHOT` |
-| **Flutter Native** | `runtime-flutter/` | Dart 3.7, Flutter 3.29 | `uidl_flutter` (`pubspec.yaml`) |
+| **Flutter Native** | `runtime-flutter/` | Dart 3.7, Flutter 3.29 | [`uidl_flutter`](https://pub.dev/packages/uidl_flutter) `^0.1.4` on pub.dev |
 | **Server Generator** | `server/uidl-generator/` | Java 21, Jackson, Maven | `dev.uidl:uidl-generator:1.0.0-SNAPSHOT` |
 | **Quarkus Server** | `server/uidl-server/` | Java 21, Quarkus 3.x, RESTEasy | Microservice executable |
 | **Companion App** | `apps/workspace-control/` | React 19, Vite, Tailwind v4 | Live workspace control desk |
@@ -167,22 +177,24 @@ val result = ExpressionEvaluator.evaluate(document.root.props["visible"], contex
 
 ### 3. Flutter Native (Dart)
 
+```yaml
+dependencies:
+  uidl_flutter: ^0.1.4
+```
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:uidl_flutter/uidl_flutter.dart';
 
 class UidlScreen extends StatelessWidget {
-  final Map<String, dynamic> rawDocument;
   const UidlScreen({super.key, required this.rawDocument});
+
+  final Map<String, dynamic> rawDocument;
 
   @override
   Widget build(BuildContext context) {
-    final document = UIDLDocument.fromJson(rawDocument);
-    return UIDLDocumentView(
-      document: document,
-      theme: MeridianTheme.light(),
-      onNavigate: (route) => Navigator.pushNamed(context, route),
-    );
+    final document = UidlParser.parse(rawDocument);
+    return UidlRenderer(document: document);
   }
 }
 ```
@@ -348,8 +360,9 @@ uidl-runtime/
 ```
 
 `packages/core`, `packages/templates`, `apps/reference`, and `apps/workspace-control` are npm workspaces. The
-published npm artifact is `uidl-runtime`, including its required `style.css`. Mobile and JVM runtimes are
-isolated and version-aligned.
+published npm artifact is [`uidl-runtime`](https://www.npmjs.com/package/uidl-runtime) (with `style.css`). The
+Flutter runtime is published separately as [`uidl_flutter`](https://pub.dev/packages/uidl_flutter) `0.1.4` on
+pub.dev. Android and Java artifacts remain SNAPSHOT libraries in this repository.
 
 
 Visual regression tests are intentionally separate from the default reference command.
