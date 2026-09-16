@@ -12,6 +12,8 @@ export interface CommandItem {
 
 const COMMAND_ITEMS: CommandItem[] = [
   // Developer & Tools
+  { id: "tool-conformance", title: "Specification Conformance Matrix", subtitle: "Multi-platform test fixtures across 7 domains (Web, Android, Flutter, Java)", category: "Tool", path: "/conformance", keywords: ["conformance", "spec", "matrix", "test", "fixtures", "android", "flutter", "kotlin", "java", "vitest"] },
+  { id: "tool-gallery", title: "Component Gallery", subtitle: "Katalog visual komponen UI library dan layout", category: "Tool", path: "/gallery", keywords: ["gallery", "components", "ui", "widgets"] },
   { id: "tool-playground", title: "JSON Schema Playground", subtitle: "Live editor, schema validation & JSON UIDL previewer", category: "Tool", path: "/playground", keywords: ["editor", "schema", "json", "uidl", "code", "dev"] },
   { id: "tool-catalog", title: "Console Catalog Landing", subtitle: "Kembali ke katalog 11 konsol industri ERP", category: "Tool", path: "/", keywords: ["home", "landing", "catalog", "beranda"] },
 

@@ -140,6 +140,21 @@ export function FloatingToolsMenu({
               </div>
             </button>
 
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                onNavigate("/conformance");
+              }}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+            >
+              <IconTable className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              <div>
+                <div className="font-medium">Conformance Matrix</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">Multi-platform test fixtures</div>
+              </div>
+            </button>
+
             {onOpenSearch && (
               <button
                 type="button"
