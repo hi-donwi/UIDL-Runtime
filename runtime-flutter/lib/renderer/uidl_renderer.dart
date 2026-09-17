@@ -20,6 +20,9 @@ class UidlRenderer extends StatefulWidget {
   final MutationHandler? onMutate;
   final CommandHandler? onCommand;
   final DownloadHandler? onDownload;
+  final ApiHandler? onApi;
+  final QueryHandler? onQuery;
+  final ThemeData? theme;
 
   const UidlRenderer({
     super.key,
@@ -34,6 +37,9 @@ class UidlRenderer extends StatefulWidget {
     this.onMutate,
     this.onCommand,
     this.onDownload,
+    this.onApi,
+    this.onQuery,
+    this.theme,
   });
 
   @override
@@ -62,6 +68,8 @@ class _UidlRendererState extends State<UidlRenderer> {
           onMutate: widget.onMutate,
           onCommand: widget.onCommand,
           onDownload: widget.onDownload,
+          onApi: widget.onApi,
+          onQuery: widget.onQuery,
           onStateChanged: () {
             if (mounted) setState(() {});
           },
@@ -70,11 +78,16 @@ class _UidlRendererState extends State<UidlRenderer> {
 
   @override
   Widget build(BuildContext context) {
-    return _renderNode(widget.document.root, _context.scope);
+    Widget child = _renderNode(widget.document.root, _context.scope);
+
+    if (widget.theme != null) {
+      child = Theme(data: widget.theme!, child: child);
+    }
+
+    return child;
   }
 
   Widget _renderNode(UidlNode node, Map<String, dynamic> localScope) {
-    // 1. Visibility check
     if (node.visibility != null && node.visibility!.condition != null) {
       final isVisible = ExpressionEvaluator.evaluateCondition(
         node.visibility!.condition,
@@ -85,7 +98,6 @@ class _UidlRendererState extends State<UidlRenderer> {
       }
     }
 
-    // 2. Repeat check
     if (node.repeat != null) {
       final items = DataSourceRunner.resolveDataSourceRows(
         node.repeat!.dataSource,
@@ -123,7 +135,6 @@ class _UidlRendererState extends State<UidlRenderer> {
       }
     }
 
-    // 3. Resolve props
     final resolvedProps = <String, dynamic>{};
     for (final entry in node.props.entries) {
       final val = entry.value;
@@ -136,12 +147,10 @@ class _UidlRendererState extends State<UidlRenderer> {
       }
     }
 
-    // 4. Render children
     final renderedChildren = node.children
         .map((child) => _renderNode(child, localScope))
         .toList();
 
-    // 5. Look up builder in ComponentRegistry
     final builder = _context.registry.get(node.type);
     if (builder == null) {
       return Container(
@@ -152,7 +161,7 @@ class _UidlRendererState extends State<UidlRenderer> {
       );
     }
 
-    return builder(
+    Widget rendered = builder(
       context,
       node,
       resolvedProps,
@@ -164,5 +173,32 @@ class _UidlRendererState extends State<UidlRenderer> {
         }
       },
     );
+
+    final semanticLabel = resolvedProps['semanticLabel']?.toString() ??
+        resolvedProps['ariaLabel']?.toString();
+    if (semanticLabel != null) {
+      rendered = Semantics(
+        label: semanticLabel,
+        child: rendered,
+      );
+    }
+
+    final tooltip = resolvedProps['tooltip']?.toString();
+    if (tooltip != null) {
+      rendered = Tooltip(
+        message: tooltip,
+        child: rendered,
+      );
+    }
+
+    final animationType = resolvedProps['animation']?.toString();
+    if (animationType != null) {
+      rendered = AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: rendered,
+      );
+    }
+
+    return rendered;
   }
 }

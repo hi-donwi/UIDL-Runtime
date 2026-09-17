@@ -22,6 +22,8 @@ class UidlRenderContext {
     MutationHandler? onMutate,
     CommandHandler? onCommand,
     DownloadHandler? onDownload,
+    ApiHandler? onApi,
+    QueryHandler? onQuery,
     void Function()? onStateChanged,
   }) : registry = registry ?? ComponentRegistry() {
     dispatcher = ActionDispatcher(
@@ -32,6 +34,8 @@ class UidlRenderContext {
       onMutate: onMutate,
       onCommand: onCommand,
       onDownload: onDownload,
+      onApi: onApi,
+      onQuery: onQuery,
       onStateChanged: onStateChanged,
     );
   }
@@ -47,6 +51,8 @@ class UidlRenderContext {
     MutationHandler? onMutate,
     CommandHandler? onCommand,
     DownloadHandler? onDownload,
+    ApiHandler? onApi,
+    QueryHandler? onQuery,
     void Function()? onStateChanged,
   }) {
     final state = Map<String, dynamic>.from(document.initialState);
@@ -65,6 +71,8 @@ class UidlRenderContext {
       onMutate: onMutate,
       onCommand: onCommand,
       onDownload: onDownload,
+      onApi: onApi,
+      onQuery: onQuery,
       onStateChanged: onStateChanged,
     );
   }

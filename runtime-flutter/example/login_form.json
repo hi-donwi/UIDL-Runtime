@@ -1,0 +1,141 @@
+{
+  "version": "1.0",
+  "id": "example-login",
+  "name": "Login Form",
+  "initialState": {
+    "email": "",
+    "password": "",
+    "isLoading": false,
+    "error": ""
+  },
+  "root": {
+    "id": "root",
+    "type": "Column",
+    "props": {
+      "mainAxisAlignment": "start"
+    },
+    "children": [
+      {
+        "id": "header",
+        "type": "Container",
+        "props": {
+          "padding": [20, 20, 20, 0]
+        },
+        "children": [
+          {
+            "id": "title",
+            "type": "Text",
+            "props": {
+              "value": "Welcome back."
+            },
+            "style": {
+              "fontSize": 24,
+              "fontWeight": "800"
+            }
+          },
+          {
+            "id": "subtitle",
+            "type": "Text",
+            "props": {
+              "value": "Sign in to continue."
+            },
+            "style": {
+              "fontSize": 14,
+              "color": "#757575"
+            }
+          }
+        ]
+      },
+      {
+        "id": "form",
+        "type": "Form",
+        "props": {
+          "padding": [20, 24, 20, 0]
+        },
+        "children": [
+          {
+            "id": "email_field",
+            "type": "TextField",
+            "props": {
+              "placeholder": "Email",
+              "value": {"$bind": "state.email"}
+            },
+            "events": {
+              "onChange": {
+                "setState": {
+                  "path": "email",
+                  "value": {"$bind": "event.value"}
+                }
+              }
+            }
+          },
+          {
+            "id": "spacer1",
+            "type": "Spacer",
+            "props": {"height": 14}
+          },
+          {
+            "id": "password_field",
+            "type": "TextField",
+            "props": {
+              "placeholder": "Password",
+              "value": {"$bind": "state.password"},
+              "obscureText": true
+            },
+            "events": {
+              "onChange": {
+                "setState": {
+                  "path": "password",
+                  "value": {"$bind": "event.value"}
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "spacer2",
+        "type": "Spacer",
+        "props": {"height": 24}
+      },
+      {
+        "id": "submit_btn",
+        "type": "Button",
+        "props": {
+          "label": {"$bind": "state.isLoading"},
+          "enabled": {"$not": {"$bind": "state.isLoading"}}
+        },
+        "events": {
+          "onClick": {
+            "sequence": [
+              {
+                "setState": {
+                  "path": "isLoading",
+                  "value": {"literal": true}
+                }
+              },
+              {
+                "api": {
+                  "url": "/api/auth/login",
+                  "method": "POST",
+                  "body": {
+                    "email": {"$bind": "state.email"},
+                    "password": {"$bind": "state.password"}
+                  },
+                  "resultPath": "state.user",
+                  "errorPath": "state.error"
+                }
+              },
+              {
+                "setState": {
+                  "path": "isLoading",
+                  "value": {"literal": false}
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

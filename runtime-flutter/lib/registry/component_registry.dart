@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../model/node.dart';
 import '../theme/theme_resolver.dart';
@@ -106,28 +109,82 @@ class ComponentRegistry {
     register('TextField', (context, node, props, children, onEvent) {
       final value = props['value']?.toString() ?? '';
       final placeholder = props['placeholder']?.toString() ?? props['label']?.toString();
+      final obscureText = props['obscureText'] == true;
+      final readOnly = props['readOnly'] == true;
+      final enabled = props['enabled'] != false;
       return TextField(
-        key: ValueKey(node.id),
+        key: ValueKey('${node.id}_$value'),
         controller: TextEditingController(text: value),
         decoration: InputDecoration(
           labelText: placeholder,
         ),
+        obscureText: obscureText,
+        readOnly: readOnly,
+        enabled: enabled,
         onChanged: (val) => onEvent('onChange', val),
       );
     });
 
     register('Image', (context, node, props, children, onEvent) {
       final src = props['src']?.toString() ?? '';
+      final width = props['width'] is num ? props['width'].toDouble() : null;
+      final height = props['height'] is num ? props['height'].toDouble() : null;
+      final fit = _parseBoxFit(props['fit']);
+
       if (src.startsWith('http://') || src.startsWith('https://')) {
-        return Image.network(src, key: ValueKey(node.id));
+        return Image.network(
+          src,
+          key: ValueKey(node.id),
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(node.id),
+        );
+      } else if (src.startsWith('asset://') || src.startsWith('assets/')) {
+        final assetPath = src.startsWith('asset://') ? src.substring(8) : src;
+        return Image.asset(
+          assetPath,
+          key: ValueKey(node.id),
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(node.id),
+        );
+      } else if (src.startsWith('file://') || src.startsWith('/')) {
+        final filePath = src.startsWith('file://') ? src.substring(7) : src;
+        return Image.file(
+          File(filePath),
+          key: ValueKey(node.id),
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(node.id),
+        );
+      } else if (src.startsWith('data:image/')) {
+        try {
+          final base64Data = src.split(',').last;
+          final bytes = base64Decode(base64Data);
+          return Image.memory(
+            bytes,
+            key: ValueKey(node.id),
+            width: width,
+            height: height,
+            fit: fit,
+          );
+        } catch (e) {
+          return _buildImagePlaceholder(node.id);
+        }
       }
-      return const SizedBox.shrink();
+      return _buildImagePlaceholder(node.id);
     });
 
     register('ListView', (context, node, props, children, onEvent) {
+      final shrinkWrap = props['shrinkWrap'] != false;
+      final scrollable = props['scrollable'] != false;
       return ListView(
         key: ValueKey(node.id),
-        shrinkWrap: true,
+        shrinkWrap: shrinkWrap,
+        physics: scrollable ? null : const NeverScrollableScrollPhysics(),
         children: children,
       );
     });
@@ -145,7 +202,16 @@ class ComponentRegistry {
     });
 
     register('Icon', (context, node, props, children, onEvent) {
-      return Icon(Icons.widgets, key: ValueKey(node.id));
+      final iconName = props['name']?.toString() ?? props['icon']?.toString();
+      final size = props['size'] is num ? props['size'].toDouble() : null;
+      final color = ThemeResolver.parseColor(props['color']);
+      final iconData = _resolveIconData(iconName);
+      return Icon(
+        iconData,
+        key: ValueKey(node.id),
+        size: size,
+        color: color,
+      );
     });
 
     register('Badge', (context, node, props, children, onEvent) {
@@ -175,10 +241,14 @@ class ComponentRegistry {
 
     register('Slider', (context, node, props, children, onEvent) {
       final raw = props['value'];
-      final value = raw is num ? raw.toDouble().clamp(0.0, 1.0).toDouble() : 0.0;
+      final min = props['min'] is num ? props['min'].toDouble() : 0.0;
+      final max = props['max'] is num ? props['max'].toDouble() : 1.0;
+      final value = raw is num ? raw.toDouble().clamp(min, max).toDouble() : min;
       return Slider(
         key: ValueKey(node.id),
         value: value,
+        min: min,
+        max: max,
         onChanged: (v) => onEvent('onChange', v),
       );
     });
@@ -331,5 +401,272 @@ class ComponentRegistry {
       default:
         return MainAxisAlignment.start;
     }
+  }
+
+  static BoxFit _parseBoxFit(dynamic val) {
+    switch (val?.toString().toLowerCase()) {
+      case 'contain':
+        return BoxFit.contain;
+      case 'cover':
+        return BoxFit.cover;
+      case 'fill':
+        return BoxFit.fill;
+      case 'fitwidth':
+        return BoxFit.fitWidth;
+      case 'fitheight':
+        return BoxFit.fitHeight;
+      case 'none':
+        return BoxFit.none;
+      case 'scaledown':
+        return BoxFit.scaleDown;
+      default:
+        return BoxFit.contain;
+    }
+  }
+
+  static Widget _buildImagePlaceholder(String nodeId) {
+    return Container(
+      key: ValueKey(nodeId),
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Icon(Icons.image_outlined, color: Colors.grey.shade400, size: 24),
+    );
+  }
+
+  static IconData? _resolveIconData(String? name) {
+    if (name == null || name.isEmpty) return Icons.help_outline;
+
+    const iconMap = <String, IconData>{
+      'home': Icons.home,
+      'settings': Icons.settings,
+      'search': Icons.search,
+      'add': Icons.add,
+      'remove': Icons.remove,
+      'edit': Icons.edit,
+      'delete': Icons.delete,
+      'save': Icons.save,
+      'cancel': Icons.cancel,
+      'check': Icons.check,
+      'close': Icons.close,
+      'menu': Icons.menu,
+      'more': Icons.more_vert,
+      'more_horiz': Icons.more_horiz,
+      'arrow_back': Icons.arrow_back,
+      'arrow_forward': Icons.arrow_forward,
+      'arrow_up': Icons.arrow_upward,
+      'arrow_down': Icons.arrow_downward,
+      'expand_more': Icons.expand_more,
+      'expand_less': Icons.expand_less,
+      'chevron_right': Icons.chevron_right,
+      'chevron_left': Icons.chevron_left,
+      'person': Icons.person,
+      'people': Icons.people,
+      'account_circle': Icons.account_circle,
+      'email': Icons.email,
+      'phone': Icons.phone,
+      'location_on': Icons.location_on,
+      'notifications': Icons.notifications,
+      'favorite': Icons.favorite,
+      'favorite_border': Icons.favorite_border,
+      'star': Icons.star,
+      'star_border': Icons.star_border,
+      'share': Icons.share,
+      'link': Icons.link,
+      'copy': Icons.copy,
+      'paste': Icons.content_paste,
+      'undo': Icons.undo,
+      'redo': Icons.redo,
+      'refresh': Icons.refresh,
+      'download': Icons.download,
+      'upload': Icons.upload,
+      'cloud': Icons.cloud,
+      'cloud_off': Icons.cloud_off,
+      'wifi': Icons.wifi,
+      'wifi_off': Icons.wifi_off,
+      'bluetooth': Icons.bluetooth,
+      'gps': Icons.gps_fixed,
+      'camera': Icons.camera_alt,
+      'photo': Icons.photo,
+      'image': Icons.image,
+      'video': Icons.videocam,
+      'music_note': Icons.music_note,
+      'play': Icons.play_arrow,
+      'pause': Icons.pause,
+      'stop': Icons.stop,
+      'skip_next': Icons.skip_next,
+      'skip_previous': Icons.skip_previous,
+      'volume_up': Icons.volume_up,
+      'volume_down': Icons.volume_down,
+      'volume_off': Icons.volume_off,
+      'mute': Icons.volume_off,
+      'lock': Icons.lock,
+      'lock_open': Icons.lock_open,
+      'visibility': Icons.visibility,
+      'visibility_off': Icons.visibility_off,
+      'info': Icons.info,
+      'warning': Icons.warning,
+      'error': Icons.error,
+      'help': Icons.help,
+      'help_outline': Icons.help_outline,
+      'bolt': Icons.bolt,
+      'battery_full': Icons.battery_full,
+      'battery_empty': Icons.battery_0_bar,
+      'battery_5_bar': Icons.battery_5_bar,
+      'battery_3_bar': Icons.battery_3_bar,
+      'battery_1_bar': Icons.battery_1_bar,
+      'power': Icons.power_settings_new,
+      'logout': Icons.logout,
+      'login': Icons.login,
+      'dashboard': Icons.dashboard,
+      'analytics': Icons.analytics,
+      'chart_bar': Icons.bar_chart,
+      'chart_line': Icons.show_chart,
+      'chart_pie': Icons.pie_chart,
+      'table_chart': Icons.table_chart,
+      'calendar_today': Icons.calendar_today,
+      'event': Icons.event,
+      'schedule': Icons.schedule,
+      'timer': Icons.timer,
+      'access_time': Icons.access_time,
+      'folder': Icons.folder,
+      'folder_open': Icons.folder_open,
+      'file_present': Icons.file_present,
+      'description': Icons.description,
+      'note': Icons.note,
+      'bookmark': Icons.bookmark,
+      'bookmark_border': Icons.bookmark_border,
+      'flag': Icons.flag,
+      'label': Icons.label,
+      'tag': Icons.tag,
+      'archive': Icons.archive,
+      'inbox': Icons.inbox,
+      'send': Icons.send,
+      'reply': Icons.reply,
+      'forward': Icons.forward,
+      'chat': Icons.chat,
+      'comment': Icons.comment,
+      'forum': Icons.forum,
+      'group': Icons.group,
+      'group_add': Icons.group_add,
+      'badge': Icons.badge,
+      'work': Icons.work,
+      'business': Icons.business,
+      'school': Icons.school,
+      'store': Icons.store,
+      'shopping_cart': Icons.shopping_cart,
+      'payments': Icons.payments,
+      'account_balance': Icons.account_balance,
+      'savings': Icons.savings,
+      'credit_card': Icons.credit_card,
+      'local_shipping': Icons.local_shipping,
+      'flight': Icons.flight,
+      'train': Icons.train,
+      'directions_car': Icons.directions_car,
+      'directions_bike': Icons.directions_bike,
+      'directions_walk': Icons.directions_walk,
+      'map': Icons.map,
+      'terrain': Icons.terrain,
+      'beach_access': Icons.beach_access,
+      'park': Icons.park,
+      'pets': Icons.pets,
+      'spa': Icons.spa,
+      'fitness_center': Icons.fitness_center,
+      'sports_esports': Icons.sports_esports,
+      'movie': Icons.movie,
+      'music': Icons.music_note,
+      'palette': Icons.palette,
+      'brush': Icons.brush,
+      'format_paint': Icons.format_paint,
+      'format_bold': Icons.format_bold,
+      'format_italic': Icons.format_italic,
+      'format_underline': Icons.format_underline,
+      'format_list_bulleted': Icons.format_list_bulleted,
+      'format_list_numbered': Icons.format_list_numbered,
+      'text_fields': Icons.text_fields,
+      'code': Icons.code,
+      'terminal': Icons.terminal,
+      'bug_report': Icons.bug_report,
+      'extension': Icons.extension,
+      'widgets': Icons.widgets,
+      'apps': Icons.apps,
+      'dashboard_customize': Icons.dashboard_customize,
+      'view_list': Icons.view_list,
+      'view_module': Icons.view_module,
+      'grid_view': Icons.grid_view,
+      'filter_list': Icons.filter_list,
+      'sort': Icons.sort,
+      'swap_horiz': Icons.swap_horiz,
+      'swap_vert': Icons.swap_vert,
+      'compare_arrows': Icons.compare_arrows,
+      'tune': Icons.tune,
+      'build': Icons.build,
+      'construction': Icons.construction,
+      'handyman': Icons.handyman,
+      'science': Icons.science,
+      'biotech': Icons.biotech,
+      'calculate': Icons.calculate,
+      'assessment': Icons.assessment,
+      'trending_up': Icons.trending_up,
+      'trending_down': Icons.trending_down,
+      'auto_graph': Icons.auto_graph,
+      'insights': Icons.insights,
+      'integration_instructions': Icons.integration_instructions,
+      'api': Icons.api,
+      'storage': Icons.storage,
+      'dns': Icons.dns,
+      'developer_board': Icons.developer_board,
+      'memory': Icons.memory,
+      'computer': Icons.computer,
+      'phone_android': Icons.phone_android,
+      'tablet': Icons.tablet,
+      'watch': Icons.watch,
+      'desktop_mac': Icons.desktop_mac,
+      'laptop': Icons.laptop,
+      'router': Icons.router,
+      'hub': Icons.hub,
+      'sim_card': Icons.sim_card,
+      'security': Icons.security,
+      'verified_user': Icons.verified_user,
+      'admin_panel_settings': Icons.admin_panel_settings,
+      'manage_accounts': Icons.manage_accounts,
+      'supervisor_account': Icons.supervisor_account,
+      'gavel': Icons.gavel,
+      'policy': Icons.policy,
+      'gpp_good': Icons.gpp_good,
+      'shield': Icons.shield,
+      'shield_outlined': Icons.shield_outlined,
+      'report_problem': Icons.report_problem,
+      'feedback': Icons.feedback,
+      'thumb_up': Icons.thumb_up,
+      'thumb_down': Icons.thumb_down,
+      'emoji_emotions': Icons.emoji_emotions,
+      'mood': Icons.mood,
+      'sentiment_satisfied': Icons.sentiment_satisfied,
+      'celebration': Icons.celebration,
+      'party_mode': Icons.party_mode,
+      'cake': Icons.cake,
+      'gift': Icons.card_giftcard,
+      'local_offer': Icons.local_offer,
+      'redeem': Icons.redeem,
+      'card_giftcard': Icons.card_giftcard,
+      'loyalty': Icons.loyalty,
+    };
+
+    final lowerName = name.toLowerCase();
+    if (iconMap.containsKey(lowerName)) {
+      return iconMap[lowerName];
+    }
+
+    for (final entry in iconMap.entries) {
+      if (entry.key.replaceAll('_', '') == lowerName.replaceAll('_', '')) {
+        return entry.value;
+      }
+    }
+
+    return Icons.help_outline;
   }
 }

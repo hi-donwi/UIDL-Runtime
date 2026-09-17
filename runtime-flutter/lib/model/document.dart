@@ -1,5 +1,7 @@
+import 'package:meta/meta.dart';
 import 'node.dart';
 
+@immutable
 class UidlDocument {
   final String version;
   final String id;
@@ -26,7 +28,7 @@ class UidlDocument {
   factory UidlDocument.fromJson(Map<String, dynamic> json) {
     final rootJson = json['root'];
     if (rootJson is! Map<String, dynamic>) {
-      throw FormatException('UidlDocument missing or invalid "root" node');
+      throw const FormatException('UidlDocument missing or invalid "root" node');
     }
 
     final rawComponents = json['components'];
