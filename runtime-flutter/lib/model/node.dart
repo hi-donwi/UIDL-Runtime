@@ -1,5 +1,7 @@
+import 'package:meta/meta.dart';
 import '../spec/errors.dart';
 
+@immutable
 class UidlVisibility {
   final dynamic condition;
 
@@ -12,6 +14,7 @@ class UidlVisibility {
   }
 }
 
+@immutable
 class UidlRepeat {
   final dynamic dataSource;
   final String asItem;
@@ -32,6 +35,7 @@ class UidlRepeat {
   }
 }
 
+@immutable
 class UidlNode {
   final String id;
   final String type;
@@ -80,7 +84,7 @@ class UidlNode {
         if (entry.value is List) {
           parsedSlots[entry.key] = (entry.value as List)
               .whereType<Map<String, dynamic>>()
-              .map((item) => UidlNode.fromJson(item))
+              .map(UidlNode.fromJson)
               .toList();
         }
       }
