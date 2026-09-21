@@ -1,0 +1,29 @@
+{
+  "family": "erp",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/erp/shoe-company/pos-closing",
+      "statePath": "api.erp.shoeCompany.posClosing",
+      "response": { "rows": [{ "store": "Jakarta", "sales": "Rp 42.800.000", "cashDiff": "Rp 0" }, { "store": "Bandung", "sales": "Rp 31.400.000", "cashDiff": "Rp 150.000" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/erp/school-abc/receivables",
+      "statePath": "api.erp.schoolAbc.receivables",
+      "response": { "rows": [{ "grade": "Grade 7", "students": 128, "outstanding": "Rp 184.000.000" }, { "grade": "Grade 8", "students": 116, "outstanding": "Rp 142.000.000" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/erp/factory-abc/work-orders",
+      "statePath": "api.erp.factoryAbc.workOrders",
+      "response": { "rows": [{ "wo": "WO-2408-001", "item": "Sepatu Kulit", "status": "In Process" }, { "wo": "WO-2408-002", "item": "Sneaker Kanvas", "status": "Material Issue" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/erp/factory-abc/stock-value",
+      "statePath": "api.erp.factoryAbc.stockValue",
+      "response": { "rows": [{ "warehouse": "Raw Material", "value": "Rp 820.000.000" }, { "warehouse": "WIP", "value": "Rp 312.000.000" }, { "warehouse": "Finished Goods", "value": "Rp 1.180.000.000" }] }
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "medical-device-console",
+  "name": "PT Medtech Precision Indonesia Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "deviceOutput": [
+      { "label": "Spuit 5ml Steril", "value": 18500 },
+      { "label": "Infusion Set Dewasa", "value": 9200 },
+      { "label": "Blood Bag 450ml", "value": 4100 },
+      { "label": "IV Cannula 20G", "value": 7800 }
+    ],
+    "dmrHierarchy": [
+      {
+        "id": "dmr-infusion-01",
+        "label": "Infusion Administration Set Sterile Class IIa (DMR-INF-01)",
+        "badge": "Device Master Record",
+        "value": "UDI: 08991234500123",
+        "children": [
+          { "id": "part-spike", "label": "ABS Plastic Spike & Air Vent Filter (0.22 micron)", "badge": "Component", "value": "Batch: ABS-2027-01" },
+          { "id": "part-chamber", "label": "Drip Chamber Flexible PVC DEHP-Free (20 drops/ml)", "badge": "Component", "value": "Batch: PVC-2027-09" },
+          { "id": "part-roller", "label": "Precision Roller Clamp & Luer Lock Connector", "badge": "Component", "value": "Batch: POM-2027-04" },
+          { "id": "proc-eo", "label": "Ethylene Oxide (EtO) Sterilization Cycle (54°C, 4.5h)", "badge": "Sterilization Gate", "value": "Validated ISO 11135" }
+        ]
+      }
+    ],
+    "dhrRecords": [
+      { "noDhr": "DHR-2027-B091", "produk": "Spuit 5ml Luer Lock Steril", "batchSteril": "ETO-LOT-2027-44", "qtyProduksi": "20.000 Pcs", "cleanroom": "Class 10.000 (ISO 7)", "ujiBioburden": "0 CFU (Pass)", "statusQc": "Released for Sale" },
+      { "noDhr": "DHR-2027-B092", "produk": "Infusion Set Dewasa Standar", "batchSteril": "ETO-LOT-2027-45", "qtyProduksi": "10.000 Pcs", "cleanroom": "Class 10.000 (ISO 7)", "ujiBioburden": "Karantina 48h", "statusQc": "Quarantine - Testing" },
+      { "noDhr": "DHR-2027-B093", "produk": "IV Cannula 20G Pink", "batchSteril": "ETO-LOT-2027-46", "qtyProduksi": "15.000 Pcs", "cleanroom": "Class 10.000 (ISO 7)", "ujiBioburden": "0 CFU (Pass)", "statusQc": "Released for Sale" }
+    ],
+    "cleanroomLogs": [
+      { "zona": "Cleanroom Room A (Injeksi Molding)", "partikel05": "85.200 / m³ (Batas 352.000)", "suhu": "21.4 °C", "kelembaban": "48% RH", "tekananRuang": "+18 Pa", "status": "Compliant (ISO 7)" },
+      { "zona": "Cleanroom Room B (Perakitan & Blister)", "partikel05": "62.400 / m³ (Batas 352.000)", "suhu": "20.8 °C", "kelembaban": "46% RH", "tekananRuang": "+22 Pa", "status": "Compliant (ISO 7)" },
+      { "zona": "Chamber Sterilisasi EtO", "partikel05": "N/A (Gas Sealed)", "suhu": "54.2 °C", "kelembaban": "65% RH", "tekananRuang": "-5 kPa", "status": "Cycle In Progress" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "medtech-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "medtech-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "medtech-title",
+              "type": "Text",
+              "props": { "text": "PT Medtech Precision Indonesia — High-Compliance Medical Device Console" },
+              "style": { "fontSize": "text-lg", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-dhr-new",
+              "type": "Button",
+              "props": { "label": "+ Rilis DHR Batch Baru", "variant": "primary" }
+            },
+            {
+              "id": "btn-audit-iso",
+              "type": "Button",
+              "props": { "label": "Laporan ISO 13485 & UDI", "variant": "outline" }
+            }
+          ]
+        }
+      },
+      {
+        "id": "medtech-kpis",
+        "type": "Row",
+        "style": { "gap": "gap-4", "flexWrap": "flex-wrap" },
+        "children": [
+          {
+            "id": "kpi-batch-steril",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-1", "type": "Text", "props": { "text": "Batch Steril Dirilis (Bulan Ini)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-1", "type": "Text", "props": { "text": "45.000 Pcs" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-1", "type": "Text", "props": { "text": "Tingkat Lolos QC 99.8%" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-cleanroom-status",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-2", "type": "Text", "props": { "text": "Status Ruang Bersih (Cleanroom)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-2", "type": "Text", "props": { "text": "ISO 7 / Class 10k" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "#059669" } },
+              { "id": "s-kpi-2", "type": "Text", "props": { "text": "Partikel & Tekanan Terpantau Normal" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } }
+            ]
+          },
+          {
+            "id": "kpi-udi-tracked",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-3", "type": "Text", "props": { "text": "Total SKU Terdaftar GS1 UDI" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-3", "type": "Text", "props": { "text": "28 SKU Alkes" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-3", "type": "Text", "props": { "text": "Kemenkes RI AKD Terakreditasi" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-capa-open",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-4", "type": "Text", "props": { "text": "Insiden CAPA / NCR Terbuka" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-4", "type": "Text", "props": { "text": "0 Kasus" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "#059669" } },
+              { "id": "s-kpi-4", "type": "Text", "props": { "text": "Zero Recall Incident 2027" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "medtech-tree-and-chart-section",
+        "type": "Row",
+        "style": { "gap": "gap-4", "flexWrap": "flex-wrap" },
+        "children": [
+          {
+            "id": "card-dmr-tree",
+            "type": "Card",
+            "style": { "flex": "1", "minWidth": "320px", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-dmr", "type": "Text", "props": { "text": "Pohon Struktur Device Master Record (DMR) & BOM" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "tree-dmr", "type": "TreeView", "props": { "nodes": "$data.dmrHierarchy", "defaultExpanded": true } }
+            ]
+          },
+          {
+            "id": "card-device-chart",
+            "type": "Card",
+            "style": { "flex": "1", "minWidth": "320px", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-chart", "type": "Text", "props": { "text": "Volume Output Produksi Alkes per Kategori (Pcs)" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "chart-device", "type": "Chart", "props": { "type": "bar", "data": "$data.deviceOutput" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "table-dhr-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-dhr", "type": "Text", "props": { "text": "Device History Record (DHR) & Riwayat Sterilisasi Batch" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-dhr",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.dhrRecords",
+              "columns": [
+                { "key": "noDhr", "label": "No. DHR" },
+                { "key": "produk", "label": "Nama Produk Alkes" },
+                { "key": "batchSteril", "label": "Lot / Batch Steril" },
+                { "key": "qtyProduksi", "label": "Jumlah Produksi" },
+                { "key": "cleanroom", "label": "Ruang Bersih" },
+                { "key": "ujiBioburden", "label": "Uji Bioburden" },
+                { "key": "statusQc", "label": "Status Rilis QA" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-cleanroom-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-cleanroom", "type": "Text", "props": { "text": "Log Pemantauan Lingkungan Ruang Bersih (Cleanroom ISO 14644)" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-cleanroom",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.cleanroomLogs",
+              "columns": [
+                { "key": "zona", "label": "Zona / Ruangan" },
+                { "key": "partikel05", "label": "Partikel ≥0.5µm / m³" },
+                { "key": "suhu", "label": "Suhu (°C)" },
+                { "key": "kelembaban", "label": "Kelembaban (%RH)" },
+                { "key": "tekananRuang", "label": "Tekanan Ruang Positif" },
+                { "key": "status", "label": "Kepatuhan Mutu" }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

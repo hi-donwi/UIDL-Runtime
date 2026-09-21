@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"malformed-version","class":"error","status":"active","spec":"v1","input":{"version":"v1","id":"doc-4","name":"bad version","root":{"id":"root","type":"Screen"}},"context":{},"expected":"MALFORMED_VERSION"}

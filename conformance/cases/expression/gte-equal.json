@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"gte-equal","class":"expression","status":"active","spec":"v1","input":{"op":"gte","left":{"literal":5},"right":{"literal":5}},"context":{},"expected":true}

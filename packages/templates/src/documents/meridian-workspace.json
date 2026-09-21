@@ -1,0 +1,213 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "meridian-workspace-demo",
+  "name": "Meridian Workspace Demo",
+  "theme": "theme-light",
+  "dataSources": {
+    "generalLedger": [
+      { "date": "2026-08-01", "account": "Sales", "debit": "$0", "credit": "$4,200", "balance": "$4,200" },
+      { "date": "2026-08-03", "account": "Accounts Receivable", "debit": "$2,100", "credit": "$0", "balance": "$6,300" },
+      { "date": "2026-08-08", "account": "Bank", "debit": "$1,850", "credit": "$0", "balance": "$8,150" }
+    ],
+    "invoiceLines": [
+      { "item": "Design Retainer", "description": "Monthly creative package", "quantity": 1, "rate": "$3,500", "amount": "$3,500" },
+      { "item": "Implementation", "description": "Landing page build", "quantity": 8, "rate": "$125", "amount": "$1,000" }
+    ],
+    "posCatalog": [
+      { "sku": "BK-001", "item": "Notebook", "stock": 42, "price": "$8" },
+      { "sku": "BK-002", "item": "Pen Set", "stock": 18, "price": "$12" },
+      { "sku": "BK-003", "item": "Desk Pad", "stock": 9, "price": "$24" }
+    ],
+    "posCart": [
+      { "item": "Notebook", "quantity": 2, "amount": "$16" },
+      { "item": "Pen Set", "quantity": 1, "amount": "$12" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    },
+    "filterBar": {
+      "id": "filter-bar-template",
+      "type": "Toolbar",
+      "style": { "display": "flex", "justifyContent": "space-between", "alignItems": "items-center", "gap": "gap-3", "padding": "p-3", "borderColor": "{primitives.color.border}", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" },
+      "slots": { "filters": [], "actions": [] }
+    },
+    "actionToolbar": {
+      "id": "action-toolbar-template",
+      "type": "Toolbar",
+      "style": { "display": "flex", "justifyContent": "flex-end", "alignItems": "items-center", "gap": "gap-2", "padding": "p-2" },
+      "slots": { "actions": [] }
+    },
+    "reportLayout": {
+      "id": "report-layout-template",
+      "type": "Column",
+      "style": { "gap": "gap-4", "padding": "p-4" },
+      "slots": { "header": [], "filters": [], "summary": [], "table": [] }
+    },
+    "formLayout": {
+      "id": "form-layout-template",
+      "type": "Column",
+      "style": { "gap": "gap-4", "padding": "p-4", "borderColor": "{primitives.color.border}", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface-elevated}" },
+      "slots": { "header": [], "fields": [], "lines": [], "summary": [], "actions": [] }
+    },
+    "invoiceLayout": {
+      "id": "invoice-layout-template",
+      "type": "Column",
+      "style": { "gap": "gap-4", "padding": "p-4", "borderColor": "{primitives.color.border}", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface-elevated}" },
+      "slots": { "header": [], "party": [], "lineItems": [], "totals": [], "actions": [] }
+    },
+    "tableCard": {
+      "id": "table-card-template",
+      "type": "DataTable",
+      "props": { "emptyMessage": "No records" },
+      "style": { "width": "w-full" }
+    },
+    "lineItemTable": {
+      "id": "line-item-table-template",
+      "type": "DataTable",
+      "props": {
+        "title": "Line Items",
+        "emptyMessage": "No line items",
+        "columns": [
+          { "key": "item", "label": "Item" },
+          { "key": "description", "label": "Description" },
+          { "key": "quantity", "label": "Qty", "align": "right" },
+          { "key": "rate", "label": "Rate", "align": "right" },
+          { "key": "amount", "label": "Amount", "align": "right" }
+        ]
+      },
+      "style": { "width": "w-full" }
+    },
+    "posLayout": {
+      "id": "pos-layout-template",
+      "type": "GridView",
+      "style": { "display": "grid", "gap": "gap-4", "gridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))" },
+      "slots": { "catalog": [], "cart": [], "payment": [] }
+    }
+  },
+  "root": {
+    "id": "workspace-page",
+    "type": "Column",
+    "style": { "gap": "gap-4" },
+    "children": [
+      {
+        "id": "workspace-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [{ "id": "workspace-title", "type": "Text", "props": { "value": "Meridian Report Workspace" }, "style": { "fontSize": "text-2xl", "fontWeight": 700 } }],
+          "actions": [{ "id": "workspace-export", "type": "Button", "props": { "label": "Export JSON" } }]
+        }
+      },
+      {
+        "id": "ledger-report",
+        "type": "Column",
+        "componentId": "reportLayout",
+        "slots": {
+          "header": [{ "id": "ledger-heading", "type": "Text", "props": { "value": "General Ledger" }, "style": { "fontSize": "text-xl", "fontWeight": 700 } }],
+          "filters": [
+            {
+              "id": "ledger-filters",
+              "type": "Toolbar",
+              "componentId": "filterBar",
+              "slots": {
+                "filters": [
+                  { "id": "ledger-date-filter", "type": "Text", "props": { "value": "Period: Aug 2026" }, "style": { "fontSize": "text-sm" } },
+                  { "id": "ledger-account-filter", "type": "Text", "props": { "value": "Account: All Accounts" }, "style": { "fontSize": "text-sm" } }
+                ],
+                "actions": [{ "id": "ledger-refresh", "type": "Button", "props": { "label": "Refresh" } }]
+              }
+            }
+          ],
+          "summary": [
+            {
+              "id": "ledger-summary",
+              "type": "GridView",
+              "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(160px, 1fr))" },
+              "children": [
+                { "id": "summary-debit", "type": "Text", "props": { "value": "Total Debit: $3,950" }, "style": { "padding": "p-3", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+                { "id": "summary-credit", "type": "Text", "props": { "value": "Total Credit: $4,200" }, "style": { "padding": "p-3", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+              ]
+            }
+          ],
+          "table": [
+            {
+              "id": "ledger-table",
+              "type": "DataTable",
+              "componentId": "tableCard",
+              "props": {
+                "title": "Ledger Entries",
+                "dataSource": "generalLedger",
+                "columns": [
+                  { "key": "date", "label": "Date" },
+                  { "key": "account", "label": "Account" },
+                  { "key": "debit", "label": "Debit", "align": "right" },
+                  { "key": "credit", "label": "Credit", "align": "right" },
+                  { "key": "balance", "label": "Balance", "align": "right" }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "invoice-form",
+        "type": "Column",
+        "componentId": "invoiceLayout",
+        "slots": {
+          "header": [{ "id": "invoice-heading", "type": "Text", "props": { "value": "Invoice Form" }, "style": { "fontSize": "text-xl", "fontWeight": 700 } }],
+          "party": [
+            {
+              "id": "invoice-fields",
+              "type": "GridView",
+              "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" },
+              "children": [
+                { "id": "customer-field", "type": "Text", "props": { "value": "Customer: Acme Studio" }, "style": { "padding": "p-3", "borderWidth": "border", "borderRadius": "rounded-lg" } },
+                { "id": "date-field", "type": "Text", "props": { "value": "Posting Date: 2026-08-20" }, "style": { "padding": "p-3", "borderWidth": "border", "borderRadius": "rounded-lg" } },
+                { "id": "status-field", "type": "Text", "props": { "value": "Status: Draft" }, "style": { "padding": "p-3", "borderWidth": "border", "borderRadius": "rounded-lg" } }
+              ]
+            }
+          ],
+          "lineItems": [{ "id": "invoice-line-items", "type": "DataTable", "componentId": "lineItemTable", "props": { "dataSource": "invoiceLines" } }],
+          "totals": [{ "id": "invoice-total", "type": "Text", "props": { "value": "Grand Total: $4,500" }, "style": { "fontSize": "text-lg", "fontWeight": 700, "textAlign": "text-right" } }],
+          "actions": [
+            { "id": "invoice-actions", "type": "Toolbar", "componentId": "actionToolbar", "slots": { "actions": [
+              { "id": "invoice-save", "type": "Button", "props": { "label": "Save Draft" } },
+              { "id": "invoice-submit", "type": "Button", "props": { "label": "Submit" } }
+            ] } }
+          ]
+        }
+      },
+      {
+        "id": "pos-workspace",
+        "type": "GridView",
+        "componentId": "posLayout",
+        "slots": {
+          "catalog": [{ "id": "pos-catalog", "type": "DataTable", "componentId": "tableCard", "props": { "title": "POS Catalog", "dataSource": "posCatalog", "columns": [
+            { "key": "sku", "label": "SKU" },
+            { "key": "item", "label": "Item" },
+            { "key": "stock", "label": "Stock", "align": "right" },
+            { "key": "price", "label": "Price", "align": "right" }
+          ] } }],
+          "cart": [{ "id": "pos-cart", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Cart", "dataSource": "posCart", "columns": [
+            { "key": "item", "label": "Item" },
+            { "key": "quantity", "label": "Qty", "align": "right" },
+            { "key": "amount", "label": "Amount", "align": "right" }
+          ] } }],
+          "payment": [
+            { "id": "pos-payment", "type": "Column", "componentId": "formLayout", "slots": {
+              "header": [{ "id": "payment-title", "type": "Text", "props": { "value": "Payment" }, "style": { "fontSize": "text-xl", "fontWeight": 700 } }],
+              "fields": [{ "id": "payment-method", "type": "Text", "props": { "value": "Method: Cash" } }, { "id": "payment-total", "type": "Text", "props": { "value": "Total: $28" }, "style": { "fontWeight": 700 } }],
+              "actions": [{ "id": "pay-button", "type": "Button", "props": { "label": "Pay Now" } }]
+            } }
+          ]
+        }
+      }
+    ]
+  }
+}

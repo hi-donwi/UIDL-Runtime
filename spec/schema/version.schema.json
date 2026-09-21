@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/version.schema.json",
+  "title": "UIDL Document Version",
+  "description": "Document version per spec/versioning.md. Canonical form is `major.minor`; a third patch component is tolerated so pre-spec documents (which shipped `1.0.0`) keep validating. Any version is checked behaviourally, not by pattern.",
+  "type": "string",
+  "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+}

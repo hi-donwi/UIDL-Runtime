@@ -1,0 +1,111 @@
+name: Publish GitHub Packages mirror
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Expected package version to publish, with or without a leading v
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: github-packages-mirror-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: "@hi-donwi"
+          package-manager-cache: false
+
+      - run: npm ci
+
+      - name: Check manual dispatch uses default branch
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$GITHUB_REF_NAME" != "$DEFAULT_BRANCH" ]; then
+            echo "Manual publish must run from ${DEFAULT_BRANCH}; current ref is ${GITHUB_REF_NAME}."
+            exit 1
+          fi
+
+      - name: Check requested version matches package version
+        env:
+          REQUESTED_VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.version }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          requested="${REQUESTED_VERSION#v}"
+          if [ "$version" != "$requested" ]; then
+            echo "Requested version ${REQUESTED_VERSION} does not match package version ${version}."
+            exit 1
+          fi
+
+      - name: Check public npm package is published first
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          for attempt in $(seq 1 30); do
+            if npm view "uidl-runtime@${version}" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+              echo "uidl-runtime@${version} is available on public npm."
+              exit 0
+            fi
+
+            echo "uidl-runtime@${version} is not available on public npm yet (attempt ${attempt}/30)."
+            sleep 20
+          done
+
+          echo "Publish uidl-runtime@${version} to public npm before publishing the GitHub Packages mirror."
+          exit 1
+
+      - name: Check mirror version is not already published
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if npm view "@hi-donwi/uidl-runtime@${version}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "@hi-donwi/uidl-runtime@${version} is already published on GitHub Packages."
+            exit 1
+          fi
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build library and schemas
+        run: npm run build
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Validate example documents
+        run: npm run validate:examples
+
+      - name: Architecture, maturity and balanced-GL gates
+        run: npm run audit:reference
+
+      - name: Build and smoke-test package artifact
+        run: npm run smoke:package
+
+      - name: Rename package for GitHub Packages
+        run: npm pkg set name=@hi-donwi/uidl-runtime
+
+      - name: Publish mirror to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "omnichannel-dist-console",
+  "name": "Nusantara Omnichannel Distribution Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "channelSales": [
+      { "label": "Lapakku Mall", "value": 1420 },
+      { "label": "TokoPrima Official", "value": 1180 },
+      { "label": "LiveMarket", "value": 940 },
+      { "label": "Direct B2B Portal", "value": 620 },
+      { "label": "NusaMall Flagship", "value": 310 }
+    ],
+    "orderQueue": [
+      { "noPesanan": "ORD-SHP-99210", "channel": "Lapakku Mall", "pembeli": "Andi Saputra", "total": "Rp 850.000", "kurir": "KirimCepat", "gudang": "Fulfillment Hub Jakarta", "status": "Siap Pick & Pack" },
+      { "noPesanan": "ORD-TKP-44012", "channel": "TokoPrima", "pembeli": "PT Cipta Kreasi", "total": "Rp 12.450.000", "kurir": "ExpressOne Cargo", "gudang": "Gudang Utama Surabaya", "status": "Dalam Pengiriman" },
+      { "noPesanan": "ORD-TTS-11982", "channel": "LiveMarket", "pembeli": "Mega Lestari", "total": "Rp 420.000", "kurir": "AntarKita", "gudang": "Fulfillment Hub Jakarta", "status": "Siap Pick & Pack" },
+      { "noPesanan": "ORD-B2B-00814", "channel": "Direct B2B", "pembeli": "CV Maju Bersama", "total": "Rp 48.000.000", "kurir": "Armada Truk Sendiri", "gudang": "Gudang Pusat Cikarang", "status": "Terkirim - Menunggu POD" }
+    ],
+    "warehouseStock": [
+      { "sku": "SKU-ELEK-001", "namaProduk": "Wireless ANC Headphone V5", "hubJkt": "420 unit", "hubSby": "180 unit", "hubMdn": "65 unit", "totalBuffer": "665 unit", "statusReorder": "Aman" },
+      { "sku": "SKU-ELEK-002", "namaProduk": "Fast Charger GaN 65W Dual Port", "hubJkt": "1.200 unit", "hubSby": "540 unit", "hubMdn": "120 unit", "totalBuffer": "1.860 unit", "statusReorder": "Aman" },
+      { "sku": "SKU-ELEK-003", "namaProduk": "Smartwatch AMOLED IP68", "hubJkt": "45 unit", "hubSby": "20 unit", "hubMdn": "10 unit", "totalBuffer": "75 unit", "statusReorder": "Peringatan Menipis" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "omni-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "omni-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "omni-title",
+              "type": "Text",
+              "props": { "text": "Nusantara Omnichannel Distribution — Marketplace & Fulfillment Hub" },
+              "style": { "fontSize": "text-lg", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-sync-channel",
+              "type": "Button",
+              "props": { "label": "Sync Marketplace (Live)", "variant": "primary", "iconName": "refresh" }
+            },
+            {
+              "id": "btn-wave-pick",
+              "type": "Button",
+              "props": { "label": "Buat Batch Wave Picking", "variant": "outline" }
+            }
+          ]
+        }
+      },
+      {
+        "id": "omni-kpis",
+        "type": "Row",
+        "style": { "gap": "gap-4", "flexWrap": "flex-wrap" },
+        "children": [
+          {
+            "id": "kpi-orders-today",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-1", "type": "Text", "props": { "text": "Total Pesanan Masuk (Hari Ini)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-1", "type": "Text", "props": { "text": "4.470 Pesanan" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-1", "type": "Text", "props": { "text": "+18.4% vs Hari Kemarin" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-fulfillment-sla",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-2", "type": "Text", "props": { "text": "Same-Day Dispatch SLA" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-2", "type": "Text", "props": { "text": "99.2%" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "#059669" } },
+              { "id": "s-kpi-2", "type": "Text", "props": { "text": "Rata-rata Pick & Pack 18 Menit" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } }
+            ]
+          },
+          {
+            "id": "kpi-gmv-today",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-3", "type": "Text", "props": { "text": "Gross Merchandise Value (GMV)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-3", "type": "Text", "props": { "text": "Rp 842.600.000" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-3", "type": "Text", "props": { "text": "5 Channel Terintegrasi" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-rma-rate",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-4", "type": "Text", "props": { "text": "Tingkat Retur (RMA Rate)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-4", "type": "Text", "props": { "text": "0.34%" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "#059669" } },
+              { "id": "s-kpi-4", "type": "Text", "props": { "text": "Di Bawah Ambang Batas 1.0%" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "omni-chart-section",
+        "type": "Row",
+        "style": { "gap": "gap-4" },
+        "children": [
+          {
+            "id": "card-channel-chart",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-chart-omni", "type": "Text", "props": { "text": "Distribusi Volume Pesanan per Marketplace Channel" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "chart-omni", "type": "Chart", "props": { "type": "bar", "data": "$data.channelSales" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "table-orders-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-orders", "type": "Text", "props": { "text": "Antrean Pesanan Masuk (Unified Marketplace Order Queue)" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-orders",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.orderQueue",
+              "columns": [
+                { "key": "noPesanan", "label": "No. Pesanan" },
+                { "key": "channel", "label": "Sales Channel" },
+                { "key": "pembeli", "label": "Nama Pembeli" },
+                { "key": "total", "label": "Total Transaksi" },
+                { "key": "kurir", "label": "Logistik / Ekspedisi" },
+                { "key": "gudang", "label": "Fulfillment Hub" },
+                { "key": "status", "label": "Status Pemenuhan" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-stock-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-stock", "type": "Text", "props": { "text": "Keseimbangan Stok Multigudang & Safety Stock Buffers" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-stock",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.warehouseStock",
+              "columns": [
+                { "key": "sku", "label": "Kode SKU" },
+                { "key": "namaProduk", "label": "Nama Produk" },
+                { "key": "hubJkt", "label": "Hub Jakarta" },
+                { "key": "hubSby", "label": "Hub Surabaya" },
+                { "key": "hubMdn", "label": "Hub Medan" },
+                { "key": "totalBuffer", "label": "Total Buffer Stock" },
+                { "key": "statusReorder", "label": "Status Reorder" }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

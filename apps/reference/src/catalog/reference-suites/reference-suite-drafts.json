@@ -1,0 +1,38 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/reference-suite-drafts.json",
+  "version": "0.1.0",
+  "purpose": "Draft complete reference suites that show uidl-runtime as an AI-agent UI generation product across websites, dashboards, documents, slides, and spreadsheets.",
+  "suites": [
+    {
+      "id": "saas-growth-suite",
+      "status": "draft",
+      "title": "SaaS Growth Launch Suite",
+      "audience": "Founder, product marketer, and growth analyst",
+      "document": "packages/templates/src/documents/saas-growth-suite.json",
+      "covers": ["website", "dashboard", "document", "slide", "spreadsheet"],
+      "agentUse": "Generate a launch page, growth dashboard, campaign brief, board update slide, and channel budget from one product brief.",
+      "verificationLabels": ["MeridianCRM Launch Suite", "Growth Dashboard", "Campaign Brief", "Board Slide", "Channel Budget"]
+    },
+    {
+      "id": "finance-ops-suite",
+      "status": "draft",
+      "title": "Finance Operations Suite",
+      "audience": "CFO, accounting lead, and operations manager",
+      "document": "packages/templates/src/documents/finance-ops-suite.json",
+      "covers": ["dashboard", "document", "spreadsheet", "rbac"],
+      "agentUse": "Generate RBAC-aware finance navigation, close dashboard, variance report, and working capital workbook.",
+      "requiredSessionPermissions": ["finance.close", "finance.variance"],
+      "verificationLabels": ["Finance Operations Suite", "Month-End Close", "Variance Memo", "Working Capital Workbook"]
+    },
+    {
+      "id": "knowledge-pack-suite",
+      "status": "draft",
+      "title": "Knowledge Pack Suite",
+      "audience": "Consultant, educator, and business operator",
+      "document": "packages/templates/src/documents/knowledge-pack-suite.json",
+      "covers": ["document", "slide", "spreadsheet", "website"],
+      "agentUse": "Generate a learning guide, workshop slides, exercise sheet, and public resource landing page from structured notes.",
+      "verificationLabels": ["Knowledge Pack Suite", "Learning Guide", "Workshop Deck", "Exercise Sheet", "Resource Landing Page"]
+    }
+  ]
+}

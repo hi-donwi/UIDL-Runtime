@@ -1,0 +1,10 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "id": "set-state-rejects-data",
+  "class": "action-exec",
+  "status": "active",
+  "spec": "v1",
+  "input": { "setState": { "path": "$data.invoices.status", "value": "success" } },
+  "context": { "state": { "count": 0 } },
+  "expected": { "ok": false, "code": "INVALID_STATE", "state": { "count": 0 } }
+}

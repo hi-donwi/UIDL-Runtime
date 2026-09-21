@@ -1,0 +1,23 @@
+{
+  "family": "spreadsheet",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/spreadsheet/budget/operating",
+      "statePath": "api.spreadsheet.operatingBudget",
+      "response": { "rows": [{ "account": "People", "q1": "$120K", "q2": "$126K", "q3": "$132K", "q4": "$138K", "formula": "SUM(B:E)" }, { "account": "Cloud", "q1": "$28K", "q2": "$31K", "q3": "$34K", "q4": "$39K", "formula": "SUM(B:E)" }, { "account": "Marketing", "q1": "$42K", "q2": "$54K", "q3": "$62K", "q4": "$76K", "formula": "SUM(B:E)" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/spreadsheet/budget/variance",
+      "statePath": "api.spreadsheet.variance",
+      "response": { "rows": [{ "department": "Engineering", "budget": "$289K", "actual": "$281K", "variance": "+$8K" }, { "department": "Sales", "budget": "$188K", "actual": "$196K", "variance": "-$8K" }, { "department": "Operations", "budget": "$76K", "actual": "$73K", "variance": "+$3K" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/spreadsheet/budget/quarterly-spend",
+      "statePath": "api.spreadsheet.quarterlySpend",
+      "response": { "rows": [{ "quarter": "Q1", "amount": 190000 }, { "quarter": "Q2", "amount": 211000 }, { "quarter": "Q3", "amount": 228000 }, { "quarter": "Q4", "amount": 253000 }] }
+    }
+  ]
+}

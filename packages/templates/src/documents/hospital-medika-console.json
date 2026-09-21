@@ -1,0 +1,208 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "hospital-medika-console",
+  "name": "RS Medika Nusantara Healthcare Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "clinicVisits": [
+      { "label": "Penyakit Dalam", "value": 142 },
+      { "label": "Poli Anak", "value": 98 },
+      { "label": "Jantung & Vaskular", "value": 64 },
+      { "label": "Gigi & Mulut", "value": 45 },
+      { "label": "Syaraf", "value": 52 }
+    ],
+    "patientQueue": [
+      { "noAntrean": "A-012", "norm": "RM-2027-0412", "nama": "Budi Santoso", "poli": "Penyakit Dalam", "dokter": "dr. Hendra, Sp.PD", "jaminan": "BPJS Kesehatan", "status": "Sedang Diperiksa" },
+      { "noAntrean": "A-013", "norm": "RM-2027-0891", "nama": "Siti Rahmawati", "poli": "Penyakit Dalam", "dokter": "dr. Hendra, Sp.PD", "jaminan": "Asuransi Mandiri", "status": "Menunggu Antrean" },
+      { "noAntrean": "B-005", "norm": "RM-2027-1102", "nama": "Ananda Kevin", "poli": "Poli Anak", "dokter": "dr. Ratna, Sp.A", "jaminan": "Umum / Mandiri", "status": "Menunggu Resep" },
+      { "noAntrean": "C-008", "norm": "RM-2027-0331", "nama": "Drs. Ahmad Fauzi", "poli": "Jantung", "dokter": "dr. Faisal, Sp.JP", "jaminan": "BPJS Kesehatan", "status": "Pemeriksaan Lab" }
+    ],
+    "pharmacyFefo": [
+      { "kodeObat": "MED-AMX-500", "namaObat": "Amoxicillin 500mg Kapsul", "noBatch": "BATCH-2026-X09", "tglKedaluwarsa": "2027-08-15", "stok": "1.250 strip", "aturanPakai": "FEFO Priority (Prioritas 1)", "status": "Aman" },
+      { "kodeObat": "MED-PAR-SYR", "namaObat": "Paracetamol Sirup 120mg/5ml", "noBatch": "BATCH-2026-P44", "tglKedaluwarsa": "2027-04-30", "stok": "340 botol", "aturanPakai": "FEFO Priority (Segera Habiskan)", "status": "Perhatian ED" },
+      { "kodeObat": "MED-INS-GLA", "namaObat": "Insulin Glargine Pen 100IU/ml", "noBatch": "BATCH-2027-IN01", "tglKedaluwarsa": "2028-01-20", "stok": "180 pen", "aturanPakai": "Cold Chain 2-8°C", "status": "Aman" }
+    ],
+    "bpjsClaims": [
+      { "noSep": "0301R0010227V000124", "pasien": "Budi Santoso", "diagnosa": "I10 - Essential (primary) hypertension", "tarifInacbg": "Rp 4.850.000", "statusVerifikasi": "Layak Klaim (Verified)", "tglPengajuan": "2027-02-14" },
+      { "noSep": "0301R0010227V000125", "pasien": "Drs. Ahmad Fauzi", "diagnosa": "I20.0 - Unstable angina", "tarifInacbg": "Rp 12.400.000", "statusVerifikasi": "Kelengkapan Berkas", "tglPengajuan": "2027-02-14" },
+      { "noSep": "0301R0010227V000126", "pasien": "Hj. Mariam", "diagnosa": "E11.9 - Type 2 diabetes mellitus", "tarifInacbg": "Rp 3.920.000", "statusVerifikasi": "Layak Klaim (Verified)", "tglPengajuan": "2027-02-13" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "hospital-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "hospital-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "hospital-title",
+              "type": "Text",
+              "props": { "text": "RS Medika Nusantara — Sistem Informasi Rumah Sakit & EMR" },
+              "style": { "fontSize": "text-lg", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-pendaftaran",
+              "type": "Button",
+              "props": { "label": "+ Daftar Pasien Baru", "variant": "primary" }
+            },
+            {
+              "id": "btn-bpjs",
+              "type": "Button",
+              "props": { "label": "Integrasi BPJS V-Claim", "variant": "outline" }
+            }
+          ]
+        }
+      },
+      {
+        "id": "hospital-kpis",
+        "type": "Row",
+        "style": { "gap": "gap-4", "flexWrap": "flex-wrap" },
+        "children": [
+          {
+            "id": "kpi-rawat-jalan",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-1", "type": "Text", "props": { "text": "Pasien Rawat Jalan Hari Ini" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-1", "type": "Text", "props": { "text": "401 Pasien" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-1", "type": "Text", "props": { "text": "5 Poliklinik Aktif" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-bed-occupancy",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-2", "type": "Text", "props": { "text": "Bed Occupancy Rate (BOR)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-2", "type": "Text", "props": { "text": "82.4%" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-2", "type": "Text", "props": { "text": "165 / 200 Tempat Tidur" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } }
+            ]
+          },
+          {
+            "id": "kpi-farmasi-resep",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-3", "type": "Text", "props": { "text": "Resep Farmasi Terlayani" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-3", "type": "Text", "props": { "text": "318 R/ Resep" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-3", "type": "Text", "props": { "text": "Rata-rata Waktu Tunggu 12 Menit" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-bpjs-verified",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-4", "type": "Text", "props": { "text": "Klaim BPJS Terverifikasi" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-4", "type": "Text", "props": { "text": "Rp 1.482.500.000" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-4", "type": "Text", "props": { "text": "Bulan Berjalan (98.2% Lolos Verifikasi)" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hospital-analytics-section",
+        "type": "Row",
+        "style": { "gap": "gap-4" },
+        "children": [
+          {
+            "id": "chart-clinic-card",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "c-title-1", "type": "Text", "props": { "text": "Distribusi Kunjungan Pasien Rawat Jalan per Poliklinik" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "c-chart-1", "type": "Chart", "props": { "type": "bar", "data": "$data.clinicVisits" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "table-patient-queue-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-queue", "type": "Text", "props": { "text": "Antrean Pasien Poliklinik & Rekam Medis (EMR ICD-10)" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-queue",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.patientQueue",
+              "columns": [
+                { "key": "noAntrean", "label": "No. Antrean" },
+                { "key": "norm", "label": "No. RM" },
+                { "key": "nama", "label": "Nama Pasien" },
+                { "key": "poli", "label": "Poliklinik Tujuan" },
+                { "key": "dokter", "label": "Dokter Penanggung Jawab" },
+                { "key": "jaminan", "label": "Penjamin / Asuransi" },
+                { "key": "status", "label": "Status Pelayanan" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-pharmacy-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-pharm", "type": "Text", "props": { "text": "Farmasi & Kontrol Kedaluwarsa Obat (FEFO — First Expired First Out)" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-pharm",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.pharmacyFefo",
+              "columns": [
+                { "key": "kodeObat", "label": "Kode Obat" },
+                { "key": "namaObat", "label": "Nama Obat & Kekuatan" },
+                { "key": "noBatch", "label": "No. Batch" },
+                { "key": "tglKedaluwarsa", "label": "Tanggal Kedaluwarsa (ED)" },
+                { "key": "stok", "label": "Sisa Stok Fisik" },
+                { "key": "aturanPakai", "label": "Aturan Dispensing" },
+                { "key": "status", "label": "Status Keamanan" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-bpjs-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-bpjs", "type": "Text", "props": { "text": "Klaim BPJS Kesehatan & INA-CBGs" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-bpjs",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.bpjsClaims",
+              "columns": [
+                { "key": "noSep", "label": "No. SEP BPJS" },
+                { "key": "pasien", "label": "Nama Pasien" },
+                { "key": "diagnosa", "label": "Diagnosa ICD-10" },
+                { "key": "tarifInacbg", "label": "Tarif INA-CBG" },
+                { "key": "statusVerifikasi", "label": "Status Verifikasi" },
+                { "key": "tglPengajuan", "label": "Tanggal Pelayanan" }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

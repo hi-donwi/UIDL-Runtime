@@ -1,0 +1,82 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "meridian-invoices-demo",
+  "name": "Meridian Invoices Demo",
+  "theme": "theme-light",
+  "dataSources": {
+    "salesInvoices": [
+      { "idx": 1, "name": "SINV-0001", "party": "Acme Studio", "date": "2026-08-01", "status": "Paid", "grandTotal": "$4,200" },
+      { "idx": 2, "name": "SINV-0002", "party": "Nusantara Supply", "date": "2026-08-03", "status": "Unpaid", "grandTotal": "$2,100" },
+      { "idx": 3, "name": "SINV-0003", "party": "Harbour Cafe", "date": "2026-08-08", "status": "Draft", "grandTotal": "$980" },
+      { "idx": 4, "name": "SINV-0004", "party": "Urban Loft", "date": "2026-08-10", "status": "Submitted", "grandTotal": "$7,540" },
+      { "idx": 5, "name": "SINV-0005", "party": "Kopi Timur", "date": "2026-08-15", "status": "Overdue", "grandTotal": "$1,275" }
+    ]
+  },
+  "definitions": {
+    "appShell": {
+      "id": "app-shell-template",
+      "type": "Container",
+      "style": { "display": "flex", "minHeight": "min-h-screen", "background": "{primitives.color.background}", "color": "{primitives.color.text-primary}" },
+      "slots": { "sidebar": [], "main": [] }
+    },
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    },
+    "tableCard": {
+      "id": "table-card-template",
+      "type": "DataTable",
+      "props": { "emptyMessage": "No records" },
+      "style": { "width": "w-full" }
+    }
+  },
+  "root": {
+    "id": "invoice-main",
+    "type": "Column",
+    "style": { "width": "w-full" },
+    "children": [
+            {
+              "id": "invoice-header",
+              "type": "Navbar",
+              "componentId": "pageHeader",
+              "slots": {
+                "title": [{ "id": "invoice-title", "type": "Text", "props": { "value": "Sales Invoices" }, "style": { "fontSize": "text-2xl", "fontWeight": 700 } }],
+                "actions": [
+                  { "id": "export-button", "type": "Button", "props": { "label": "Export" } },
+                  { "id": "filter-button", "type": "Button", "props": { "label": "Filter" } },
+                  { "id": "new-button", "type": "Button", "props": { "label": "+ New Invoice" }, "events": { "onClick": [{ "navigate": { "route": "/invoice/new" } }] } }
+                ]
+              }
+            },
+            {
+              "id": "invoice-content",
+              "type": "Column",
+              "style": { "gap": "gap-4", "padding": "p-4" },
+              "children": [
+                {
+                  "id": "invoice-table",
+                  "type": "DataTable",
+                  "componentId": "tableCard",
+                  "props": {
+                    "title": "Invoices and Billing",
+                    "dataSource": "salesInvoices",
+                    "rowActions": [{ "label": "Open" }, { "label": "Print" }],
+                    "columns": [
+                      { "key": "idx", "label": "#", "align": "right" },
+                      { "key": "name", "label": "Invoice" },
+                      { "key": "party", "label": "Customer" },
+                      { "key": "date", "label": "Date" },
+                      { "key": "status", "label": "Status" },
+                      { "key": "grandTotal", "label": "Total", "align": "right" }
+                    ]
+                  }
+                },
+                { "id": "invoice-pagination", "type": "Text", "props": { "value": "Showing 1-5 of 5 entries" }, "style": { "padding": "p-3", "fontSize": "text-sm", "color": "{primitives.color.text-muted}", "textAlign": "text-right" } }
+              ]
+            }
+    ]
+  }
+}

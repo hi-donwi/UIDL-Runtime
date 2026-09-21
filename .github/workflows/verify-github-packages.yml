@@ -1,0 +1,41 @@
+name: Verify GitHub Packages mirror
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Package version to install from GitHub Packages
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: "@hi-donwi"
+
+      - name: Install and import the mirrored package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          package="@hi-donwi/uidl-runtime@${VERSION#v}"
+          npm init -y >/dev/null
+          npm install "${package}" --ignore-scripts
+          node --input-type=module -e '
+            const m = await import("@hi-donwi/uidl-runtime");
+            for (const name of ["DocumentSchema", "UIDocumentRenderer", "meridianLightTheme"]) {
+              if (!m[name]) throw new Error(`missing expected export: ${name}`);
+            }
+          '
+          test -f node_modules/@hi-donwi/uidl-runtime/dist/style.css

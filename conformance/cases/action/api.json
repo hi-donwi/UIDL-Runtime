@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"api","class":"action","status":"active","spec":"v1","input":{"api":{"url":"/api/users","method":"GET"}},"context":{},"expected":true}

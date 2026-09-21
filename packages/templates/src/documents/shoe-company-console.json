@@ -1,0 +1,49 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "shoe-company-console",
+  "name": "Toko Sepatu Nusantara Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "cashflow": [
+      { "label": "Week 1", "value": 182000000 },
+      { "label": "Week 2", "value": 214000000 },
+      { "label": "Week 3", "value": 197000000 },
+      { "label": "Week 4", "value": 238000000 }
+    ],
+    "modules": [
+      { "module": "POS Closing", "document": "POS-CLS-2026-0820", "status": "Ready to Submit", "control": "Cash drawer = Bank deposit", "amount": "Rp 38.450.000" },
+      { "module": "Sales Invoice", "document": "SINV-2026-0841", "status": "Overdue", "control": "AR tied to Debtors", "amount": "Rp 12.900.000" },
+      { "module": "Purchase Invoice", "document": "PINV-2026-0318", "status": "Unpaid", "control": "AP tied to Creditors", "amount": "Rp 74.200.000" },
+      { "module": "Stock Ledger", "document": "STK-BDG-42-BLK", "status": "Low Stock", "control": "Qty x valuation = Inventory GL", "amount": "Rp 169.700.000" }
+    ],
+    "ledger": [
+      { "date": "2026-08-20", "account": "Bank Operasional - Main", "debit": "Rp 38.450.000", "credit": "Rp 0", "voucher": "POS Closing" },
+      { "date": "2026-08-20", "account": "Cash - Store Bandung", "debit": "Rp 0", "credit": "Rp 38.450.000", "voucher": "POS Closing" },
+      { "date": "2026-08-20", "account": "Inventory - Footwear", "debit": "Rp 74.200.000", "credit": "Rp 0", "voucher": "Purchase Invoice" },
+      { "date": "2026-08-20", "account": "Accounts Payable", "debit": "Rp 0", "credit": "Rp 74.200.000", "voucher": "Purchase Invoice" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": { "id": "page-header-template", "type": "Navbar", "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" }, "slots": { "title": [], "actions": [] } },
+    "tableCard": { "id": "table-card-template", "type": "DataTable", "props": { "emptyMessage": "No records" }, "style": { "width": "w-full" } },
+    "chartCard": { "id": "chart-card-template", "type": "Chart", "props": { "chartType": "line", "xKey": "label", "yKey": "value" }, "style": { "width": "w-full" } }
+  },
+  "root": {
+    "id": "shoe-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      { "id": "shoe-header", "type": "Navbar", "componentId": "pageHeader", "slots": { "title": [{ "id": "shoe-title", "type": "Text", "props": { "value": "Toko Sepatu Nusantara" }, "style": { "fontSize": "text-2xl", "fontWeight": 700 } }], "actions": [{ "id": "close-pos", "type": "Button", "props": { "label": "Close POS Shift" } }, { "id": "new-invoice", "type": "Button", "props": { "label": "+ Sales Invoice" } }] } },
+      { "id": "shoe-kpis", "type": "GridView", "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" }, "children": [
+        { "id": "shoe-kpi-sales", "type": "Text", "props": { "value": "Net Sales Today\nRp 126.800.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+        { "id": "shoe-kpi-ar", "type": "Text", "props": { "value": "Open AR\nRp 89.300.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+        { "id": "shoe-kpi-ap", "type": "Text", "props": { "value": "Open AP\nRp 142.600.000" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+        { "id": "shoe-kpi-stock", "type": "Text", "props": { "value": "Inventory Value\nRp 1.48 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+      ] },
+      { "id": "shoe-cashflow", "type": "Chart", "componentId": "chartCard", "props": { "title": "Retail Cashflow", "chartType": "line", "dataSource": "cashflow" } },
+      { "id": "shoe-modules", "type": "DataTable", "componentId": "tableCard", "props": { "title": "ERP Modules Console", "dataSource": "modules", "columns": [ { "key": "module", "label": "Module" }, { "key": "document", "label": "Document" }, { "key": "status", "label": "Status" }, { "key": "control", "label": "Control" }, { "key": "amount", "label": "Amount", "align": "right" } ], "rowActions": [{ "label": "Open" }, { "label": "Reconcile" }] } },
+      { "id": "shoe-ledger", "type": "DataTable", "componentId": "tableCard", "props": { "title": "Balanced General Ledger Preview", "dataSource": "ledger", "columns": [ { "key": "date", "label": "Date" }, { "key": "account", "label": "Account" }, { "key": "debit", "label": "Debit", "align": "right" }, { "key": "credit", "label": "Credit", "align": "right" }, { "key": "voucher", "label": "Voucher" } ] } }
+    ]
+  }
+}

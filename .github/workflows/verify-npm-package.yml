@@ -1,0 +1,39 @@
+name: Verify npm package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Package version to install from npm
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install and import the public package
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          package="uidl-runtime@${VERSION#v}"
+          npm init -y >/dev/null
+          npm install "${package}" --ignore-scripts
+          node --input-type=module -e '
+            const m = await import("uidl-runtime");
+            for (const name of ["DocumentSchema", "UIDocumentRenderer", "meridianLightTheme"]) {
+              if (!m[name]) throw new Error(`missing expected export: ${name}`);
+            }
+          '
+          test -f node_modules/uidl-runtime/dist/style.css

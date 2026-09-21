@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"lte-less","class":"expression","status":"active","spec":"v1","input":{"op":"lte","left":{"literal":3},"right":{"literal":5}},"context":{},"expected":true}

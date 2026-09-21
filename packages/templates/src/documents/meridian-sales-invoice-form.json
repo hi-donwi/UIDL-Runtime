@@ -1,0 +1,365 @@
+{
+  "version": "1.0.0",
+  "id": "meridian-sales-invoice-SINV-2027-00001",
+  "name": "Sales Invoice: SINV-2027-00001",
+  "state": {
+    "customer": "PT Sinar Abadi Jaya",
+    "date": "2027-07-02",
+    "dueDate": "2027-08-01",
+    "status": "Paid"
+  },
+  "dataSources": {
+    "lineItems": [
+      {
+        "item": "ITEM-003",
+        "description": "Laptop Business 14\"",
+        "quantity": 3,
+        "rate": 8500000,
+        "amount": 25500000
+      },
+      {
+        "item": "ITEM-004",
+        "description": "Monitor LED 24\"",
+        "quantity": 3,
+        "rate": 1750000,
+        "amount": 5250000
+      }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderColor": "{primitives.color.border}",
+        "borderWidth": "border-b"
+      },
+      "slots": {
+        "title": [],
+        "actions": []
+      }
+    },
+    "invoiceLayout": {
+      "id": "invoice-layout-template",
+      "type": "Column",
+      "style": {
+        "gap": "gap-4",
+        "padding": "p-4",
+        "borderColor": "{primitives.color.border}",
+        "borderWidth": "border",
+        "borderRadius": "rounded-lg",
+        "background": "{primitives.color.surface-elevated}"
+      },
+      "slots": {
+        "header": [],
+        "party": [],
+        "lineItems": [],
+        "totals": [],
+        "actions": []
+      }
+    },
+    "lineItemTable": {
+      "id": "line-item-table-template",
+      "type": "DataTable",
+      "props": {
+        "title": "Line Items",
+        "emptyMessage": "No line items",
+        "columns": [
+          {
+            "key": "item",
+            "label": "Item"
+          },
+          {
+            "key": "description",
+            "label": "Description"
+          },
+          {
+            "key": "quantity",
+            "label": "Qty",
+            "align": "right"
+          },
+          {
+            "key": "rate",
+            "label": "Rate",
+            "align": "right"
+          },
+          {
+            "key": "amount",
+            "label": "Amount",
+            "align": "right"
+          }
+        ]
+      },
+      "style": {
+        "width": "w-full"
+      }
+    }
+  },
+  "root": {
+    "id": "page",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4",
+      "maxWidth": "max-w-3xl"
+    },
+    "children": [
+      {
+        "id": "header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "title",
+              "type": "Text",
+              "props": {
+                "value": "Sales Invoice: SINV-2027-00001"
+              },
+              "style": {
+                "fontSize": "text-2xl",
+                "fontWeight": 700
+              }
+            }
+          ],
+          "actions": []
+        }
+      },
+      {
+        "id": "invoice",
+        "type": "Column",
+        "componentId": "invoiceLayout",
+        "slots": {
+          "header": [],
+          "party": [
+            {
+              "id": "field-customer",
+              "type": "TextField",
+              "props": {
+                "label": "Customer",
+                "value": {
+                  "$bind": "state.customer"
+                }
+              },
+              "events": {
+                "onChange": [
+                  {
+                    "setState": {
+                      "path": "customer",
+                      "value": null
+                    }
+                  }
+                ]
+              },
+              "style": {
+                "width": "w-full",
+                "padding": "p-2",
+                "borderWidth": "border",
+                "borderColor": "{primitives.color.border}",
+                "borderRadius": "rounded-md",
+                "background": "{primitives.color.background}"
+              }
+            },
+            {
+              "id": "field-date",
+              "type": "TextField",
+              "props": {
+                "label": "Date",
+                "value": {
+                  "$bind": "state.date"
+                }
+              },
+              "events": {
+                "onChange": [
+                  {
+                    "setState": {
+                      "path": "date",
+                      "value": null
+                    }
+                  }
+                ]
+              },
+              "style": {
+                "width": "w-full",
+                "padding": "p-2",
+                "borderWidth": "border",
+                "borderColor": "{primitives.color.border}",
+                "borderRadius": "rounded-md",
+                "background": "{primitives.color.background}"
+              }
+            },
+            {
+              "id": "field-dueDate",
+              "type": "TextField",
+              "props": {
+                "label": "Due Date",
+                "value": {
+                  "$bind": "state.dueDate"
+                }
+              },
+              "events": {
+                "onChange": [
+                  {
+                    "setState": {
+                      "path": "dueDate",
+                      "value": null
+                    }
+                  }
+                ]
+              },
+              "style": {
+                "width": "w-full",
+                "padding": "p-2",
+                "borderWidth": "border",
+                "borderColor": "{primitives.color.border}",
+                "borderRadius": "rounded-md",
+                "background": "{primitives.color.background}"
+              }
+            },
+            {
+              "id": "field-status",
+              "type": "Select",
+              "props": {
+                "label": "Status",
+                "value": {
+                  "$bind": "state.status"
+                },
+                "options": [
+                  {
+                    "value": "Draft",
+                    "label": "Draft"
+                  },
+                  {
+                    "value": "Unpaid",
+                    "label": "Unpaid"
+                  },
+                  {
+                    "value": "Paid",
+                    "label": "Paid"
+                  },
+                  {
+                    "value": "Overdue",
+                    "label": "Overdue"
+                  }
+                ]
+              },
+              "events": {
+                "onChange": [
+                  {
+                    "setState": {
+                      "path": "status",
+                      "value": null
+                    }
+                  }
+                ]
+              },
+              "style": {
+                "width": "w-full",
+                "padding": "p-2",
+                "borderWidth": "border",
+                "borderColor": "{primitives.color.border}",
+                "borderRadius": "rounded-md",
+                "background": "{primitives.color.background}"
+              }
+            }
+          ],
+          "lineItems": [
+            {
+              "id": "lines",
+              "type": "DataTable",
+              "componentId": "lineItemTable",
+              "props": {
+                "dataSource": "lineItems"
+              }
+            }
+          ],
+          "totals": [
+            {
+              "id": "subtotal",
+              "type": "Text",
+              "props": {
+                "value": "Subtotal: Rp 30.750.000"
+              },
+              "style": {
+                "fontSize": "text-sm",
+                "color": "{primitives.color.text-secondary}"
+              }
+            },
+            {
+              "id": "tax",
+              "type": "Text",
+              "props": {
+                "value": "PPN 11%: Rp 3.382.500"
+              },
+              "style": {
+                "fontSize": "text-sm",
+                "color": "{primitives.color.text-secondary}"
+              }
+            },
+            {
+              "id": "total",
+              "type": "Text",
+              "props": {
+                "value": "Total: Rp 34.132.500"
+              },
+              "style": {
+                "fontSize": "text-lg",
+                "fontWeight": 700
+              }
+            }
+          ],
+          "actions": [
+            {
+              "id": "cancel-btn",
+              "type": "Button",
+              "props": {
+                "label": "Cancel"
+              },
+              "events": {
+                "onClick": [
+                  {
+                    "navigate": {
+                      "route": "/meridian/list/SalesInvoice"
+                    }
+                  }
+                ]
+              },
+              "style": {
+                "padding": "p-2",
+                "borderRadius": "rounded-md",
+                "borderColor": "{primitives.color.border}",
+                "borderWidth": "border",
+                "fontSize": "text-sm"
+              }
+            },
+            {
+              "id": "save-btn",
+              "type": "Button",
+              "props": {
+                "label": "Save"
+              },
+              "events": {
+                "onClick": [
+                  {
+                    "navigate": {
+                      "route": "/meridian/list/SalesInvoice"
+                    }
+                  }
+                ]
+              },
+              "style": {
+                "padding": "p-2",
+                "borderRadius": "rounded-md",
+                "background": "{primitives.color.text-primary}",
+                "color": "{primitives.color.background}",
+                "fontSize": "text-sm"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

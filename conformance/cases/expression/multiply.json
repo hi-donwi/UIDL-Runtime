@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"multiply","class":"expression","status":"active","spec":"v1","input":{"op":"multiply","left":{"literal":6},"right":{"literal":7}},"context":{},"expected":42}

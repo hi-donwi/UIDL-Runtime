@@ -1,0 +1,15 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "id": "legacy-and",
+  "class": "expression",
+  "status": "active",
+  "spec": "v1",
+  "input": {
+    "and": [
+      {"literal": true},
+      {"==": [{"literal": 2}, {"literal": 2}]}
+    ]
+  },
+  "context": {},
+  "expected": true
+}

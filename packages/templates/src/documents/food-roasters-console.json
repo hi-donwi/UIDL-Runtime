@@ -1,0 +1,125 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "food-roasters-console",
+  "name": "Nusantara Coffee Roasters Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "roastYield": [
+      { "label": "Gayo Honey", "value": 84 },
+      { "label": "Toraja Washed", "value": 82 },
+      { "label": "Dampit Natural", "value": 85 },
+      { "label": "Bali Kintamani", "value": 83 }
+    ],
+    "roastingBOM": [
+      {
+        "id": "bom-gayo",
+        "label": "Aceh Gayo Single Origin Roast 250g (Finished Goods)",
+        "badge": "Batch Assembly",
+        "value": "Rp 68.000 / pouch",
+        "children": [
+          { "id": "mat-1", "label": "Green Bean Arabica Aceh Gayo Grade 1 (300g)", "badge": "Raw Material", "value": "Rp 42.000" },
+          { "id": "proc-1", "label": "Roasting Operation - Medium Light Profile", "badge": "Machine Hour", "value": "Rp 12.000" },
+          { "id": "mat-2", "label": "Degassing Valve Zipper Pouch 250g", "badge": "Packaging", "value": "Rp 6.500" },
+          { "id": "proc-2", "label": "Nitrogen Flushing & Heat Sealing", "badge": "Operation", "value": "Rp 7.500" }
+        ]
+      }
+    ],
+    "qcGates": [
+      { "batch": "ROAST-2027-0801", "bean": "Arabica Aceh Gayo", "moisture": "10.4%", "agtron": "62 (Light-Med)", "defectCount": "0 beans", "status": "Passed - Released", "inspector": "Rian Pratama" },
+      { "batch": "ROAST-2027-0802", "bean": "Toraja Sapan Natural", "moisture": "12.8%", "agtron": "54 (Medium)", "defectCount": "5 beans", "status": "Hold - Degas Check", "inspector": "Siti Nurhaliza" },
+      { "batch": "ROAST-2027-0803", "bean": "Robusta Dampit Fine", "moisture": "10.1%", "agtron": "42 (Dark)", "defectCount": "1 bean", "status": "Passed - Released", "inspector": "Rian Pratama" }
+    ],
+    "inventory": [
+      { "item": "Green Bean Arabica Aceh Gayo", "stockKg": "1.250 kg", "reorderLevel": "500 kg", "valuation": "Rp 175.000.000", "warehouse": "Silo Raw A" },
+      { "item": "Green Bean Toraja Sapan", "stockKg": "820 kg", "reorderLevel": "400 kg", "valuation": "Rp 123.000.000", "warehouse": "Silo Raw B" },
+      { "item": "Green Bean Robusta Dampit", "stockKg": "2.400 kg", "reorderLevel": "800 kg", "valuation": "Rp 168.000.000", "warehouse": "Silo Raw C" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "food-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "food-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "food-title",
+              "type": "Text",
+              "props": { "value": "Nusantara Coffee Roasters Production Console" },
+              "style": { "fontSize": "text-xl", "fontWeight": 700 }
+            }
+          ],
+          "actions": [
+            { "id": "act-roast", "type": "Button", "props": { "label": "+ New Roast Batch" } },
+            { "id": "act-qc", "type": "Button", "props": { "label": "QC Inspection Gate" } }
+          ]
+        }
+      },
+      {
+        "id": "food-kpis",
+        "type": "GridView",
+        "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" },
+        "children": [
+          { "id": "kpi-1", "type": "Text", "props": { "value": "Daily Roast Output\n420 kg" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "kpi-2", "type": "Text", "props": { "value": "Batch QC Pass Rate\n98.2%" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "kpi-3", "type": "Text", "props": { "value": "Average Roasted Yield\n83.5%" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "kpi-4", "type": "Text", "props": { "value": "Green Bean Stock\n4.47 Tonnes" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+        ]
+      },
+      {
+        "id": "bom-section",
+        "type": "TreeView",
+        "props": {
+          "title": "Bill of Materials (BOM) & Multi-stage Roasting Operations",
+          "dataSource": "roastingBOM"
+        }
+      },
+      {
+        "id": "qc-section",
+        "type": "DataTable",
+        "props": {
+          "title": "Quality Inspection Gates (Defect Threshold & Agtron Color Check)",
+          "dataSource": "qcGates",
+          "columns": [
+            { "key": "batch", "label": "Batch ID" },
+            { "key": "bean", "label": "Bean Origin" },
+            { "key": "moisture", "label": "Moisture %" },
+            { "key": "agtron", "label": "Agtron Roast Score" },
+            { "key": "defectCount", "label": "Defects / 350g" },
+            { "key": "status", "label": "Release Gate" },
+            { "key": "inspector", "label": "Q-Grader" }
+          ],
+          "rowActions": [{ "label": "View Curve" }, { "label": "Release Batch" }]
+        }
+      },
+      {
+        "id": "inventory-section",
+        "type": "DataTable",
+        "props": {
+          "title": "Green Bean Silo Stock & Reorder Points",
+          "dataSource": "inventory",
+          "columns": [
+            { "key": "item", "label": "Variety & Origin" },
+            { "key": "stockKg", "label": "Available Qty", "align": "right" },
+            { "key": "reorderLevel", "label": "Reorder Point", "align": "right" },
+            { "key": "valuation", "label": "Stock Valuation", "align": "right" },
+            { "key": "warehouse", "label": "Silo Location" }
+          ]
+        }
+      }
+    ]
+  }
+}

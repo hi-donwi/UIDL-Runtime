@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"text-column","class":"render","status":"active","spec":"v1","input":{"version":"1.0.0","id":"text-column","name":"Text in a column","root":{"id":"root","type":"Column","children":[{"id":"greeting","type":"Text","props":{"value":"hello"}}]}},"context":{},"expected":true}

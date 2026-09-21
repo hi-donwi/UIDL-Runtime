@@ -1,0 +1,14 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "id": "lt-string-numeric",
+  "class": "expression",
+  "status": "active",
+  "spec": "v1",
+  "input": {
+    "op": "lt",
+    "left": {"literal": "5"},
+    "right": {"literal": 10}
+  },
+  "context": {},
+  "expected": true
+}

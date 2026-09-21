@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"condition-false","class":"condition","status":"active","spec":"v1","input":{"literal":0},"context":{},"expected":false}

@@ -1,0 +1,179 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "helpdesk-console",
+  "name": "CloudDesk Support Center Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "ticketCategories": [
+      { "label": "Technical Bug", "value": 34 },
+      { "label": "Billing & Invoice", "value": 52 },
+      { "label": "How-To / Guidance", "value": 89 },
+      { "label": "Feature Request", "value": 21 },
+      { "label": "Access & Security", "value": 15 }
+    ],
+    "ticketQueue": [
+      { "ticketId": "TCK-2027-0104", "customer": "PT Digital Solusi Nusantara", "subject": "Gagal export CSV e-Faktur PPN 11% masa Februari", "priority": "Urgent", "channel": "WhatsApp", "slaCountdown": "24 Menit Tersisa", "assignee": "Rian (Senior L2)", "status": "In Progress" },
+      { "ticketId": "TCK-2027-0105", "customer": "Koperasi Mandiri Syariah", "subject": "Permintaan panduan distribusi SHU RAT tahunan", "priority": "Medium", "channel": "Web Portal", "slaCountdown": "3.5 Jam Tersisa", "assignee": "Siti (Support L1)", "status": "Pending Customer" },
+      { "ticketId": "TCK-2027-0106", "customer": "PT Rekayasa Konstruksi", "subject": "Sinkronisasi progress billing BAP subkontraktor", "priority": "High", "channel": "Email", "slaCountdown": "1.2 Jam Tersisa", "assignee": "Budi (Tech Support)", "status": "In Progress" },
+      { "ticketId": "TCK-2027-0107", "customer": "Nusantara Coffee Roasters", "subject": "Integrasi timbangan bluetooth ke modul roasting", "priority": "Low", "channel": "Web Portal", "slaCountdown": "7.0 Jam Tersisa", "assignee": "Siti (Support L1)", "status": "Open" }
+    ],
+    "cannedResponses": [
+      { "kode": "KB-EFAKTUR-01", "judul": "Langkah Ekspor CSV e-Faktur Format Terbaru DJP", "kategori": "Tax & Accounting", "penggunaan": "142 kali", "ratingEfektivitas": "98%" },
+      { "kode": "KB-BOM-ROUTING", "judul": "Cara Konfigurasi Multi-level BOM & Stasiun Kerja", "kategori": "Manufacturing", "penggunaan": "89 kali", "ratingEfektivitas": "95%" },
+      { "kode": "KB-RESET-PASS", "judul": "Prosedur Reset Password & Autentikasi 2FA Akun", "kategori": "Account Security", "penggunaan": "210 kali", "ratingEfektivitas": "99%" }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "helpdesk-root",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "helpdesk-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "helpdesk-title",
+              "type": "Text",
+              "props": { "text": "CloudDesk Support Center — Customer Help Desk & SLA Hub" },
+              "style": { "fontSize": "text-lg", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-new-ticket",
+              "type": "Button",
+              "props": { "label": "+ Buat Tiket Baru", "variant": "primary" }
+            },
+            {
+              "id": "btn-kb-center",
+              "type": "Button",
+              "props": { "label": "Knowledge Base & Canned", "variant": "outline" }
+            }
+          ]
+        }
+      },
+      {
+        "id": "helpdesk-kpis",
+        "type": "Row",
+        "style": { "gap": "gap-4", "flexWrap": "flex-wrap" },
+        "children": [
+          {
+            "id": "kpi-open-tickets",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-1", "type": "Text", "props": { "text": "Tiket Terbuka (Aktif)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-1", "type": "Text", "props": { "text": "28 Tiket" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-1", "type": "Text", "props": { "text": "4 Tiket Prioritas Urgent" }, "style": { "fontSize": "text-xs", "textColor": "#dc2626" } }
+            ]
+          },
+          {
+            "id": "kpi-first-response-sla",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-2", "type": "Text", "props": { "text": "First Response Time (SLA)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-2", "type": "Text", "props": { "text": "14 Menit" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "#059669" } },
+              { "id": "s-kpi-2", "type": "Text", "props": { "text": "Target < 30 Menit (99.4% Lolos SLA)" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-resolution-rate",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-3", "type": "Text", "props": { "text": "One-Touch Resolution Rate" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-3", "type": "Text", "props": { "text": "78.5%" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "s-kpi-3", "type": "Text", "props": { "text": "Selesai di Respon Pertama" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          },
+          {
+            "id": "kpi-csat-score",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-kpi-4", "type": "Text", "props": { "text": "Kepuasan Pelanggan (CSAT)" }, "style": { "fontSize": "text-xs", "textColor": "{primitives.color.textSecondary}" } },
+              { "id": "v-kpi-4", "type": "Text", "props": { "text": "4.92 / 5.0" }, "style": { "fontSize": "text-xl", "fontWeight": "font-bold", "textColor": "#059669" } },
+              { "id": "s-kpi-4", "type": "Text", "props": { "text": "Berdasarkan 480 Rating Pengguna" }, "style": { "fontSize": "text-xs", "textColor": "#059669" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "helpdesk-chart-section",
+        "type": "Row",
+        "style": { "gap": "gap-4" },
+        "children": [
+          {
+            "id": "card-cat-chart",
+            "type": "Card",
+            "style": { "flex": "1", "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+            "children": [
+              { "id": "t-chart-cat", "type": "Text", "props": { "text": "Distribusi Tiket Masuk Berdasarkan Kategori Permasalahan" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+              { "id": "chart-cat", "type": "Chart", "props": { "type": "bar", "data": "$data.ticketCategories" } }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "table-ticket-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-tickets", "type": "Text", "props": { "text": "Antrean Tiket Masuk & Status SLA (Active Ticket Queue)" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-tickets",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.ticketQueue",
+              "columns": [
+                { "key": "ticketId", "label": "No. Tiket" },
+                { "key": "customer", "label": "Nama Klien / Perusahaan" },
+                { "key": "subject", "label": "Subjek Kendala" },
+                { "key": "priority", "label": "Prioritas" },
+                { "key": "channel", "label": "Channel" },
+                { "key": "slaCountdown", "label": "Sisa Waktu SLA" },
+                { "key": "assignee", "label": "Agent Penanggung Jawab" },
+                { "key": "status", "label": "Status Tiket" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-canned-card",
+        "type": "Card",
+        "style": { "padding": "p-4", "backgroundColor": "{primitives.color.surface}" },
+        "children": [
+          { "id": "t-title-canned", "type": "Text", "props": { "text": "Knowledge Base Terpopuler & Canned Responses" }, "style": { "fontSize": "text-sm", "fontWeight": "font-semibold", "textColor": "{primitives.color.textPrimary}" } },
+          {
+            "id": "grid-canned",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.cannedResponses",
+              "columns": [
+                { "key": "kode", "label": "Kode Solusi" },
+                { "key": "judul", "label": "Judul Panduan Solusi" },
+                { "key": "kategori", "label": "Kategori Modul" },
+                { "key": "penggunaan", "label": "Frekuensi Dipakai" },
+                { "key": "ratingEfektivitas", "label": "Tingkat Efektivitas" }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

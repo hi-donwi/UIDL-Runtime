@@ -1,0 +1,23 @@
+{
+  "family": "suites",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/suites/saas-growth",
+      "statePath": "api.suites.saasGrowth",
+      "response": { "rows": [{ "artifact": "Website", "status": "Ready" }, { "artifact": "Growth Dashboard", "status": "Ready" }, { "artifact": "Campaign Brief", "status": "Draft" }, { "artifact": "Board Slide", "status": "Ready" }, { "artifact": "Channel Budget", "status": "Review" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/suites/finance-ops",
+      "statePath": "api.suites.financeOps",
+      "response": { "rows": [{ "artifact": "Month-End Close", "status": "Open" }, { "artifact": "Variance Memo", "status": "Review" }, { "artifact": "Working Capital Workbook", "status": "Ready" }] }
+    },
+    {
+      "method": "GET",
+      "path": "/suites/knowledge-pack",
+      "statePath": "api.suites.knowledgePack",
+      "response": { "rows": [{ "artifact": "Learning Guide", "status": "Ready" }, { "artifact": "Workshop Deck", "status": "Draft" }, { "artifact": "Exercise Sheet", "status": "Ready" }, { "artifact": "Resource Landing Page", "status": "Ready" }] }
+    }
+  ]
+}

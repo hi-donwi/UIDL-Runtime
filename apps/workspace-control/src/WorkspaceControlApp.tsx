@@ -1,0 +1,870 @@
+import { useState, useEffect, useCallback, type FormEvent } from "react";
+import { UIDocumentRenderer, meridianDarkTheme, type UIDLDocument } from "@uidl-runtime/core";
+import {
+  buildBoardDocument,
+  buildBacklogDocument,
+  buildActivityDocument,
+  buildCommitsDocument,
+  buildTableDocument,
+  type BoardData,
+  type ActivityData,
+  type ActiveClocks,
+  type CommitItem,
+  type TaskItem,
+} from "./uidlDocuments";
+
+interface ProjectItem {
+  key: string;
+  client: string;
+  description: string;
+}
+
+interface SearchResponseItem {
+  task: TaskItem;
+}
+
+type Tab =
+  | "overview"
+  | "clients"
+  | "board"
+  | "backlog"
+  | "plans"
+  | "activity"
+  | "commits"
+  | "health"
+  | "settings";
+
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: "overview", label: "Overview" },
+  { id: "clients", label: "Clients" },
+  { id: "board", label: "Board" },
+  { id: "backlog", label: "Backlog" },
+  { id: "plans", label: "Plans" },
+  { id: "activity", label: "Activity" },
+  { id: "commits", label: "Commits" },
+  { id: "health", label: "Health" },
+  { id: "settings", label: "Settings" },
+];
+
+const TABS_WITHOUT_PROJECT = new Set<Tab>(["overview", "clients", "health", "settings"]);
+
+export function WorkspaceControlApp() {
+  const [serverUrl, setServerUrl] = useState(() => {
+    if (typeof window !== "undefined") {
+      const param = new URLSearchParams(window.location.search).get("server");
+      if (param) return param.replace(/\/+$/, "");
+      const origin = window.location.origin;
+      if (origin && origin.startsWith("http")) {
+        // If served from ws_web directly (e.g. port 8765 or root)
+        const port = window.location.port;
+        if (!port || port === "8765" || !port.startsWith("517")) {
+          return origin.replace(/\/+$/, "");
+        }
+      }
+    }
+    return "http://127.0.0.1:8765";
+  });
+
+  const [token, setToken] = useState(() => {
+    if (typeof window !== "undefined") {
+      const param = new URLSearchParams(window.location.search).get("token");
+      if (param) {
+        sessionStorage.setItem("ws_token", param);
+        return param;
+      }
+      return sessionStorage.getItem("ws_token") || "";
+    }
+    return "";
+  });
+
+  const [isConnected, setIsConnected] = useState(false);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [document, setDocument] = useState<UIDLDocument | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [activeClocks, setActiveClocks] = useState<ActiveClocks | null>(null);
+
+  // Modal states for New Task and Move Task
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskStatus, setNewTaskStatus] = useState("backlog");
+  const [newTaskPriority, setNewTaskPriority] = useState("medium");
+  const [newTaskOwner, setNewTaskOwner] = useState("");
+  const [newTaskDesc, setNewTaskDesc] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Quick Move state
+  const [isMoveOpen, setIsMoveOpen] = useState(false);
+  const [moveTaskId, setMoveTaskId] = useState("");
+  const [moveToStatus, setMoveToStatus] = useState("in_progress");
+  const [availableTasks, setAvailableTasks] = useState<TaskItem[]>([]);
+
+  const api = useCallback(
+    async <T = Record<string, unknown>>(path: string, options: RequestInit = {}): Promise<T> => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...((options.headers as Record<string, string>) || {}),
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch(`${serverUrl}${path}`, {
+        ...options,
+        headers,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`API error (${res.status}): ${text}`);
+      }
+      return res.json() as Promise<T>;
+    },
+    [serverUrl, token],
+  );
+
+  const fetchViewData = useCallback(
+    async (
+      project: string,
+      tab: string,
+    ): Promise<{ doc: UIDLDocument; tasks: TaskItem[]; clocks?: ActiveClocks | null }> => {
+      if (tab === "overview") {
+        const data = await api<{ clients: Array<{ key: string; projects: ProjectItem[] }> }>("/api/overview");
+        const rows = (data.clients || []).flatMap((c) =>
+          (c.projects || []).map((p) => ({ client: c.key, key: p.key, description: p.description })),
+        );
+        return {
+          doc: buildTableDocument({
+            id: "overview",
+            title: "Workspace overview",
+            columns: [
+              { key: "client", title: "Client" },
+              { key: "key", title: "Project" },
+              { key: "description", title: "Description" },
+            ],
+            rows,
+            emptyMessage: "No projects registered",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "clients") {
+        const data = await api<{ clients: Array<{ key: string; summary: string; projects: ProjectItem[] }> }>("/api/clients");
+        const rows = (data.clients || []).map((c) => ({
+          key: c.key,
+          projects: (c.projects || []).map((p) => p.key).join(", "),
+          summary: (c.summary || "").split("\n")[0] || "",
+        }));
+        return {
+          doc: buildTableDocument({
+            id: "clients",
+            title: "Clients",
+            columns: [
+              { key: "key", title: "Client" },
+              { key: "projects", title: "Projects" },
+              { key: "summary", title: "Summary" },
+            ],
+            rows,
+            emptyMessage: "No clients",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "plans") {
+        const q = project ? `?project=${encodeURIComponent(project)}` : "";
+        const data = await api<{ plans: Array<{ title: string; project: string; path: string; run: string }> }>(
+          `/api/plans${q}`,
+        );
+        return {
+          doc: buildTableDocument({
+            id: "plans",
+            title: "Plans",
+            columns: [
+              { key: "project", title: "Project" },
+              { key: "title", title: "Title" },
+              { key: "run", title: "Run" },
+              { key: "path", title: "Path" },
+            ],
+            rows: data.plans || [],
+            emptyMessage: "No plan.md files",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "health") {
+        const data = await api<{ checks: Array<{ id: string; ok: boolean; detail: string }> }>("/api/health");
+        return {
+          doc: buildTableDocument({
+            id: "health",
+            title: "Local health",
+            columns: [
+              { key: "id", title: "Check" },
+              { key: "ok", title: "OK" },
+              { key: "detail", title: "Detail" },
+            ],
+            rows: (data.checks || []).map((c) => ({ ...c, ok: c.ok ? "yes" : "no" })),
+            emptyMessage: "No checks",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "settings") {
+        const data = await api<{
+          identity: Record<string, string>;
+          root_name: string;
+          runtime: string;
+          loopback: boolean;
+        }>("/api/settings");
+        const identity = data.identity || {};
+        const rows = [
+          { key: "root", value: data.root_name },
+          { key: "org_name", value: identity.org_name },
+          { key: "packs", value: identity.packs },
+          { key: "context_remote", value: identity.context_remote || "(local-only)" },
+          { key: "runtime", value: data.runtime },
+          { key: "loopback", value: data.loopback ? "yes" : "no" },
+        ];
+        return {
+          doc: buildTableDocument({
+            id: "settings",
+            title: "Settings",
+            columns: [
+              { key: "key", title: "Setting" },
+              { key: "value", title: "Value" },
+            ],
+            rows,
+            emptyMessage: "No settings",
+          }),
+          tasks: [],
+        };
+      } else if (tab === "board") {
+        const boardData = await api<BoardData>(`/api/projects/${encodeURIComponent(project)}/board`);
+        const allBoardTasks: TaskItem[] = [];
+        if (boardData.columns) {
+          for (const tasks of Object.values(boardData.columns)) {
+            if (Array.isArray(tasks)) allBoardTasks.push(...tasks);
+          }
+        }
+        return { doc: buildBoardDocument(project, boardData), tasks: allBoardTasks };
+      } else if (tab === "backlog") {
+        const searchData = await api<{ results: SearchResponseItem[] }>(
+          `/api/projects/${encodeURIComponent(project)}/search`,
+        );
+        const tasks = (searchData.results || []).map((r: SearchResponseItem) => r.task);
+        return { doc: buildBacklogDocument(project, tasks), tasks };
+      } else if (tab === "activity") {
+        const activityData = await api<ActivityData>(
+          `/api/projects/${encodeURIComponent(project)}/activity`,
+        );
+        return {
+          doc: buildActivityDocument(project, activityData),
+          tasks: [],
+          clocks: activityData.active_clocks || null,
+        };
+      } else {
+        const commitsData = await api<{ commits: CommitItem[] }>(
+          `/api/projects/${encodeURIComponent(project)}/commits`,
+        );
+        return { doc: buildCommitsDocument(project, commitsData.commits || []), tasks: [] };
+      }
+    },
+    [api],
+  );
+
+  // Fetch projects on mount or when token changes
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    api<{ projects: ProjectItem[] }>("/api/projects")
+      .then((data) => {
+        if (cancelled) return;
+        const list = data.projects || [];
+        setProjects(list);
+        setIsConnected(true);
+        setError(null);
+        if (list.length > 0) {
+          setSelectedProject((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0].key));
+        }
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setIsConnected(false);
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(`Failed to connect to Agent Workspace server: ${msg}`);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [api, token]);
+
+  // Reload document when project or tab changes
+  useEffect(() => {
+    if (!TABS_WITHOUT_PROJECT.has(activeTab) && !selectedProject) return;
+    let cancelled = false;
+    fetchViewData(selectedProject, activeTab)
+      .then(({ doc, tasks, clocks }) => {
+        if (cancelled) return;
+        setDocument(doc);
+        if (tasks.length > 0) {
+          setAvailableTasks(tasks);
+          setMoveTaskId((prev) => (prev && tasks.some((t) => t.id === prev) ? prev : tasks[0].id));
+        }
+        if (clocks !== undefined) {
+          setActiveClocks(clocks);
+        }
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(`Error rendering ${activeTab} view: ${msg}`);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedProject, activeTab, fetchViewData]);
+
+  // Auto-refresh timer
+  useEffect(() => {
+    if (!autoRefresh || !selectedProject) return;
+    const interval = setInterval(() => {
+      fetchViewData(selectedProject, activeTab)
+        .then(({ doc, tasks, clocks }) => {
+          setDocument(doc);
+          if (tasks.length > 0) {
+            setAvailableTasks(tasks);
+          }
+          if (clocks !== undefined) {
+            setActiveClocks(clocks);
+          }
+        })
+        .catch(() => {});
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [autoRefresh, selectedProject, activeTab, fetchViewData]);
+
+  const handleRefresh = () => {
+    if (!selectedProject) return;
+    setLoading(true);
+    setError(null);
+    fetchViewData(selectedProject, activeTab)
+      .then(({ doc, tasks, clocks }) => {
+        setDocument(doc);
+        if (tasks.length > 0) {
+          setAvailableTasks(tasks);
+          setMoveTaskId((prev) => (prev && tasks.some((t) => t.id === prev) ? prev : tasks[0].id));
+        }
+        if (clocks !== undefined) {
+          setActiveClocks(clocks);
+        }
+      })
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(`Error rendering ${activeTab} view: ${msg}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  async function handleCreateTask(e: FormEvent) {
+    e.preventDefault();
+    if (!selectedProject || !newTaskTitle.trim()) return;
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await api(`/api/projects/${encodeURIComponent(selectedProject)}/tasks`, {
+        method: "POST",
+        body: JSON.stringify({
+          title: newTaskTitle.trim(),
+          status: newTaskStatus,
+          priority: newTaskPriority,
+          owner: newTaskOwner.trim() || "unassigned",
+          description: newTaskDesc.trim(),
+        }),
+      });
+      setIsNewTaskOpen(false);
+      setNewTaskTitle("");
+      setNewTaskDesc("");
+      setNewTaskOwner("");
+      const { doc, tasks, clocks } = await fetchViewData(selectedProject, activeTab);
+      setDocument(doc);
+      if (tasks.length > 0) setAvailableTasks(tasks);
+      if (clocks !== undefined) setActiveClocks(clocks);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Failed to create task: ${msg}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleMoveTask(e: FormEvent) {
+    e.preventDefault();
+    if (!selectedProject || !moveTaskId) return;
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await api(
+        `/api/projects/${encodeURIComponent(selectedProject)}/tasks/${encodeURIComponent(moveTaskId)}/move`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            to_status: moveToStatus,
+          }),
+        },
+      );
+      setIsMoveOpen(false);
+      const { doc, tasks, clocks } = await fetchViewData(selectedProject, activeTab);
+      setDocument(doc);
+      if (tasks.length > 0) setAvailableTasks(tasks);
+      if (clocks !== undefined) setActiveClocks(clocks);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Failed to move task: ${msg}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleClockAction(action: "in" | "out") {
+    if (!selectedProject) return;
+    const promptMsg = action === "in" ? "Optional note for clock in:" : "Optional note for clock out:";
+    const note = prompt(promptMsg, "");
+    if (note === null) return;
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await api(`/api/projects/${encodeURIComponent(selectedProject)}/clock`, {
+        method: "POST",
+        body: JSON.stringify({ action, kind: "human", note: note.trim() }),
+      });
+      const { doc, tasks, clocks } = await fetchViewData(selectedProject, activeTab);
+      setDocument(doc);
+      if (tasks.length > 0) setAvailableTasks(tasks);
+      if (clocks !== undefined) setActiveClocks(clocks);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Clock action failed: ${msg}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  function handleSaveToken(newToken: string) {
+    setToken(newToken);
+    sessionStorage.setItem("ws_token", newToken);
+    if (!newToken.trim()) {
+      setIsConnected(false);
+      setProjects([]);
+      setDocument(null);
+    }
+  }
+
+  function handleConnect() {
+    if (!token.trim()) return;
+    setLoading(true);
+    setError(null);
+    api<{ projects: ProjectItem[] }>("/api/projects")
+      .then((data) => {
+        const list = data.projects || [];
+        setProjects(list);
+        setIsConnected(true);
+        setError(null);
+        if (list.length > 0) {
+          setSelectedProject((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0].key));
+        }
+      })
+      .catch((err: unknown) => {
+        setIsConnected(false);
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(`Failed to connect to Agent Workspace server: ${msg}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0d1117] text-[#f0f6fc] flex flex-col font-sans">
+      {/* Workspace Control Header */}
+      <header className="border-b border-[#30363d] bg-[#161b22] px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="bg-[#58a6ff] text-slate-950 font-black px-2 py-0.5 rounded text-xs tracking-wider">
+              UIDL
+            </span>
+            <span className="font-bold text-sm tracking-tight text-white">Agent Workspace Control</span>
+            <span className="text-xs text-[#8b949e]">powered by uidl-runtime</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-[#0d1117] border-[#30363d]">
+            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-[#3fb950]" : "bg-[#8b949e]"}`} />
+            <span className={isConnected ? "text-[#3fb950]" : "text-[#8b949e]"}>
+              {isConnected ? "Connected" : "Disconnected"}
+            </span>
+          </div>
+
+          <nav className="flex gap-1 ml-4 bg-[#0d1117] p-1 rounded-md border border-[#30363d] flex-wrap">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                  activeTab === tab.id
+                    ? "bg-[#21262d] text-[#58a6ff] border border-[#30363d]"
+                    : "text-[#8b949e] hover:text-[#f0f6fc]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            disabled={!isConnected || projects.length === 0}
+            className="bg-[#0d1117] border border-[#30363d] text-xs text-[#f0f6fc] rounded px-3 py-1.5 focus:outline-none focus:border-[#58a6ff] disabled:opacity-50"
+          >
+            {projects.length === 0 ? (
+              <option value="">No Projects</option>
+            ) : (
+              projects.map((p) => (
+                <option key={p.key} value={p.key}>
+                  {p.key} ({p.client})
+                </option>
+              ))
+            )}
+          </select>
+
+          <input
+            type="password"
+            placeholder="Bearer token..."
+            value={token}
+            onChange={(e) => handleSaveToken(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleConnect();
+            }}
+            className="bg-[#0d1117] border border-[#30363d] text-xs text-[#f0f6fc] rounded px-3 py-1.5 w-36 focus:outline-none focus:border-[#58a6ff]"
+          />
+
+          {!isConnected && (
+            <button
+              onClick={handleConnect}
+              disabled={!token.trim() || loading}
+              className="bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded font-medium transition-colors"
+            >
+              Connect
+            </button>
+          )}
+
+          <button
+            onClick={() => setIsNewTaskOpen(true)}
+            disabled={!isConnected || !selectedProject}
+            className="bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded font-medium transition-colors"
+          >
+            + New Task
+          </button>
+
+          {(activeTab === "board" || activeTab === "backlog") && (
+            <button
+              onClick={() => setIsMoveOpen(true)}
+              disabled={!isConnected || !selectedProject}
+              className="bg-[#21262d] hover:bg-[#30363d] disabled:opacity-50 text-[#58a6ff] text-xs px-3 py-1.5 rounded border border-[#30363d] transition-colors"
+            >
+              Move Card
+            </button>
+          )}
+
+          <label className="flex items-center gap-1.5 text-xs text-[#8b949e] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+              disabled={!isConnected}
+              className="rounded bg-[#0d1117] border-[#30363d] text-[#58a6ff] cursor-pointer disabled:opacity-50"
+            />
+            Auto 10s
+          </label>
+
+          {activeClocks?.human ? (
+            <div className="flex items-center gap-1.5">
+              <span className="bg-[#1f6feb]/20 text-[#58a6ff] border border-[#388bfd]/40 text-xs px-2 py-1 rounded font-mono">
+                CLOCKED IN
+              </span>
+              <button
+                onClick={() => handleClockAction("out")}
+                disabled={isSubmitting || !isConnected}
+                className="bg-[#da3633] hover:bg-[#f85149] text-white text-xs px-2.5 py-1.5 rounded font-medium transition-colors disabled:opacity-50"
+              >
+                Clock Out
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => handleClockAction("in")}
+              disabled={isSubmitting || !isConnected || !selectedProject}
+              className="bg-[#21262d] hover:bg-[#30363d] text-[#58a6ff] text-xs px-2.5 py-1.5 rounded border border-[#30363d] transition-colors disabled:opacity-50"
+            >
+              Clock In
+            </button>
+          )}
+
+          <button
+            onClick={handleRefresh}
+            disabled={!isConnected || !selectedProject}
+            className="bg-[#21262d] hover:bg-[#30363d] disabled:opacity-50 text-xs px-3 py-1.5 rounded border border-[#30363d] transition-colors"
+          >
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        {error && (
+          <div className="mb-4 bg-red-950/40 border border-red-800 text-red-300 text-xs px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+
+        {loading && (
+          <div className="text-center py-12 text-[#8b949e] text-sm font-mono">
+            Compiling and rendering UIDL document...
+          </div>
+        )}
+
+        {!isConnected && projects.length === 0 && !loading && (
+          <div className="max-w-xl mx-auto mt-10 p-8 bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-[#1f6feb]/20 border border-[#388bfd]/40 flex items-center justify-center text-[#58a6ff] font-mono font-bold text-sm">
+                WS
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-white">Connect to Agent Workspace</h2>
+                <p className="text-xs text-[#8b949e]">Bidirectional Kanban board synchronization and activity clock metrics</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#c9d1d9] leading-relaxed mb-6">
+              Workspace Control pairs with your local workspace daemon to inspect real-time project backlogs, track active clocks, and manage tasks.
+            </p>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1.5">Workspace Backend URL</label>
+                <input
+                  type="text"
+                  value={serverUrl}
+                  onChange={(e) => setServerUrl(e.target.value)}
+                  placeholder="http://127.0.0.1:8765"
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-xs text-[#f0f6fc] font-mono focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1.5">Bearer Token</label>
+                <input
+                  type="password"
+                  value={token}
+                  onChange={(e) => handleSaveToken(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleConnect();
+                  }}
+                  placeholder="Paste your workspace bearer token..."
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-xs text-[#f0f6fc] font-mono focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+
+              <button
+                onClick={handleConnect}
+                disabled={!token.trim() || loading}
+                className="w-full py-2.5 px-4 bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white font-medium text-xs rounded-md transition-colors"
+              >
+                Connect to Workspace
+              </button>
+            </div>
+
+            <div className="pt-5 border-t border-[#30363d] text-xs text-[#8b949e] space-y-2">
+              <div className="font-semibold text-[#c9d1d9]">Quick Start:</div>
+              <div className="font-mono bg-[#0d1117] p-2.5 rounded border border-[#30363d] text-[#79c0ff] text-xs select-all">
+                ws web --runtime uidl
+              </div>
+              <p className="text-[11px] leading-normal text-[#8b949e]">
+                When started, ws web prints the local server URL and your bearer token. You can also append <span className="text-[#f0f6fc] font-mono">?token=...</span> to the URL to authenticate automatically.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!loading && document && (
+          <div className="rounded-lg border border-[#30363d] bg-[#161b22] shadow-sm overflow-hidden">
+            <UIDocumentRenderer document={document} theme={meridianDarkTheme} />
+          </div>
+        )}
+      </main>
+
+      {/* New Task Modal */}
+      {isNewTaskOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-[#161b22] border border-[#30363d] rounded-lg max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#30363d] mb-4">
+              <h3 className="text-sm font-bold text-white">Create New Task — {selectedProject}</h3>
+              <button
+                onClick={() => setIsNewTaskOpen(false)}
+                className="text-[#8b949e] hover:text-white text-base leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <form onSubmit={handleCreateTask} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1">Task Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  placeholder="e.g. Implement user export endpoint"
+                  className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#8b949e] mb-1">Status</label>
+                  <select
+                    value={newTaskStatus}
+                    onChange={(e) => setNewTaskStatus(e.target.value)}
+                    className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                  >
+                    <option value="backlog">Backlog</option>
+                    <option value="ready">Ready</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="review">Review</option>
+                    <option value="done">Done</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#8b949e] mb-1">Priority</label>
+                  <select
+                    value={newTaskPriority}
+                    onChange={(e) => setNewTaskPriority(e.target.value)}
+                    className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1">Owner</label>
+                <input
+                  type="text"
+                  value={newTaskOwner}
+                  onChange={(e) => setNewTaskOwner(e.target.value)}
+                  placeholder="e.g. donwi or unassigned"
+                  className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1">Description</label>
+                <textarea
+                  rows={3}
+                  value={newTaskDesc}
+                  onChange={(e) => setNewTaskDesc(e.target.value)}
+                  placeholder="Optional markdown notes..."
+                  className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#30363d]">
+                <button
+                  type="button"
+                  onClick={() => setIsNewTaskOpen(false)}
+                  className="px-3 py-1.5 text-xs text-[#8b949e] hover:text-white rounded border border-[#30363d]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-1.5 text-xs font-medium bg-[#238636] hover:bg-[#2ea043] text-white rounded transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? "Creating..." : "Create Task"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Move Modal */}
+      {isMoveOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-[#161b22] border border-[#30363d] rounded-lg max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#30363d] mb-4">
+              <h3 className="text-sm font-bold text-white">Move Task Status — {selectedProject}</h3>
+              <button
+                onClick={() => setIsMoveOpen(false)}
+                className="text-[#8b949e] hover:text-white text-base leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <form onSubmit={handleMoveTask} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1">Select Task *</label>
+                {availableTasks.length === 0 ? (
+                  <p className="text-xs text-[#8b949e]">No tasks available in project</p>
+                ) : (
+                  <select
+                    value={moveTaskId}
+                    onChange={(e) => setMoveTaskId(e.target.value)}
+                    className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                  >
+                    {availableTasks.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.id}: {t.title} [{t.columnId || t.status || "task"}]
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#8b949e] mb-1">Target Column / Status</label>
+                <select
+                  value={moveToStatus}
+                  onChange={(e) => setMoveToStatus(e.target.value)}
+                  className="w-full bg-[#0d1117] border border-[#30363d] text-xs text-white rounded px-3 py-2 focus:outline-none focus:border-[#58a6ff]"
+                >
+                  <option value="backlog">Backlog</option>
+                  <option value="ready">Ready</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="review">Review</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#30363d]">
+                <button
+                  type="button"
+                  onClick={() => setIsMoveOpen(false)}
+                  className="px-3 py-1.5 text-xs text-[#8b949e] hover:text-white rounded border border-[#30363d]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || availableTasks.length === 0}
+                  className="px-4 py-1.5 text-xs font-medium bg-[#58a6ff] hover:bg-[#388bfd] text-slate-950 font-bold rounded transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? "Moving..." : "Move Task"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

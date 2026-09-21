@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"command","class":"action","status":"active","spec":"v1","input":{"command":{"name":"exportReport","payload":{"format":"pdf"}}},"context":{},"expected":true}

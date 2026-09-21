@@ -1,0 +1,100 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "crm-pipeline-console",
+  "name": "Pipeline CRM Opportunity Pipeline Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "dealCards": [
+      { "id": "deal-1", "columnId": "lead", "title": "PT Samudera Logistik", "subtitle": "Supply Chain ERP (50 Users)", "value": "Rp 240.000.000", "badge": "Warm Lead" },
+      { "id": "deal-2", "columnId": "lead", "title": "Klinik Sehat Utama", "subtitle": "Healthcare POS + Inventory", "value": "Rp 45.000.000", "badge": "Referral" },
+      { "id": "deal-3", "columnId": "demo", "title": "PT Manufaktur Maju", "subtitle": "Discrete MRP + Quality Gates", "value": "Rp 380.000.000", "badge": "Demo Scheduled" },
+      { "id": "deal-4", "columnId": "demo", "title": "CV Resto Nusantara", "subtitle": "Multi-outlet POS + Kitchen Display", "value": "Rp 72.000.000", "badge": "POC Active" },
+      { "id": "deal-5", "columnId": "proposal", "title": "PT Retail Mega Indo", "subtitle": "Omnichannel Retail + Loyalty", "value": "Rp 520.000.000", "badge": "Proposal Sent" },
+      { "id": "deal-6", "columnId": "proposal", "title": "PT Agro Makmur Lestari", "subtitle": "Estate Plantation Accounting", "value": "Rp 310.000.000", "badge": "Budget Approved" },
+      { "id": "deal-7", "columnId": "negotiation", "title": "PT Finansial Mitra Abadi", "subtitle": "BMT Core Banking + Sharia GL", "value": "Rp 650.000.000", "badge": "Legal Review" },
+      { "id": "deal-8", "columnId": "won", "title": "PT Megah Jaya Sentosa", "subtitle": "Full ERP + Custom Dimensions", "value": "Rp 420.000.000", "badge": "Contract Signed" }
+    ],
+    "salesActivity": [
+      { "rep": "Aditya Pratama", "calls": 24, "demos": 6, "proposals": 3, "wonValue": "Rp 420.000.000", "quotaTarget": "Rp 600.000.000" },
+      { "rep": "Siti Rahmawati", "calls": 38, "demos": 8, "proposals": 5, "wonValue": "Rp 350.000.000", "quotaTarget": "Rp 500.000.000" },
+      { "rep": "Budi Hermawan", "calls": 19, "demos": 4, "proposals": 2, "wonValue": "Rp 180.000.000", "quotaTarget": "Rp 400.000.000" }
+    ]
+  },
+  "definitions": {
+    "headerTpl": {
+      "id": "crm-header-tpl",
+      "type": "Navbar",
+      "style": { "justifyContent": "space-between", "padding": "p-4", "borderWidth": "border-b", "borderColor": "{primitives.color.border}" },
+      "slots": { "title": [], "actions": [] }
+    }
+  },
+  "root": {
+    "id": "crm-console",
+    "type": "Column",
+    "style": { "gap": "gap-4", "padding": "p-4" },
+    "children": [
+      {
+        "id": "crm-nav",
+        "type": "Navbar",
+        "componentId": "headerTpl",
+        "slots": {
+          "title": [
+            {
+              "id": "crm-title",
+              "type": "Text",
+              "props": { "value": "Pipeline CRM — Opportunity & Pipeline Hub" },
+              "style": { "fontSize": "text-xl", "fontWeight": 700 }
+            }
+          ],
+          "actions": [
+            { "id": "btn-new-deal", "type": "Button", "props": { "label": "+ Add Opportunity" } },
+            { "id": "btn-forecast", "type": "Button", "props": { "label": "Export Forecast" } }
+          ]
+        }
+      },
+      {
+        "id": "crm-kpis",
+        "type": "GridView",
+        "style": { "display": "grid", "gap": "gap-3", "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))" },
+        "children": [
+          { "id": "crm-k-1", "type": "Text", "props": { "value": "Total Pipeline Value\nRp 2.637 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "crm-k-2", "type": "Text", "props": { "value": "Weighted Forecast\nRp 1.485 M" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "crm-k-3", "type": "Text", "props": { "value": "Win Rate (Q3)\n41.8%" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } },
+          { "id": "crm-k-4", "type": "Text", "props": { "value": "Average Deal Cycle\n28 Days" }, "style": { "padding": "p-4", "borderWidth": "border", "borderRadius": "rounded-lg", "background": "{primitives.color.surface}" } }
+        ]
+      },
+      {
+        "id": "crm-kanban",
+        "type": "KanbanBoard",
+        "props": {
+          "title": "Opportunity Deal Flow (Kanban View)",
+          "dataSource": "dealCards",
+          "columns": [
+            { "id": "lead", "title": "Lead Qualification", "color": "#3b82f6" },
+            { "id": "demo", "title": "Demo & Scoping", "color": "#8b5cf6" },
+            { "id": "proposal", "title": "Proposal / Quote", "color": "#f59e0b" },
+            { "id": "negotiation", "title": "Commercial Negotiation", "color": "#ec4899" },
+            { "id": "won", "title": "Closed Won", "color": "#10b981" }
+          ]
+        }
+      },
+      {
+        "id": "rep-activity",
+        "type": "DataTable",
+        "props": {
+          "title": "Sales Representative Performance & Quota Attainment",
+          "dataSource": "salesActivity",
+          "columns": [
+            { "key": "rep", "label": "Sales Executive" },
+            { "key": "calls", "label": "Calls / Meetings", "align": "right" },
+            { "key": "demos", "label": "Product Demos", "align": "right" },
+            { "key": "proposals", "label": "Proposals Sent", "align": "right" },
+            { "key": "wonValue", "label": "Closed Revenue", "align": "right" },
+            { "key": "quotaTarget", "label": "Quarterly Quota", "align": "right" }
+          ]
+        }
+      }
+    ]
+  }
+}

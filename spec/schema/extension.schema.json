@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uidl.dev/schema/v1/extension.schema.json",
+  "title": "UIDL Extension",
+  "description": "Free-form extension surface. Anything a producer adds beyond the core goes under an extension, declared here only by staying additive to the core.",
+  "type": "object",
+  "additionalProperties": true
+}

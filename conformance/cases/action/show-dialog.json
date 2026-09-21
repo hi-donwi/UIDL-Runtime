@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"show-dialog","class":"action","status":"active","spec":"v1","input":{"showDialog":{"title":"Confirm","content":"Are you sure?"}},"context":{},"expected":true}

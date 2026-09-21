@@ -1,0 +1,62 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "slide-deck",
+  "name": "Slide Deck Example",
+  "route": "/examples/slide-deck",
+  "definitions": {
+    "slide": {
+      "id": "slide-template",
+      "type": "Column",
+      "style": { "width": "w-[960px]", "height": "h-[540px]", "padding": "p-10", "borderRadius": "rounded-3xl", "backgroundColor": "bg-white", "borderWidth": "border", "borderColor": "border-border", "gap": "gap-6" },
+      "slots": { "content": [] }
+    }
+  },
+  "root": {
+    "id": "deck",
+    "type": "Column",
+    "style": { "gap": "gap-8", "padding": "p-8", "backgroundColor": "bg-surface" },
+    "children": [
+      {
+        "id": "title-slide",
+        "type": "Container",
+        "componentId": "slide",
+        "slots": { "content": [
+          { "id": "deck-badge", "type": "Badge", "style": { "width": "w-fit", "padding": "px-3 py-1", "borderRadius": "rounded-full", "backgroundColor": "bg-accent-subtle" }, "children": [{ "id": "deck-badge-text", "type": "Text", "props": { "value": "Pitch Deck" } }] },
+          { "id": "deck-title", "type": "Text", "props": { "value": "UIDL Universal Schema" }, "style": { "fontSize": "text-5xl", "fontWeight": "font-bold" } },
+          { "id": "deck-subtitle", "type": "Text", "props": { "value": "One JSON runtime for websites, dashboards, documents, slides, and spreadsheets." }, "style": { "fontSize": "text-xl", "color": "text-text-secondary" } }
+        ] }
+      },
+      {
+        "id": "agenda-slide",
+        "type": "Container",
+        "componentId": "slide",
+        "slots": { "content": [
+          { "id": "agenda-title", "type": "Text", "props": { "value": "Agenda" }, "style": { "fontSize": "text-4xl", "fontWeight": "font-bold" } },
+          { "id": "agenda-grid", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-2", "gap": "gap-4" }, "children": [
+            { "id": "agenda-1", "type": "Text", "props": { "value": "1. Component coverage" } },
+            { "id": "agenda-2", "type": "Text", "props": { "value": "2. AI agent contract" } },
+            { "id": "agenda-3", "type": "Text", "props": { "value": "3. RBAC and session" } },
+            { "id": "agenda-4", "type": "Text", "props": { "value": "4. Export roadmap" } }
+          ] }
+        ] }
+      },
+      {
+        "id": "chart-slide",
+        "type": "Container",
+        "componentId": "slide",
+        "slots": { "content": [
+          { "id": "chart-title", "type": "Text", "props": { "value": "Adoption Plan" }, "style": { "fontSize": "text-4xl", "fontWeight": "font-bold" } },
+          { "id": "deck-chart", "type": "Chart", "props": { "title": "Artifacts Generated", "dataSource": "adoption", "chartType": "bar", "xKey": "quarter", "yKey": "count" } }
+        ] }
+      }
+    ]
+  },
+  "dataSources": {
+    "adoption": [
+      { "quarter": "Q1", "count": 12 },
+      { "quarter": "Q2", "count": 32 },
+      { "quarter": "Q3", "count": 64 }
+    ]
+  }
+}

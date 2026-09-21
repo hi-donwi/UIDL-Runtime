@@ -1,0 +1,60 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "saas-growth-suite",
+  "name": "SaaS Growth Launch Suite",
+  "route": "/examples/suites/saas-growth",
+  "definitions": {
+    "suiteSection": {
+      "id": "suite-section-template",
+      "type": "Column",
+      "style": { "padding": "p-6", "borderWidth": "border", "borderColor": "border-border", "borderRadius": "rounded-2xl", "backgroundColor": "bg-white", "gap": "gap-4" },
+      "slots": { "content": [] }
+    }
+  },
+  "root": {
+    "id": "suite-root",
+    "type": "Column",
+    "style": { "gap": "gap-6", "padding": "p-8", "backgroundColor": "bg-surface" },
+    "children": [
+      { "id": "hero", "type": "Container", "componentId": "suiteSection", "slots": { "content": [
+        { "id": "title", "type": "Text", "props": { "value": "MeridianCRM Launch Suite" }, "style": { "fontSize": "text-4xl", "fontWeight": "font-bold" } },
+        { "id": "subtitle", "type": "Text", "props": { "value": "One AI-generated package: marketing website, launch dashboard, campaign brief, board slide, and channel budget." }, "style": { "color": "text-text-secondary" } },
+        { "id": "cta-row", "type": "Row", "style": { "gap": "gap-3" }, "children": [
+          { "id": "cta-primary", "type": "Button", "props": { "label": "Open Launch Plan" }, "style": { "padding": "px-4 py-2", "borderRadius": "rounded-xl", "backgroundColor": "bg-primary", "color": "text-white" }, "events": { "onClick": [{ "navigate": { "route": "/launch" } }] } },
+          { "id": "cta-secondary", "type": "Button", "props": { "label": "View Budget" }, "events": { "onClick": [{ "navigate": { "route": "/budget" } }] } }
+        ] }
+      ] } },
+      { "id": "dashboard", "type": "Container", "componentId": "suiteSection", "slots": { "content": [
+        { "id": "dashboard-title", "type": "Text", "props": { "value": "Growth Dashboard" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "dashboard-grid", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-2", "gap": "gap-4" }, "children": [
+          { "id": "pipeline-chart", "type": "Chart", "props": { "title": "Qualified Pipeline", "dataSource": "pipeline", "xKey": "week", "yKey": "value", "chartType": "bar" } },
+          { "id": "channel-table", "type": "DataTable", "props": { "title": "Channel Performance", "dataSource": "channels", "columns": [{ "key": "channel", "label": "Channel" }, { "key": "leads", "label": "Leads", "align": "right" }, { "key": "cac", "label": "CAC", "align": "right" }] } }
+        ] }
+      ] } },
+      { "id": "brief", "type": "Container", "componentId": "suiteSection", "slots": { "content": [
+        { "id": "brief-title", "type": "Text", "props": { "value": "Campaign Brief" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "brief-copy", "type": "Text", "props": { "value": "Target product-led teams with a message around faster CRM onboarding, ready-made automation, and manager visibility." } },
+        { "id": "brief-table", "type": "DataTable", "props": { "title": "Launch Workstreams", "dataSource": "workstreams", "columns": [{ "key": "owner", "label": "Owner" }, { "key": "workstream", "label": "Workstream" }, { "key": "status", "label": "Status" }] } }
+      ] } },
+      { "id": "board-slide", "type": "Container", "componentId": "suiteSection", "slots": { "content": [
+        { "id": "slide-title", "type": "Text", "props": { "value": "Board Slide" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "slide-grid", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-3", "gap": "gap-4" }, "children": [
+          { "id": "slide-1", "type": "Text", "props": { "value": "Launch ARR target: $1.2M" } },
+          { "id": "slide-2", "type": "Text", "props": { "value": "Primary risk: paid CAC drift" } },
+          { "id": "slide-3", "type": "Text", "props": { "value": "Ask: approve partner budget" } }
+        ] }
+      ] } },
+      { "id": "budget", "type": "Container", "componentId": "suiteSection", "slots": { "content": [
+        { "id": "budget-title", "type": "Text", "props": { "value": "Channel Budget" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-semibold" } },
+        { "id": "budget-table", "type": "DataTable", "props": { "dataSource": "budget", "columns": [{ "key": "line", "label": "Line" }, { "key": "amount", "label": "Amount", "align": "right" }, { "key": "formula", "label": "Formula" }] } }
+      ] } }
+    ]
+  },
+  "dataSources": {
+    "pipeline": [{ "week": "W1", "value": 80 }, { "week": "W2", "value": 140 }, { "week": "W3", "value": 220 }],
+    "channels": [{ "channel": "Organic", "leads": 420, "cac": "$18" }, { "channel": "Partners", "leads": 260, "cac": "$42" }, { "channel": "Paid", "leads": 310, "cac": "$71" }],
+    "workstreams": [{ "owner": "Maya", "workstream": "Landing page", "status": "Ready" }, { "owner": "Rafi", "workstream": "Lifecycle emails", "status": "Draft" }, { "owner": "Nina", "workstream": "Partner kit", "status": "Review" }],
+    "budget": [{ "line": "Paid search", "amount": "$24K", "formula": "CPL * leads" }, { "line": "Partner MDF", "amount": "$18K", "formula": "fixed" }, { "line": "Webinars", "amount": "$9K", "formula": "3 * $3K" }]
+  }
+}

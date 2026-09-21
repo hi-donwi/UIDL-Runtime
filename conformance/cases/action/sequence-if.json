@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"sequence-if","class":"action","status":"active","spec":"v1","input":{"sequence":[{"if":{"condition":{"$gt":[{"expr":{"literal":2}},{"expr":{"literal":1}}]},"then":{"showSnackbar":{"message":"yes"}}}}]},"context":{},"expected":true}

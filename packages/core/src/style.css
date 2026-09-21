@@ -1,0 +1,186 @@
+/*
+ * Shipped, self-contained Tailwind bundle for uidl-runtime. Import this from any app that
+ * renders uidl-runtime documents and/or mounts <Editor />:
+ *
+ *   import "uidl-runtime/style.css";
+ *
+ * Why this file exists — two separate problems, one file:
+ *
+ * 1. `resolveStyleIntent` (src/theme/engine.ts) turns a UIDL document's `style` values into
+ *    Tailwind classes AT RUNTIME, from JSON. A consumer app's own Tailwind build only sees
+ *    literal class-name substrings in its own source files — it can never see a class
+ *    assembled at runtime (e.g. a responsive `{ base: "p-8", lg: "p-16" }` becoming the string
+ *    "lg:p-16"), no matter where that JSON lives.
+ *
+ * 2. The <Editor /> component's own chrome (Canvas, LayerTree, WidgetPalette, PropertyPanel,
+ *    StylePanel, ValidationStatus) uses classes like `bg-background`/`border-border`/
+ *    `text-accent` that only exist as real Tailwind utilities once these tokens are registered
+ *    via @theme, plus literal classes like `border-b`/`text-lg`/`cursor-pointer` hardcoded
+ *    directly in those components' source. Both are equally invisible to a consumer's Tailwind
+ *    build, because it doesn't scan node_modules — so a class being "static text in a file"
+ *    doesn't help once that file ships inside a published package. The chrome's colors support
+ *    light (default) and dark mode via a `.dark` class toggle — see the comment above `@theme`
+ *    below for how that's wired to `<Editor />`'s existing "Theme" selector.
+ *
+ * `@source inline(...)` below force-generates every combination of the *structural* document
+ * utility vocabulary this renderer supports (layout keywords, the spacing scale, opacity)
+ * across all breakpoints, plus the Editor chrome's fixed, exhaustively-enumerated class list.
+ *
+ * This does NOT cover token-backed *document* style values (colors, radii, shadows, border
+ * widths, font weights) — those are resolved to CSS custom properties (`var(--color-primary)`,
+ * etc) and applied as inline styles instead, via `ThemeEngine.resolveInlineStyle`. Those never
+ * need Tailwind at all; see `theme/tailwind.ts`'s `themeToCssVariablesMap`, wired into the root
+ * element by `renderUIDocument`.
+ *
+ * Scope of the document-utility safelist: the common Tailwind spacing scale (0 through 24)
+ * across padding/margin/gap/width/height *and* their directional/min/max/positioning variants
+ * (paddingTop.../marginBottom.../minWidth/maxWidth/minHeight/maxHeight/inset/top/right/bottom/
+ * left — the full `StyleIntent` field list in src/types/theme.ts), the fixed enum values
+ * `resolveStyleIntent` maps from `flexDirection`/`justifyContent`/`alignItems`/`position`, plus
+ * common `display`/`opacity`/`zIndex` values and width/max-width container keywords, all six
+ * breakpoints. Document `style` values
+ * outside this set (e.g. `p-32`, arbitrary values, unusual `display` keywords) are literal
+ * Tailwind classes just like any other — they'll still work correctly if the consuming app's
+ * own Tailwind build happens to scan a file containing them, same as before this stylesheet
+ * existed.
+ */
+
+@import "tailwindcss" source(none);
+
+/*
+ * Meridian design tokens (color ramps, radii, shadows) + the `.meridian-ui` type scale
+ * and layout utilities. Every widget in src/components/primitives.tsx is styled against
+ * these — see src/meridian-theme.css for where each value comes from upstream.
+ */
+@import "./meridian-theme.css";
+
+/*
+ * Editor chrome light/dark: <Editor />'s `themeMode` state (default "light", same store field
+ * that already picks defaultLightTheme/defaultDarkTheme for the *document* preview) also toggles
+ * a `dark` class on the Editor's own root element — see editor/Editor.tsx. `@theme` below sets
+ * the light palette as the default (matching the store's default), and `.dark` overrides the
+ * same CSS custom properties when that class is present on an ancestor. No `dark:`-prefixed
+ * utility classes are used anywhere in editor/*.tsx — every chrome class (bg-background,
+ * text-text-primary, etc) stays the same string in both modes; only the CSS variable *values*
+ * change, which is why plain `.dark { --color-x: ... }` overrides are enough here.
+ */
+@theme {
+  --color-background: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-surface-hover: #e5e5e5;
+  --color-border: #e5e5e5;
+  --color-border-hover: #d4d4d4;
+  --color-text-primary: #171717;
+  --color-text-secondary: #525252;
+  --color-text-muted: #737373;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --radius-lg: 0.75rem;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  --color-background: #0a0a0a;
+  --color-surface: #171717;
+  --color-surface-hover: #262626;
+  --color-border: #262626;
+  --color-border-hover: #404040;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+}
+
+@source inline("flex flex-1 flex-col flex-shrink-0 inline-flex grid grid-cols-2 items-center justify-between space-y-2 space-y-4");
+@source inline("h-full h-screen h-2 w-2 w-12 w-64 w-80 w-full max-w-4xl");
+@source inline("gap-1 gap-1.5 gap-2 gap-4 p-2 p-3 p-4 p-8 px-2 px-3 px-4 py-1 py-1.5 py-2 py-3 mb-1 mb-2 mb-4 mt-1 mx-auto");
+@source inline("border border-b border-b-2 border-r border-border border-border-hover border-accent");
+@source inline("bg-background bg-surface bg-surface-hover bg-accent/10 bg-green-500 bg-red-500 bg-yellow-500");
+@source inline("text-sm text-xs text-lg text-left text-text-primary text-text-secondary text-text-muted text-accent text-red-400 text-red-500 text-yellow-400");
+@source inline("font-medium font-semibold rounded-full rounded-lg rounded-md");
+@source inline("overflow-hidden overflow-y-auto overflow-auto");
+@source inline("cursor-pointer transition-colors truncate uppercase tracking-wider hidden relative");
+@source inline("hover:bg-surface-hover hover:border-border-hover hover:text-text-primary");
+@source inline("disabled:cursor-not-allowed disabled:opacity-50");
+
+/*
+ * Dialog/Snackbar (src/components/primitives.tsx) are registered widgets, shown by
+ * UIDocumentRenderer in response to showDialog/showSnackbar actions — their own hardcoded
+ * classes ship inside this package too, same reasoning as the rest of the Editor chrome above.
+ */
+@source inline("fixed absolute relative inset-0 z-10 z-50 bottom-4 left-1/2 -translate-x-1/2 mt-4");
+@source inline("bg-black/50 bg-white bg-gray-200 bg-gray-900 text-white text-gray-700 shadow-lg shadow-xl hover:bg-gray-300");
+
+/*
+ * Drawer/Panel overlay chrome (src/components/primitives.tsx, roadmap step 5) — side strips,
+ * focus-trap containers, pointer-events plumbing, and the enter/exit motion classes
+ * (round 14: 300ms in / 200ms out, ease-out; transform+opacity only — see
+ * overlayMotionClasses in primitives.tsx). inset-x-0/inset-y-0 were intentionally NOT
+ * safelisted in round 10 (no StyleIntent field produces them) — they're back here as
+ * component-hardcoded classes, which is a different justification than the style-engine
+ * vocabulary. h-80 is the top/bottom drawer's default height; w-80 already ships (line above).
+ * opacity-0/opacity-100 come from the {sm:...}opacity-{0..100..5} pattern below.
+ */
+@source inline("pointer-events-none pointer-events-auto outline-none inset-x-0 inset-y-0 h-80 border-s border-e");
+@source inline("transition-transform transition-opacity duration-200 duration-300 ease-out");
+@source inline("translate-x-0 translate-y-0 translate-x-full -translate-x-full translate-y-full -translate-y-full");
+
+/*
+ * Meridian-styled widget chrome (src/components/primitives.tsx + charts.tsx). These are literal
+ * classes in this package's own source, which a consumer's Tailwind build never scans — same
+ * justification as the Editor chrome above. Grouped by the widget that owns them.
+ */
+/* Structure + spacing shared across DataTable/Chart/Kanban/TreeView. */
+@source inline("section grid grid-cols-3 justify-end justify-center justify-self-start justify-self-center justify-self-end place-items-center flex-wrap flex-shrink-0 items-baseline");
+@source inline("me-2 ms-2 ms-auto my-auto my-3 my-20 mt-1 mt-2 mt-4 mb-1 mb-3 mb-4 pe-4 py-4 py-8 w-3 w-7 w-8 w-9 w-28 h-3 h-4 w-1/2 w-full");
+@source inline("truncate select-none whitespace-nowrap overflow-x-auto overflow-y-auto resize-none appearance-none");
+/* Meridian row heights, widths and component utilities (src/meridian-theme.css). */
+@source inline("h-row-smallest h-row-small h-row-mid h-row-large h-row-largest min-h-row-mid w-sidebar w-form w-dialog w-toast w-quick-edit pill flex-center no-scrollbar custom-scroll backdrop meridian-overlay meridian-ui vb-slider");
+/* Icon layer (src/components/icons.tsx): the widget's inline-baseline alignment and the
+   colored marks Snackbar/Badge draw beside their text. */
+@source inline("align-[-0.15em] text-green-500 text-green-600 text-red-500 text-orange-500 text-blue-500 dark:text-green-400 dark:text-orange-400 dark:text-blue-400");
+/* Meridian grays/status colors used by the widgets and their dark-mode pairs. */
+@source inline("bg-white bg-black bg-gray-25 bg-gray-50 bg-gray-100 bg-gray-200 bg-gray-300 bg-blue-500 bg-black/10 backdrop-blur-[2px]");
+@source inline("dark:bg-gray-300 dark:bg-gray-700 dark:bg-gray-800 dark:bg-gray-850 dark:bg-gray-875 dark:bg-gray-890 dark:bg-gray-900 dark:bg-blue-600");
+@source inline("hover:bg-gray-50 hover:bg-gray-200 dark:hover:bg-gray-800 dark:hover:bg-gray-850 dark:hover:bg-gray-890");
+@source inline("text-black text-white text-gray-500 text-gray-600 text-gray-700 text-gray-800 text-gray-900 text-red-600 placeholder-gray-500 text-end");
+@source inline("dark:text-black dark:text-white dark:text-gray-25 dark:text-gray-100 dark:text-gray-200 dark:text-gray-300 dark:text-gray-400 dark:text-gray-500 dark:text-gray-600 dark:text-red-400");
+@source inline("border-gray-100 border-gray-200 border-gray-300 border-t border-b border-s-4 dark:border-gray-700 dark:border-gray-800 dark:border-red-800 border-red-300");
+@source inline("focus:bg-gray-100 dark:focus:bg-gray-850 focus:outline-none dark:font-semibold shadow-2xl shadow-button");
+/* Badge/StatusPill color pairs — getBgTextColorClass in utils/colors.ts. */
+@source inline("bg-{gray,orange,green,red,yellow,blue,indigo,pink,purple,teal}-200");
+@source inline("text-{gray,orange,green,red,yellow,blue,indigo,pink,purple,teal}-700");
+@source inline("dark:bg-{gray,orange,green,red,yellow,blue,indigo,pink,purple,teal}-800");
+@source inline("dark:text-{gray,orange,green,red,yellow,blue,indigo,pink,purple,teal}-200");
+
+/*
+ * Literal classes used by defaultLightTheme/defaultDarkTheme's semantics.typography tokens
+ * (src/theme/presets.ts) — resolved via style.typography (see theme/engine.ts's
+ * resolveTypography). These ship inside this package too, so they need the same safelisting
+ * as everything else here.
+ */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}text-{xs,sm,base,lg,xl,2xl,3xl,4xl}");
+@source inline("leading-tight leading-snug leading-normal leading-relaxed leading-loose");
+@source inline("tracking-tight tracking-normal tracking-wide");
+
+@source inline("{sm:,md:,lg:,xl:,2xl:,}flex-{row,row-reverse,col,col-reverse}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}justify-{start,center,end,between,around,evenly}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}items-{start,center,end,stretch,baseline}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{block,inline-block,inline,flex,inline-flex,grid,inline-grid,hidden,contents}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}opacity-{0..100..5}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{w,h}-{full,screen,auto,fit,min,max}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{min-w,max-w,min-h,max-h}-{0,full,screen,auto,fit,min,max}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{max-w,min-w}-{3xs,2xs,xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}max-w-screen-{sm,md,lg,xl,2xl}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{p,px,py,pt,pr,pb,pl,m,mx,my,mt,mr,mb,ml,gap,gap-x,gap-y,w,h,min-w,max-w,min-h,max-h}-{0,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24}");
+
+/*
+ * Positioning: StyleIntent's position/inset/top/right/bottom/left/zIndex fields
+ * (theme/engine.ts's resolveStyleIntent). Needed for sticky/fixed/off-canvas document elements
+ * (sidebars, toolbars, drawers) — see .notes/notes.md's chrome-widget roadmap.
+ */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{static,relative,absolute,fixed,sticky}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}z-{0,10,20,30,40,50,auto}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{inset,top,right,bottom,left}-{0,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,auto,full,1/2}");

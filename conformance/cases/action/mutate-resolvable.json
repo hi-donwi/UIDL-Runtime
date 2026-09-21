@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"mutate-resolvable","class":"action","status":"active","spec":"v1","input":{"mutate":{"operation":"update","collection":"invoices","id":{"$bind":"event.id"},"payload":{"$bind":"event"}}},"context":{},"expected":true}

@@ -1,0 +1,174 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart' hide ActionDispatcher;
+import 'package:flutter_test/flutter_test.dart';
+import 'package:uidl_flutter/uidl_flutter.dart';
+
+void main() {
+  group('Cross-Platform Conformance Suite (spec v1)', () {
+    final casesDir = Directory('../conformance/cases');
+    if (!casesDir.existsSync()) {
+      fail('Conformance cases directory not found at ${casesDir.path}');
+    }
+
+    final List<Map<String, dynamic>> activeCases = [];
+
+    for (final entity in casesDir.listSync(recursive: true)) {
+      if (entity is File && entity.path.endsWith('.json')) {
+        final content = entity.readAsStringSync();
+        final json = jsonDecode(content) as Map<String, dynamic>;
+        if (json['status'] == 'active') {
+          activeCases.add(json);
+        }
+      }
+    }
+
+    group('expression', () {
+      final exprCases = activeCases.where((c) => c['class'] == 'expression');
+      for (final c in exprCases) {
+        test('evaluates ${c['id']}', () {
+          final context = c['context'] as Map<String, dynamic>? ?? {};
+          final result = ExpressionEvaluator.evaluate(c['input'], context);
+          expect(result, c['expected']);
+        });
+      }
+    });
+
+    group('condition', () {
+      final condCases = activeCases.where((c) => c['class'] == 'condition');
+      for (final c in condCases) {
+        test('condition ${c['id']}', () {
+          final context = c['context'] as Map<String, dynamic>? ?? {};
+          final result = ExpressionEvaluator.evaluateCondition(c['input'], context);
+          expect(result, c['expected']);
+        });
+      }
+    });
+
+    group('binding', () {
+      final bindCases = activeCases.where((c) => c['class'] == 'binding');
+      for (final c in bindCases) {
+        test('resolves ${c['id']}', () {
+          final context = c['context'] as Map<String, dynamic>? ?? {};
+          final input = c['input'] as Map<String, dynamic>;
+          final bindPath = input[r'$bind'] as String;
+          final result = resolvePath(bindPath, context);
+          expect(result, c['expected']);
+        });
+      }
+    });
+
+    group('action', () {
+      final actionCases = activeCases.where((c) => c['class'] == 'action');
+      for (final c in actionCases) {
+        test('accepts ${c['id']}', () {
+          final input = c['input'] as Map<String, dynamic>;
+          final hasKnown = input.keys.any((k) => ActionDispatcher.knownActionKinds.contains(k));
+          expect(hasKnown, c['expected']);
+        });
+      }
+    });
+
+    group('action-exec', () {
+      final execCases = activeCases.where((c) => c['class'] == 'action-exec');
+      for (final c in execCases) {
+        test('executes ${c['id']}', () async {
+          final context = c['context'] as Map<String, dynamic>? ?? {};
+          final rawState = context['state'];
+          final initial = rawState is Map
+              ? Map<String, dynamic>.from(rawState)
+              : <String, dynamic>{};
+          final dispatcher = ActionDispatcher(
+            state: initial,
+            scope: <String, dynamic>{'state': initial},
+          );
+          final expected = c['expected'] as Map<String, dynamic>;
+          if (expected['ok'] == true) {
+            await dispatcher.execute(c['input']);
+          } else {
+            await expectLater(
+              dispatcher.execute(c['input']),
+              throwsA(
+                isA<UidlException>().having(
+                  (error) => error.code,
+                  'code',
+                  expected['code'],
+                ),
+              ),
+            );
+          }
+          expect(initial, expected['state']);
+        });
+      }
+    });
+
+    group('error', () {
+      final errorCases = activeCases.where((c) => c['class'] == 'error');
+      for (final c in errorCases) {
+        test('rejects ${c['id']} with expected error', () async {
+          final input = c['input'];
+          if (c['id'] == 'unknown-action') {
+            final dispatcher = ActionDispatcher(
+              state: <String, dynamic>{},
+              scope: <String, dynamic>{},
+            );
+            await expectLater(
+              dispatcher.execute(input),
+              throwsA(
+                isA<UidlException>().having(
+                  (error) => error.code,
+                  'code',
+                  c['expected'],
+                ),
+              ),
+            );
+            return;
+          }
+          expect(
+            () => UidlParser.parse(input),
+            throwsA(isA<UidlException>()),
+          );
+        });
+      }
+    });
+
+    group('render', () {
+      final renderCases = activeCases.where((c) => c['class'] == 'render');
+      for (final c in renderCases) {
+        testWidgets('renders ${c['id']}', (tester) async {
+          final doc = UidlDocument.fromJson(c['input'] as Map<String, dynamic>);
+          await tester.pumpWidget(
+            MaterialApp(
+              home: Scaffold(
+                body: UidlRenderer(document: doc),
+              ),
+            ),
+          );
+          expect(find.textContaining('Unknown widget'), findsNothing);
+          if (c['id'] == 'text-column') {
+            expect(find.text('hello'), findsOneWidget);
+          }
+        });
+      }
+    });
+
+    group('data', () {
+      final dataCases = activeCases.where((c) => c['class'] == 'data');
+      for (final c in dataCases) {
+        test('resolves dataSource for ${c['id']}', () {
+          final input = c['input'] as Map<String, dynamic>;
+          final state = <String, dynamic>{};
+          final data = <String, dynamic>{};
+          DataSourceRunner.initializeDataSources(
+            {input['key'] as String: input['config']},
+            state,
+            data,
+          );
+          if (c['expected'] == true) {
+            expect(state.containsKey(r'$data'), isTrue);
+          }
+        });
+      }
+    });
+  });
+}

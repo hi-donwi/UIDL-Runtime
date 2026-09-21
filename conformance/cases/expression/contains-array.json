@@ -1,0 +1,14 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "id": "contains-array",
+  "class": "expression",
+  "status": "active",
+  "spec": "v1",
+  "input": {
+    "op": "contains",
+    "left": {"literal": ["a", "b", "c"]},
+    "right": {"literal": "b"}
+  },
+  "context": {},
+  "expected": true
+}

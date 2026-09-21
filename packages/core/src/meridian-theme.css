@@ -1,0 +1,415 @@
+/*
+ * The Meridian design tokens: the color ramps, radii, shadows and type scale the shell is built on.
+ *
+ * Sources:
+ *   - colors.json                 → every color ramp below
+ *   - tailwind.config.js          → font sizes, radii, shadows, spacing extras
+ *   - src/styles/index.css        → :root layout variables + component utilities
+ *
+ * Two deliberately different scopes:
+ *
+ * 1. `@theme` (global) — color ramps, radii and shadows. These replace Tailwind's
+ *    defaults for the whole bundle. Meridian's grays are neutral (#F8F8F8 … #171717) where
+ *    Tailwind's are blue-tinted, and its blue/pink/green ramps are what every chart,
+ *    pill and status color in the app is built from. Utilities read these as CSS
+ *    variables (`bg-gray-100` → `var(--color-gray-100)`), so overriding the variable is
+ *    enough — no utility needs rewriting.
+ *
+ * 2. `.meridian-ui` (scoped) — the type scale and layout metrics. Meridian runs on a 13px
+ *    base (`text-base: 13px`, `text-sm: 12px`, `text-xl: 18px`), which is much denser
+ *    than Tailwind's 16px default. Applying that globally would also shrink the
+ *    <Editor /> chrome, which is not part of this design pass — so it is scoped to an
+ *    opt-in class that demo/app shells put on their root element. Tailwind v4 utilities
+ *    resolve `var(--text-base)` at the use site, so the override cascades correctly to
+ *    everything rendered inside.
+ *
+ * Meridian's line-height comes from Tailwind v2 preflight (`html { line-height: 1.5 }`)
+ * because its `fontSize` config entries are bare strings with no paired leading — hence
+ * the explicit `--text-*--line-height: 1.5` values here, which reproduce that.
+ */
+
+/* Meridian sets `darkMode: 'class'`; Tailwind v4 defaults to prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* colors.json */
+  --color-black: #1e293b;
+
+  --color-gray-25: #fbfbfb;
+  --color-gray-50: #f8f8f8;
+  --color-gray-100: #f3f3f3;
+  --color-gray-200: #ededed;
+  --color-gray-300: #e2e2e2;
+  --color-gray-400: #c7c7c7;
+  --color-gray-500: #999999;
+  --color-gray-600: #7c7c7c;
+  --color-gray-700: #525252;
+  --color-gray-800: #383838;
+  --color-gray-850: #282828;
+  --color-gray-875: #212121;
+  --color-gray-890: #1c1c1c;
+  --color-gray-900: #171717;
+
+  --color-red-50: #fff7f7;
+  --color-red-100: #fff0f0;
+  --color-red-200: #fcd7d7;
+  --color-red-300: #f9c6c6;
+  --color-red-400: #eb9091;
+  --color-red-500: #e03636;
+  --color-red-600: #cc2929;
+  --color-red-700: #b52a2a;
+  --color-red-800: #941f1f;
+  --color-red-900: #6b1515;
+
+  --color-orange-50: #fff9f5;
+  --color-orange-100: #fff1e7;
+  --color-orange-200: #fce6d5;
+  --color-orange-300: #f7d6bd;
+  --color-orange-400: #f0b58b;
+  --color-orange-500: #e86c13;
+  --color-orange-600: #d45a08;
+  --color-orange-700: #bd3e0c;
+  --color-orange-800: #9e3513;
+  --color-orange-900: #6b2711;
+
+  --color-yellow-50: #fffcef;
+  --color-yellow-100: #fff7d3;
+  --color-yellow-200: #f7e9a8;
+  --color-yellow-300: #f5e171;
+  --color-yellow-400: #f2d14b;
+  --color-yellow-500: #edba13;
+  --color-yellow-600: #d1930d;
+  --color-yellow-700: #ab6e05;
+  --color-yellow-800: #8c5600;
+  --color-yellow-900: #733f12;
+
+  --color-green-50: #f3fcf5;
+  --color-green-100: #e4f5e9;
+  --color-green-200: #daf0e1;
+  --color-green-300: #cae5d4;
+  --color-green-400: #b6dec5;
+  --color-green-500: #59ba8b;
+  --color-green-600: #30a66d;
+  --color-green-700: #278f5e;
+  --color-green-800: #16794c;
+  --color-green-900: #173b2c;
+
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #e6f7f4;
+  --color-teal-200: #bae8e1;
+  --color-teal-300: #97ded4;
+  --color-teal-400: #73d1c4;
+  --color-teal-500: #36baad;
+  --color-teal-600: #0b9e92;
+  --color-teal-700: #0f736b;
+  --color-teal-800: #115c57;
+  --color-teal-900: #114541;
+
+  --color-blue-50: #f7fbfd;
+  --color-blue-100: #edf6fd;
+  --color-blue-200: #e3f1fd;
+  --color-blue-300: #c9e7fc;
+  --color-blue-400: #70b6f0;
+  --color-blue-500: #33a1ff;
+  --color-blue-600: #007be0;
+  --color-blue-700: #0070cc;
+  --color-blue-800: #005ca3;
+  --color-blue-900: #004880;
+
+  --color-indigo-100: #ebf4ff;
+  --color-indigo-200: #c3dafe;
+  --color-indigo-300: #a3bffa;
+  --color-indigo-400: #7f9cf5;
+  --color-indigo-500: #667eea;
+  --color-indigo-600: #5a67d8;
+  --color-indigo-700: #4c51bf;
+  --color-indigo-800: #434190;
+  --color-indigo-900: #3c366b;
+
+  --color-purple-50: #fdfaff;
+  --color-purple-100: #f9f0ff;
+  --color-purple-200: #f1e5fa;
+  --color-purple-300: #e9d6f5;
+  --color-purple-400: #d6c1e6;
+  --color-purple-500: #9c45e3;
+  --color-purple-600: #8642c2;
+  --color-purple-700: #6e399d;
+  --color-purple-800: #5c2f83;
+  --color-purple-900: #401863;
+
+  --color-pink-50: #fff7fc;
+  --color-pink-100: #feeef8;
+  --color-pink-200: #f8e2f0;
+  --color-pink-300: #f2d4e6;
+  --color-pink-400: #e9c4da;
+  --color-pink-500: #df9eb8;
+  --color-pink-600: #cf3a96;
+  --color-pink-700: #9c2671;
+  --color-pink-800: #801458;
+  --color-pink-900: #570f3e;
+
+  --color-violet-50: #fbfaff;
+  --color-violet-100: #f5f2ff;
+  --color-violet-200: #e5e1fa;
+  --color-violet-300: #dad2f7;
+  --color-violet-400: #bdb1f0;
+  --color-violet-500: #6846e3;
+  --color-violet-600: #5f46c7;
+  --color-violet-700: #4f3da1;
+  --color-violet-800: #392980;
+  --color-violet-900: #251959;
+
+  --color-cyan-50: #f5fbfc;
+  --color-cyan-100: #e0f8ff;
+  --color-cyan-200: #b3ecfc;
+  --color-cyan-300: #94e6ff;
+  --color-cyan-400: #6bd3f2;
+  --color-cyan-500: #34bae3;
+  --color-cyan-600: #32a4c7;
+  --color-cyan-700: #267a94;
+  --color-cyan-800: #125c73;
+  --color-cyan-900: #164759;
+
+  --color-amber-50: #fdfaed;
+  --color-amber-100: #fcf3cf;
+  --color-amber-200: #f7e28d;
+  --color-amber-300: #f5d261;
+  --color-amber-400: #f2be3a;
+  --color-amber-500: #e79913;
+  --color-amber-600: #db7706;
+  --color-amber-700: #b35309;
+  --color-amber-800: #91400d;
+  --color-amber-900: #763813;
+
+  /* tailwind.config.js → borderRadius */
+  --radius: 0.313rem; /* `rounded` — 5px, Meridian's default */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* tailwind.config.js → boxShadow */
+  --shadow: 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 0 2px 0 rgb(0 0 0 / 0.1), 0 2px 4px 0 rgb(0 0 0 / 0.08);
+  --shadow-button: 0 0.5px 0 0 rgb(0 0 0 / 0.08);
+
+  /* tailwind.config.js → spacing extras (7/14/18/28/72/80 already exist in v4) */
+  --spacing-18: 4.5rem;
+}
+
+/*
+ * Tailwind's border utilities resolve their style through `--tw-border-style`, which Tailwind
+ * registers with `@property`. Property registration is document-scoped, so when this sheet is
+ * adopted into a shadow root — how a host console renders every generated screen — the
+ * registration is ignored, the variable is empty, and `border-b` / `border-e` / `border` all
+ * compute to `style: none; width: 0`. Every rule a compiled document asked for silently
+ * vanished there: form rows lost their separators, summary strips lost their dividers, and
+ * page headers lost the line beneath them.
+ *
+ * Declaring the default explicitly costs nothing where `@property` did work and restores the
+ * utilities where it did not.
+ */
+:host,
+.meridian-ui,
+.meridian-overlay,
+.meridian-ui *,
+.meridian-overlay *,
+.meridian-ui *::before,
+.meridian-ui *::after {
+  --tw-border-style: solid;
+}
+
+/*
+ * Layout metrics + component utilities — src/styles/index.css.
+ *
+ * On :root so `var(--h-row-mid)` also resolves for elements portalled outside a `.meridian-ui`
+ * subtree (overlays render into document.body) — but :root alone matches *nothing* when this
+ * sheet is adopted into a shadow root, which is how a host console renders every
+ * generated screen. Every `h-row-*`, `min-h-row-mid` and `w-form` silently resolved to no
+ * value there: form rows fell back to content height and page headers came out at 27px
+ * instead of 3.5rem. `:host` covers the shadow root and `.meridian-ui` the subtree itself, so
+ * the metrics resolve however the sheet is loaded.
+ */
+:root,
+:host,
+.meridian-ui,
+.meridian-overlay {
+  --w-form: 600px;
+  --w-app: 1200px;
+  --w-sidebar: 14rem;
+  --w-desk: calc(100vw - var(--w-sidebar));
+  --w-desk-fixed: calc(var(--w-app) - var(--w-sidebar));
+  --w-quick-edit: 22rem;
+  --w-dialog: 24rem;
+  --w-toast: 24rem;
+  --w-scrollbar: 0.6rem;
+
+  /* Row heights — the vertical rhythm the whole app is built on. */
+  --h-row-smallest: 2rem;
+  --h-row-small: 2.5rem;
+  --h-row-mid: 3rem;
+  --h-row-large: 3.5rem;
+  --h-row-largest: 4rem;
+}
+
+.meridian-ui,
+.meridian-overlay {
+  /* tailwind.config.js → fontSize */
+  --text-xs: 11px;
+  --text-xs--line-height: 1.5;
+  --text-sm: 12px;
+  --text-sm--line-height: 1.5;
+  --text-base: 13px;
+  --text-base--line-height: 1.5;
+  --text-lg: 14px;
+  --text-lg--line-height: 1.5;
+  --text-xl: 18px;
+  --text-xl--line-height: 1.5;
+  --text-2xl: 20px;
+  --text-2xl--line-height: 1.5;
+  --text-3xl: 24px;
+  --text-3xl--line-height: 1.5;
+  --text-4xl: 28px;
+  --text-4xl--line-height: 1.5;
+
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-black);
+}
+
+.meridian-ui.dark,
+.dark .meridian-ui,
+.meridian-overlay.dark,
+.dark .meridian-overlay {
+  color: var(--color-gray-25);
+}
+
+/* src/styles/index.css → row-height + width utilities */
+.h-row-smallest {
+  height: var(--h-row-smallest);
+}
+.h-row-small {
+  height: var(--h-row-small);
+}
+.h-row-mid {
+  height: var(--h-row-mid);
+}
+.h-row-large {
+  height: var(--h-row-large);
+}
+.h-row-largest {
+  height: var(--h-row-largest);
+}
+.min-h-row-mid {
+  min-height: var(--h-row-mid);
+}
+.w-sidebar {
+  width: var(--w-sidebar);
+}
+.w-form {
+  width: var(--w-form);
+}
+.w-dialog {
+  width: var(--w-dialog);
+}
+.w-toast {
+  width: var(--w-toast);
+}
+.w-quick-edit {
+  width: var(--w-quick-edit);
+  flex-shrink: 0;
+}
+
+/*
+ * Slider — Meridian has no range control, so this is the one place a look had to be designed
+ * rather than inherited. It follows the same vocabulary: a 4px gray-200 track, a 14px thumb
+ * on the blue-500 accent, and the same 14px control size as Check's box.
+ */
+.vb-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-gray-200);
+}
+.dark .vb-slider {
+  background: var(--color-gray-800);
+}
+.vb-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--color-blue-500);
+}
+.vb-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-blue-500);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Status pills — `.pill` in src/styles/index.css. */
+.pill {
+  padding-block: 0.125rem;
+  padding-inline: 0.375rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  width: fit-content;
+  height: fit-content;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(0 0 0 / 0.1);
+  backdrop-filter: blur(2px);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: var(--w-scrollbar);
+  height: var(--w-scrollbar);
+}
+.custom-scroll::-webkit-scrollbar-track:vertical {
+  border-left: solid 1px var(--color-gray-100);
+}
+.custom-scroll::-webkit-scrollbar-track:horizontal {
+  border-top: solid 1px var(--color-gray-100);
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-gray-100);
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-200);
+}
+.custom-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.dark .custom-scroll::-webkit-scrollbar-track:vertical {
+  border-left-color: var(--color-gray-800);
+}
+.dark .custom-scroll::-webkit-scrollbar-track:horizontal {
+  border-top-color: var(--color-gray-800);
+}
+.dark .custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-gray-850);
+}

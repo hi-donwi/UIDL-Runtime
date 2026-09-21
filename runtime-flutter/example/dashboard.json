@@ -1,0 +1,159 @@
+{
+  "version": "1.0",
+  "id": "example-dashboard",
+  "name": "Dashboard",
+  "initialState": {
+    "userName": "User",
+    "itemCount": 0
+  },
+  "root": {
+    "id": "root",
+    "type": "ListView",
+    "props": {
+      "shrinkWrap": true,
+      "padding": [16, 16, 16, 16]
+    },
+    "children": [
+      {
+        "id": "welcome_card",
+        "type": "Card",
+        "children": [
+          {
+            "id": "welcome_content",
+            "type": "Column",
+            "props": {
+              "mainAxisAlignment": "start"
+            },
+            "children": [
+              {
+                "id": "welcome_title",
+                "type": "Text",
+                "props": {
+                  "value": "Welcome, {{userName}}"
+                },
+                "style": {
+                  "fontSize": 20,
+                  "fontWeight": "700"
+                }
+              },
+              {
+                "id": "spacer1",
+                "type": "Spacer",
+                "props": {"height": 8}
+              },
+              {
+                "id": "welcome_desc",
+                "type": "Text",
+                "props": {
+                  "value": "You have {{itemCount}} items pending."
+                },
+                "style": {
+                  "fontSize": 14,
+                  "color": "#757575"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "spacer2",
+        "type": "Spacer",
+        "props": {"height": 16}
+      },
+      {
+        "id": "stats_row",
+        "type": "Row",
+        "children": [
+          {
+            "id": "stat_1",
+            "type": "Card",
+            "children": [
+              {
+                "id": "stat_1_value",
+                "type": "Text",
+                "props": {
+                  "value": "1,234"
+                },
+                "style": {
+                  "fontSize": 24,
+                  "fontWeight": "800"
+                }
+              },
+              {
+                "id": "stat_1_label",
+                "type": "Text",
+                "props": {
+                  "value": "Total Items"
+                },
+                "style": {
+                  "fontSize": 12,
+                  "color": "#757575"
+                }
+              }
+            ]
+          },
+          {
+            "id": "stat_2",
+            "type": "Card",
+            "children": [
+              {
+                "id": "stat_2_value",
+                "type": "Text",
+                "props": {
+                  "value": "567"
+                },
+                "style": {
+                  "fontSize": 24,
+                  "fontWeight": "800"
+                }
+              },
+              {
+                "id": "stat_2_label",
+                "type": "Text",
+                "props": {
+                  "value": "Active"
+                },
+                "style": {
+                  "fontSize": 12,
+                  "color": "#757575"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "spacer3",
+        "type": "Spacer",
+        "props": {"height": 16}
+      },
+      {
+        "id": "search_field",
+        "type": "TextField",
+        "props": {
+          "placeholder": "Search..."
+        }
+      },
+      {
+        "id": "spacer4",
+        "type": "Spacer",
+        "props": {"height": 16}
+      },
+      {
+        "id": "add_button",
+        "type": "Button",
+        "props": {
+          "label": "Add New Item"
+        },
+        "events": {
+          "onClick": {
+            "navigate": {
+              "route": "/items/new"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

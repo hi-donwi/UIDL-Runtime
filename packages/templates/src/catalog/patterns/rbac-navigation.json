@@ -1,0 +1,59 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "rbac-navigation-example",
+  "name": "Reusable RBAC Navigation Example",
+  "definitions": {
+    "appShell": {
+      "id": "app-shell-template",
+      "type": "Container",
+      "style": { "display": "flex", "minHeight": "min-h-screen" },
+      "slots": { "sidebar": [], "navbar": [], "drawer": [], "main": [] }
+    }
+  },
+  "root": {
+    "id": "root",
+    "type": "Container",
+    "componentId": "appShell",
+    "slots": {
+      "sidebar": [
+        {
+          "id": "sidebar",
+          "type": "Sidebar",
+          "children": [
+            { "id": "nav-dashboard", "type": "Button", "props": { "label": "Dashboard" }, "events": { "onClick": [{ "navigate": { "route": "/dashboard" } }] } },
+            { "id": "nav-finance", "type": "Button", "props": { "label": "Finance" }, "visibility": { "condition": { "path": "session.permissions.finance" } }, "events": { "onClick": [{ "navigate": { "route": "/finance" } }] } },
+            { "id": "nav-payroll", "type": "Button", "props": { "label": "Payroll" }, "visibility": { "condition": { "path": "session.permissions.payroll" } }, "events": { "onClick": [{ "navigate": { "route": "/payroll" } }] } }
+          ]
+        }
+      ],
+      "navbar": [
+        {
+          "id": "navbar",
+          "type": "Navbar",
+          "children": [
+            { "id": "current-user", "type": "Text", "props": { "value": { "$expr": { "path": "session.user.name" } } } }
+          ]
+        }
+      ],
+      "drawer": [
+        {
+          "id": "finance-drawer",
+          "type": "Drawer",
+          "props": { "open": { "$bind": "state.overlays.financeDrawer" }, "title": "Finance" },
+          "visibility": { "condition": { "path": "session.permissions.finance" } },
+          "events": { "onClose": [{ "setState": { "path": "overlays.financeDrawer", "value": false } }] },
+          "children": [{ "id": "drawer-copy", "type": "Text", "props": { "value": "Finance-only shortcuts" } }]
+        }
+      ],
+      "main": [
+        {
+          "id": "page-content",
+          "type": "Column",
+          "visibility": { "condition": { "path": "session.permissions.finance" } },
+          "children": [{ "id": "page-title", "type": "Text", "props": { "value": "Finance page content" } }]
+        }
+      ]
+    }
+  }
+}

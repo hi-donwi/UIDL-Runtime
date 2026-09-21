@@ -1,0 +1,14 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json",
+  "id": "eq-objects-reference",
+  "class": "expression",
+  "status": "active",
+  "spec": "v1",
+  "input": {
+    "op": "eq",
+    "left": {"literal": {"x": 1}},
+    "right": {"literal": {"x": 1}}
+  },
+  "context": {},
+  "expected": false
+}

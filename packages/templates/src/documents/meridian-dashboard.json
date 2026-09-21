@@ -1,0 +1,120 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "meridian-dashboard-demo",
+  "name": "Meridian Dashboard Demo",
+  "theme": "theme-light",
+  "state": {
+    "filters": {
+      "period": "This Year"
+    }
+  },
+  "dataSources": {
+    "cashflow": [
+      { "label": "Jan", "value": 18000 },
+      { "label": "Feb", "value": 22000 },
+      { "label": "Mar", "value": 19500 },
+      { "label": "Apr", "value": 26000 }
+    ],
+    "profitLoss": [
+      { "label": "Revenue", "value": 82000 },
+      { "label": "Cost", "value": 31000 },
+      { "label": "Profit", "value": 51000 }
+    ],
+    "expenses": [
+      { "label": "Payroll", "value": 42 },
+      { "label": "Rent", "value": 24 },
+      { "label": "Ops", "value": 18 },
+      { "label": "Other", "value": 16 }
+    ],
+    "unpaidInvoices": [
+      { "name": "SINV-0001", "party": "Acme Studio", "dueDate": "2026-08-24", "status": "Overdue", "grandTotal": "$4,200" },
+      { "name": "SINV-0002", "party": "Nusantara Supply", "dueDate": "2026-08-27", "status": "Unpaid", "grandTotal": "$2,100" }
+    ]
+  },
+  "definitions": {
+    "appShell": {
+      "id": "app-shell-template",
+      "type": "Container",
+      "style": {
+        "display": "flex",
+        "minHeight": "min-h-screen",
+        "background": "{primitives.color.background}",
+        "color": "{primitives.color.text-primary}"
+      },
+      "slots": { "sidebar": [], "main": [] }
+    },
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderWidth": "border-b",
+        "borderColor": "{primitives.color.border}"
+      },
+      "slots": { "title": [], "actions": [] }
+    },
+    "chartCard": {
+      "id": "chart-card-template",
+      "type": "Chart",
+      "props": { "chartType": "bar", "xKey": "label", "yKey": "value" },
+      "style": { "width": "w-full" }
+    },
+    "tableCard": {
+      "id": "table-card-template",
+      "type": "DataTable",
+      "props": { "emptyMessage": "No records" },
+      "style": { "width": "w-full" }
+    }
+  },
+  "root": {
+    "id": "dashboard-main",
+    "type": "Column",
+    "style": { "width": "w-full" },
+    "children": [
+            {
+              "id": "dashboard-header",
+              "type": "Navbar",
+              "componentId": "pageHeader",
+              "slots": {
+                "title": [{ "id": "dashboard-title", "type": "Text", "props": { "value": "Dashboard" }, "style": { "fontSize": "text-2xl", "fontWeight": 700 } }],
+                "actions": [{ "id": "period-button", "type": "Button", "props": { "label": "This Year" } }]
+              }
+            },
+            {
+              "id": "dashboard-content",
+              "type": "Column",
+              "style": { "gap": "gap-4", "padding": "p-4" },
+              "children": [
+                { "id": "cashflow-chart", "type": "Chart", "componentId": "chartCard", "props": { "title": "Cashflow", "chartType": "line", "dataSource": "cashflow" } },
+                {
+                  "id": "dashboard-chart-grid",
+                  "type": "GridView",
+                  "style": { "display": "grid", "gap": "gap-4" },
+                  "children": [
+                    { "id": "profit-loss-chart", "type": "Chart", "componentId": "chartCard", "props": { "title": "Profit and Loss", "chartType": "bar", "dataSource": "profitLoss" } },
+                    { "id": "expenses-chart", "type": "Chart", "componentId": "chartCard", "props": { "title": "Expenses", "chartType": "donut", "dataSource": "expenses" } }
+                  ]
+                },
+                {
+                  "id": "unpaid-invoices-table",
+                  "type": "DataTable",
+                  "componentId": "tableCard",
+                  "props": {
+                    "title": "Unpaid Invoices",
+                    "dataSource": "unpaidInvoices",
+                    "columns": [
+                      { "key": "name", "label": "Invoice" },
+                      { "key": "party", "label": "Customer" },
+                      { "key": "dueDate", "label": "Due Date" },
+                      { "key": "status", "label": "Status" },
+                      { "key": "grandTotal", "label": "Total", "align": "right" }
+                    ]
+                  }
+                }
+              ]
+            }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+{"$schema":"https://uidl.dev/schema/v1/conformance-case.schema.json","id":"bind-data-reserved","class":"binding","status":"active","spec":"v1","input":{"$bind":"state.$data.items.status"},"context":{"state":{"$data":{"items":{"status":"ready"}}}},"expected":"ready"}

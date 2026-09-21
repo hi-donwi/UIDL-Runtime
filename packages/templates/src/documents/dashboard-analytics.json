@@ -1,0 +1,86 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "dashboard-analytics",
+  "name": "Dashboard Analytics Example",
+  "route": "/examples/dashboard-analytics",
+  "state": { "overlays": { "filters": true } },
+  "definitions": {
+    "dashboardShell": {
+      "id": "dashboard-shell-template",
+      "type": "Container",
+      "style": { "display": "flex", "minHeight": "min-h-screen", "backgroundColor": "bg-surface" },
+      "slots": { "sidebar": [], "main": [], "drawer": [] }
+    },
+    "metricCard": {
+      "id": "metric-card-template",
+      "type": "Column",
+      "style": { "padding": "p-5", "borderRadius": "rounded-2xl", "borderWidth": "border", "borderColor": "border-border", "backgroundColor": "bg-white", "gap": "gap-2" },
+      "slots": { "content": [] }
+    }
+  },
+  "root": {
+    "id": "dashboard",
+    "type": "Container",
+    "componentId": "dashboardShell",
+    "slots": {
+      "sidebar": [
+        {
+          "id": "sidebar",
+          "type": "Sidebar",
+          "style": { "width": "w-64", "padding": "p-4", "gap": "gap-2", "borderWidth": "border-r", "borderColor": "border-border", "backgroundColor": "bg-white" },
+          "children": [
+            { "id": "dash-brand", "type": "Text", "props": { "value": "InsightOps" }, "style": { "fontWeight": "font-bold", "fontSize": "text-xl" } },
+            { "id": "dash-home", "type": "Button", "props": { "label": "Overview" }, "events": { "onClick": [{ "navigate": { "route": "/dashboard" } }] } },
+            { "id": "dash-revenue", "type": "Button", "props": { "label": "Revenue" }, "visibility": { "condition": { "path": "session.permissions.revenue" } }, "events": { "onClick": [{ "navigate": { "route": "/dashboard/revenue" } }] } },
+            { "id": "dash-admin", "type": "Button", "props": { "label": "Admin" }, "visibility": { "condition": { "path": "session.permissions.admin" } }, "events": { "onClick": [{ "navigate": { "route": "/dashboard/admin" } }] } }
+          ]
+        }
+      ],
+      "main": [
+        {
+          "id": "main",
+          "type": "Column",
+          "style": { "flex": "flex-1", "gap": "gap-6", "padding": "p-6" },
+          "children": [
+            { "id": "navbar", "type": "Navbar", "style": { "justifyContent": "space-between" }, "children": [
+              { "id": "dash-title", "type": "Text", "props": { "value": "Analytics Dashboard" }, "style": { "fontSize": "text-2xl", "fontWeight": "font-bold" } },
+              { "id": "dash-user", "type": "Text", "props": { "value": { "$expr": { "path": "session.user.name" } } }, "style": { "color": "text-text-secondary" } }
+            ] },
+            { "id": "toolbar", "type": "Toolbar", "children": [
+              { "id": "date-filter", "type": "Button", "props": { "label": "This Quarter" } },
+              { "id": "open-filters", "type": "Button", "props": { "label": "Open Filters" }, "events": { "onClick": [{ "setState": { "path": "overlays.filters", "value": true } }] } }
+            ] },
+            { "id": "metrics", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-3", "gap": "gap-4" }, "children": [
+              { "id": "metric-revenue", "type": "Container", "componentId": "metricCard", "slots": { "content": [{ "id": "metric-revenue-label", "type": "Text", "props": { "value": "Revenue" } }, { "id": "metric-revenue-value", "type": "Text", "props": { "value": "$428K" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } }] } },
+              { "id": "metric-conversion", "type": "Container", "componentId": "metricCard", "slots": { "content": [{ "id": "metric-conversion-label", "type": "Text", "props": { "value": "Conversion" } }, { "id": "metric-conversion-value", "type": "Text", "props": { "value": "8.4%" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } }] } },
+              { "id": "metric-churn", "type": "Container", "componentId": "metricCard", "slots": { "content": [{ "id": "metric-churn-label", "type": "Text", "props": { "value": "Churn Risk" } }, { "id": "metric-churn-value", "type": "Text", "props": { "value": "2.1%" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } }] } }
+            ] },
+            { "id": "charts", "type": "GridView", "style": { "display": "grid", "gridTemplateColumns": "grid-cols-2", "gap": "gap-4" }, "children": [
+              { "id": "revenue-chart", "type": "Chart", "props": { "title": "Revenue Trend", "dataSource": "revenueTrend", "chartType": "bar", "xKey": "month", "yKey": "value" } },
+              { "id": "segment-table", "type": "DataTable", "props": { "title": "Top Segments", "dataSource": "segments", "columns": [{ "key": "segment", "label": "Segment" }, { "key": "revenue", "label": "Revenue", "align": "right" }, { "key": "growth", "label": "Growth", "align": "right" }] } }
+            ] }
+          ]
+        }
+      ],
+      "drawer": [
+        { "id": "filter-drawer", "type": "Drawer", "props": { "open": { "$bind": "state.overlays.filters" }, "title": "Dashboard Filters" }, "events": { "onClose": [{ "setState": { "path": "overlays.filters", "value": false } }] }, "children": [
+          { "id": "filter-region", "type": "TextField", "props": { "label": "Region", "value": "All Regions", "readOnly": true } },
+          { "id": "filter-enterprise", "type": "Checkbox", "props": { "label": "Enterprise only", "checked": false, "readOnly": true } }
+        ] }
+      ]
+    }
+  },
+  "dataSources": {
+    "revenueTrend": [
+      { "month": "Jan", "value": 94000 },
+      { "month": "Feb", "value": 118000 },
+      { "month": "Mar", "value": 216000 }
+    ],
+    "segments": [
+      { "segment": "Enterprise", "revenue": "$238K", "growth": "+18%" },
+      { "segment": "Mid Market", "revenue": "$142K", "growth": "+11%" },
+      { "segment": "SMB", "revenue": "$48K", "growth": "+4%" }
+    ]
+  }
+}
