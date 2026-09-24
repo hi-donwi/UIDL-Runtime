@@ -215,7 +215,6 @@ export function WorkspaceControlApp() {
         const identity = data.identity || {};
         const rows = [
           { key: "root", value: data.root_name },
-          { key: "org_name", value: identity.org_name },
           { key: "packs", value: identity.packs },
           { key: "context_remote", value: identity.context_remote || "(local-only)" },
           { key: "runtime", value: data.runtime },
