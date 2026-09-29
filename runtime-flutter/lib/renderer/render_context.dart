@@ -24,6 +24,9 @@ class UidlRenderContext {
     DownloadHandler? onDownload,
     ApiHandler? onApi,
     QueryHandler? onQuery,
+    UploadHandler? onUpload,
+    DialogHandler? onConfirm,
+    ClipboardHandler? onClipboard,
     void Function()? onStateChanged,
   }) : registry = registry ?? ComponentRegistry() {
     dispatcher = ActionDispatcher(
@@ -36,6 +39,9 @@ class UidlRenderContext {
       onDownload: onDownload,
       onApi: onApi,
       onQuery: onQuery,
+      onUpload: onUpload,
+      onConfirm: onConfirm,
+      onClipboard: onClipboard,
       onStateChanged: onStateChanged,
     );
   }
@@ -53,6 +59,9 @@ class UidlRenderContext {
     DownloadHandler? onDownload,
     ApiHandler? onApi,
     QueryHandler? onQuery,
+    UploadHandler? onUpload,
+    DialogHandler? onConfirm,
+    ClipboardHandler? onClipboard,
     void Function()? onStateChanged,
   }) {
     final state = Map<String, dynamic>.from(document.initialState);
@@ -73,6 +82,9 @@ class UidlRenderContext {
       onDownload: onDownload,
       onApi: onApi,
       onQuery: onQuery,
+      onUpload: onUpload,
+      onConfirm: onConfirm,
+      onClipboard: onClipboard,
       onStateChanged: onStateChanged,
     );
   }

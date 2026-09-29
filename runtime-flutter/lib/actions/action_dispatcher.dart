@@ -9,6 +9,9 @@ typedef CommandHandler = Future<dynamic> Function(String command, Map<String, dy
 typedef DownloadHandler = Future<void> Function(String url, String? filename);
 typedef ApiHandler = Future<Map<String, dynamic>> Function(String url, String method, Map<String, dynamic>? body, Map<String, String>? headers);
 typedef QueryHandler = Future<List<Map<String, dynamic>>> Function(String target, Map<String, dynamic> params);
+typedef UploadHandler = Future<Map<String, dynamic>> Function(String url, String filePath, String fieldName, Map<String, String>? headers);
+typedef DialogHandler = Future<bool> Function(String title, String message, String? confirmLabel, String? cancelLabel);
+typedef ClipboardHandler = Future<void> Function(String text);
 
 class ActionDispatcher {
   final Map<String, dynamic> state;
@@ -20,6 +23,9 @@ class ActionDispatcher {
   final DownloadHandler? onDownload;
   final ApiHandler? onApi;
   final QueryHandler? onQuery;
+  final UploadHandler? onUpload;
+  final DialogHandler? onConfirm;
+  final ClipboardHandler? onClipboard;
   final void Function()? onStateChanged;
 
   ActionDispatcher({
@@ -32,6 +38,9 @@ class ActionDispatcher {
     this.onDownload,
     this.onApi,
     this.onQuery,
+    this.onUpload,
+    this.onConfirm,
+    this.onClipboard,
     this.onStateChanged,
   });
 
@@ -48,6 +57,9 @@ class ActionDispatcher {
     'showSnackbar',
     'showDialog',
     'validate',
+    'upload',
+    'confirm',
+    'copyToClipboard',
   };
 
   static bool isReservedDataEnvelopePath(String path) {
@@ -248,6 +260,85 @@ class ActionDispatcher {
         break;
 
       case 'showDialog':
+        if (actionConfig is Map) {
+          final title = actionConfig['title']?.toString() ?? 'Notice';
+          final message = actionConfig['message']?.toString() ?? '';
+          if (onConfirm != null) {
+            await onConfirm!(title, message, 'OK', null);
+          } else {
+            onSnackbar?.call(message);
+          }
+        }
+        break;
+
+      case 'confirm':
+        if (actionConfig is Map) {
+          final title = actionConfig['title']?.toString() ?? 'Confirm';
+          final message = actionConfig['message']?.toString() ?? '';
+          final confirmLabel = actionConfig['confirmLabel']?.toString();
+          final cancelLabel = actionConfig['cancelLabel']?.toString();
+
+          bool confirmed = true;
+          if (onConfirm != null) {
+            confirmed = await onConfirm!(title, message, confirmLabel, cancelLabel);
+          }
+
+          if (confirmed) {
+            if (actionConfig.containsKey('then')) {
+              await execute(actionConfig['then'], eventPayload);
+            }
+          } else {
+            if (actionConfig.containsKey('else')) {
+              await execute(actionConfig['else'], eventPayload);
+            }
+          }
+        }
+        break;
+
+      case 'upload':
+        if (actionConfig is Map) {
+          final url = ExpressionEvaluator.evaluate(actionConfig['url'], scope)?.toString() ?? '';
+          final filePath = ExpressionEvaluator.evaluate(actionConfig['filePath'], scope)?.toString() ?? '';
+          final fieldName = actionConfig['fieldName']?.toString() ?? 'file';
+          final headers = actionConfig['headers'] is Map
+              ? Map<String, String>.from(
+                  (actionConfig['headers'] as Map).map((k, v) => MapEntry(k.toString(), v.toString())))
+              : null;
+          final resultPath = actionConfig['resultPath'] as String?;
+
+          if (url.isNotEmpty && onUpload != null) {
+            try {
+              final result = await onUpload!(url, filePath, fieldName, headers);
+              if (resultPath != null) {
+                final targetPath = resultPath.startsWith('state.') ? resultPath.substring(6) : resultPath;
+                setByPath(state, targetPath, result);
+                onStateChanged?.call();
+              }
+            } catch (e) {
+              final errorPath = actionConfig['errorPath'] as String?;
+              if (errorPath != null) {
+                final targetPath = errorPath.startsWith('state.') ? errorPath.substring(6) : errorPath;
+                setByPath(state, targetPath, {'error': e.toString()});
+                onStateChanged?.call();
+              }
+            }
+          }
+        }
+        break;
+
+      case 'copyToClipboard':
+        final text = (actionConfig is Map
+            ? ExpressionEvaluator.evaluate(actionConfig['text'], scope)?.toString()
+            : actionConfig?.toString()) ?? '';
+        if (text.isNotEmpty) {
+          if (onClipboard != null) {
+            await onClipboard!(text);
+          } else {
+            onSnackbar?.call('Copied to clipboard');
+          }
+        }
+        break;
+
       case 'validate':
         break;
     }

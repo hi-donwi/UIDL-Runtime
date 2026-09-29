@@ -22,6 +22,9 @@ class UidlRenderer extends StatefulWidget {
   final DownloadHandler? onDownload;
   final ApiHandler? onApi;
   final QueryHandler? onQuery;
+  final UploadHandler? onUpload;
+  final DialogHandler? onConfirm;
+  final ClipboardHandler? onClipboard;
   final ThemeData? theme;
 
   const UidlRenderer({
@@ -39,6 +42,9 @@ class UidlRenderer extends StatefulWidget {
     this.onDownload,
     this.onApi,
     this.onQuery,
+    this.onUpload,
+    this.onConfirm,
+    this.onClipboard,
     this.theme,
   });
 
@@ -70,6 +76,9 @@ class _UidlRendererState extends State<UidlRenderer> {
           onDownload: widget.onDownload,
           onApi: widget.onApi,
           onQuery: widget.onQuery,
+          onUpload: widget.onUpload,
+          onConfirm: widget.onConfirm,
+          onClipboard: widget.onClipboard,
           onStateChanged: () {
             if (mounted) setState(() {});
           },

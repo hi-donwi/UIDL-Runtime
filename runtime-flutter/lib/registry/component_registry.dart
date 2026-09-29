@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../model/node.dart';
 import '../theme/theme_resolver.dart';
 import '../widgets/data_widgets.dart';
+import '../widgets/interactive_widgets.dart';
 import '../widgets/primitive_widgets.dart';
 
 typedef WidgetBuilderFn = Widget Function(
@@ -20,6 +21,7 @@ class ComponentRegistry {
   static const List<String> catalogWidgetTypes = [
     'Container', 'Row', 'Column', 'Stack', 'Spacer', 'Divider',
     'Wrap', 'Positioned', 'Expanded', 'Flexible', 'AspectRatio', 'SafeArea', 'RefreshIndicator',
+    'Transform', 'DraggableLayer', 'InteractiveCanvas', 'VideoPlayer', 'ImagePicker',
     'Text', 'Icon', 'Image', 'Button', 'Badge',
     'TextField', 'Checkbox', 'Switch', 'Slider', 'Select', 'Textarea', 'RadioGroup', 'Form',
     'ListView', 'GridView', 'DataTable', 'PageBar', 'Chart', 'KanbanBoard', 'TreeView',
@@ -498,6 +500,85 @@ class ComponentRegistry {
           onEvent('onRefresh');
         },
         child: childWidget,
+      );
+    });
+
+    register('Transform', (context, node, props, children, onEvent) {
+      final translateX = props['translateX'] is num ? (props['translateX'] as num).toDouble() : 0.0;
+      final translateY = props['translateY'] is num ? (props['translateY'] as num).toDouble() : 0.0;
+      final scale = props['scale'] is num ? (props['scale'] as num).toDouble() : 1.0;
+      final scaleX = props['scaleX'] is num ? (props['scaleX'] as num).toDouble() : null;
+      final scaleY = props['scaleY'] is num ? (props['scaleY'] as num).toDouble() : null;
+      final rotation = props['rotation'] is num ? (props['rotation'] as num).toDouble() : 0.0;
+      return UidlTransform(
+        key: ValueKey(node.id),
+        translateX: translateX,
+        translateY: translateY,
+        scale: scale,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        rotation: rotation,
+        child: _childColumn(children),
+      );
+    });
+
+    Widget buildDraggable(BuildContext context, UidlNode node, Map<String, dynamic> props, List<Widget> children, void Function(String event, [dynamic payload]) onEvent) {
+      final initialX = props['x'] is num ? (props['x'] as num).toDouble() : 0.0;
+      final initialY = props['y'] is num ? (props['y'] as num).toDouble() : 0.0;
+      final coordinateMode = props['coordinateMode']?.toString() ?? 'absolute';
+      final lockAxis = props['lockAxis']?.toString() ?? 'none';
+      return UidlDraggableLayer(
+        key: ValueKey(node.id),
+        initialX: initialX,
+        initialY: initialY,
+        coordinateMode: coordinateMode,
+        lockAxis: lockAxis,
+        onPanStart: (payload) => onEvent('onPanStart', payload),
+        onPanUpdate: (payload) => onEvent('onPanUpdate', payload),
+        onPanEnd: (payload) => onEvent('onPanEnd', payload),
+        child: _childColumn(children),
+      );
+    }
+    register('DraggableLayer', buildDraggable);
+    register('InteractiveCanvas', buildDraggable);
+
+    register('VideoPlayer', (context, node, props, children, onEvent) {
+      final src = props['src']?.toString() ?? '';
+      final autoplay = props['autoplay'] != false;
+      final muted = props['muted'] == true;
+      final loop = props['loop'] == true;
+      final showControls = props['showControls'] != false;
+      final showLiveBadge = props['showLiveBadge'] == true;
+      final title = props['title']?.toString();
+      final fit = _parseBoxFit(props['fit']);
+      return UidlVideoPlayer(
+        key: ValueKey(node.id),
+        src: src,
+        fit: fit,
+        autoplay: autoplay,
+        muted: muted,
+        loop: loop,
+        showControls: showControls,
+        showLiveBadge: showLiveBadge,
+        title: title,
+        onPlay: () => onEvent('onPlay'),
+        onPause: () => onEvent('onPause'),
+      );
+    });
+
+    register('ImagePicker', (context, node, props, children, onEvent) {
+      final source = props['source']?.toString() ?? 'gallery';
+      final label = props['label']?.toString() ?? 'Select Image';
+      final value = props['value']?.toString();
+      final readOnly = props['readOnly'] == true;
+      return UidlImagePicker(
+        key: ValueKey(node.id),
+        source: source,
+        label: label,
+        value: value,
+        readOnly: readOnly,
+        onPick: (payload) => onEvent('onPick', payload),
+        onClear: () => onEvent('onClear'),
       );
     });
   }
