@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../model/node.dart';
 import '../theme/theme_resolver.dart';
 import '../widgets/data_widgets.dart';
+import '../widgets/primitive_widgets.dart';
 
 typedef WidgetBuilderFn = Widget Function(
   BuildContext context,
@@ -18,6 +19,7 @@ class ComponentRegistry {
   /// React `defaultWidgets` types. Native registries must cover every name.
   static const List<String> catalogWidgetTypes = [
     'Container', 'Row', 'Column', 'Stack', 'Spacer', 'Divider',
+    'Wrap', 'Positioned', 'Expanded', 'Flexible', 'AspectRatio', 'SafeArea', 'RefreshIndicator',
     'Text', 'Icon', 'Image', 'Button', 'Badge',
     'TextField', 'Checkbox', 'Switch', 'Slider', 'Select', 'Textarea', 'RadioGroup', 'Form',
     'ListView', 'GridView', 'DataTable', 'PageBar', 'Chart', 'KanbanBoard', 'TreeView',
@@ -112,12 +114,11 @@ class ComponentRegistry {
       final obscureText = props['obscureText'] == true;
       final readOnly = props['readOnly'] == true;
       final enabled = props['enabled'] != false;
-      return TextField(
-        key: ValueKey('${node.id}_$value'),
-        controller: TextEditingController(text: value),
-        decoration: InputDecoration(
-          labelText: placeholder,
-        ),
+      return UidlTextField(
+        key: ValueKey(node.id),
+        nodeId: node.id,
+        value: value,
+        placeholder: placeholder,
         obscureText: obscureText,
         readOnly: readOnly,
         enabled: enabled,
@@ -271,9 +272,17 @@ class ComponentRegistry {
     });
 
     register('Textarea', (context, node, props, children, onEvent) {
-      return TextField(
+      final value = props['value']?.toString() ?? '';
+      final placeholder = props['placeholder']?.toString() ?? props['label']?.toString();
+      final readOnly = props['readOnly'] == true;
+      final enabled = props['enabled'] != false;
+      return UidlTextField(
         key: ValueKey(node.id),
-        controller: TextEditingController(text: props['value']?.toString() ?? ''),
+        nodeId: node.id,
+        value: value,
+        placeholder: placeholder,
+        readOnly: readOnly,
+        enabled: enabled,
         maxLines: 4,
         onChanged: (val) => onEvent('onChange', val),
       );
@@ -371,6 +380,163 @@ class ComponentRegistry {
     register('DataMatrix', (context, node, props, children, onEvent) {
       return buildCodeMark(id: node.id, kind: 'DataMatrix', props: props);
     });
+
+    register('Wrap', (context, node, props, children, onEvent) {
+      final direction = _parseAxis(props['direction']);
+      final alignment = _parseWrapAlignment(props['alignment']);
+      final spacing = props['spacing'] is num ? (props['spacing'] as num).toDouble() : 0.0;
+      final runAlignment = _parseWrapAlignment(props['runAlignment']);
+      final runSpacing = props['runSpacing'] is num ? (props['runSpacing'] as num).toDouble() : 0.0;
+      final crossAxisAlignment = _parseWrapCrossAlignment(props['crossAxisAlignment']);
+      return Wrap(
+        key: ValueKey(node.id),
+        direction: direction,
+        alignment: alignment,
+        spacing: spacing,
+        runAlignment: runAlignment,
+        runSpacing: runSpacing,
+        crossAxisAlignment: crossAxisAlignment,
+        children: children,
+      );
+    });
+
+    register('Positioned', (context, node, props, children, onEvent) {
+      final left = props['left'] is num ? (props['left'] as num).toDouble() : null;
+      final top = props['top'] is num ? (props['top'] as num).toDouble() : null;
+      final right = props['right'] is num ? (props['right'] as num).toDouble() : null;
+      final bottom = props['bottom'] is num ? (props['bottom'] as num).toDouble() : null;
+      final width = props['width'] is num ? (props['width'] as num).toDouble() : null;
+      final height = props['height'] is num ? (props['height'] as num).toDouble() : null;
+      final child = children.isNotEmpty ? children.first : const SizedBox.shrink();
+      return UidlPositioned(
+        key: ValueKey(node.id),
+        left: left,
+        top: top,
+        right: right,
+        bottom: bottom,
+        width: width,
+        height: height,
+        child: child,
+      );
+    });
+
+    register('Expanded', (context, node, props, children, onEvent) {
+      final flex = props['flex'] is int ? props['flex'] as int : (props['flex'] is num ? (props['flex'] as num).toInt() : 1);
+      final child = children.isNotEmpty ? children.first : const SizedBox.shrink();
+      return UidlExpanded(
+        key: ValueKey(node.id),
+        flex: flex > 0 ? flex : 1,
+        child: child,
+      );
+    });
+
+    register('Flexible', (context, node, props, children, onEvent) {
+      final flex = props['flex'] is int ? props['flex'] as int : (props['flex'] is num ? (props['flex'] as num).toInt() : 1);
+      final fit = props['fit']?.toString().toLowerCase() == 'tight' ? FlexFit.tight : FlexFit.loose;
+      final child = children.isNotEmpty ? children.first : const SizedBox.shrink();
+      return UidlFlexible(
+        key: ValueKey(node.id),
+        flex: flex > 0 ? flex : 1,
+        fit: fit,
+        child: child,
+      );
+    });
+
+    register('AspectRatio', (context, node, props, children, onEvent) {
+      final ratio = props['aspectRatio'] is num
+          ? (props['aspectRatio'] as num).toDouble()
+          : (props['ratio'] is num ? (props['ratio'] as num).toDouble() : (16 / 9));
+      final width = props['width'] is num ? (props['width'] as num).toDouble() : null;
+      final height = props['height'] is num ? (props['height'] as num).toDouble() : null;
+      final child = children.isNotEmpty ? children.first : const SizedBox.shrink();
+
+      Widget widget = AspectRatio(
+        key: ValueKey(node.id),
+        aspectRatio: ratio > 0 ? ratio : (16 / 9),
+        child: child,
+      );
+
+      if (width != null || height != null) {
+        widget = SizedBox(width: width, height: height, child: widget);
+      }
+      return widget;
+    });
+
+    register('SafeArea', (context, node, props, children, onEvent) {
+      final left = props['left'] != false;
+      final top = props['top'] != false;
+      final right = props['right'] != false;
+      final bottom = props['bottom'] != false;
+      return SafeArea(
+        key: ValueKey(node.id),
+        left: left,
+        top: top,
+        right: right,
+        bottom: bottom,
+        child: _childColumn(children),
+      );
+    });
+
+    register('RefreshIndicator', (context, node, props, children, onEvent) {
+      Widget childWidget;
+      if (children.isEmpty) {
+        childWidget = const SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: SizedBox.shrink(),
+        );
+      } else if (children.length == 1) {
+        childWidget = children.first;
+      } else {
+        childWidget = SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(children: children),
+        );
+      }
+      return RefreshIndicator(
+        key: ValueKey(node.id),
+        onRefresh: () async {
+          onEvent('onRefresh');
+        },
+        child: childWidget,
+      );
+    });
+  }
+
+  static Axis _parseAxis(dynamic val) {
+    if (val?.toString().toLowerCase() == 'vertical') {
+      return Axis.vertical;
+    }
+    return Axis.horizontal;
+  }
+
+  static WrapAlignment _parseWrapAlignment(dynamic val) {
+    switch (val?.toString().toLowerCase()) {
+      case 'end':
+      case 'right':
+        return WrapAlignment.end;
+      case 'center':
+        return WrapAlignment.center;
+      case 'spacebetween':
+        return WrapAlignment.spaceBetween;
+      case 'spacearound':
+        return WrapAlignment.spaceAround;
+      case 'spaceevenly':
+        return WrapAlignment.spaceEvenly;
+      default:
+        return WrapAlignment.start;
+    }
+  }
+
+  static WrapCrossAlignment _parseWrapCrossAlignment(dynamic val) {
+    switch (val?.toString().toLowerCase()) {
+      case 'end':
+      case 'bottom':
+        return WrapCrossAlignment.end;
+      case 'center':
+        return WrapCrossAlignment.center;
+      default:
+        return WrapCrossAlignment.start;
+    }
   }
 
   static CrossAxisAlignment _parseCrossAxisAlignment(dynamic val) {
