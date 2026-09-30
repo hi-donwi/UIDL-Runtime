@@ -21,6 +21,11 @@ class UidlDocumentState extends ChangeNotifier {
   DownloadHandler? onDownload;
   ApiHandler? onApi;
   QueryHandler? onQuery;
+  UploadHandler? onUpload;
+  DialogHandler? onConfirm;
+  ClipboardHandler? onClipboard;
+  SubscriptionHandler? onSubscribe;
+  UnsubscribeHandler? onUnsubscribe;
 
   UidlDocumentState({
     required this.document,
@@ -35,6 +40,11 @@ class UidlDocumentState extends ChangeNotifier {
     this.onDownload,
     this.onApi,
     this.onQuery,
+    this.onUpload,
+    this.onConfirm,
+    this.onClipboard,
+    this.onSubscribe,
+    this.onUnsubscribe,
   })  : session = session ?? {},
         route = route ?? {},
         registry = registry ?? ComponentRegistry() {
@@ -52,6 +62,11 @@ class UidlDocumentState extends ChangeNotifier {
       onDownload: onDownload,
       onApi: onApi,
       onQuery: onQuery,
+      onUpload: onUpload,
+      onConfirm: onConfirm,
+      onClipboard: onClipboard,
+      onSubscribe: onSubscribe,
+      onUnsubscribe: onUnsubscribe,
       onStateChanged: notifyListeners,
     );
   }
@@ -86,5 +101,15 @@ class UidlDocumentState extends ChangeNotifier {
   void updateRoute(String key, dynamic value) {
     route[key] = value;
     notifyListeners();
+  }
+
+  bool isSubscribed(String id) => dispatcher.isSubscribed(id);
+
+  Future<void> cancelSubscription(String id) => dispatcher.cancelSubscription(id);
+
+  @override
+  void dispose() {
+    dispatcher.dispose();
+    super.dispose();
   }
 }

@@ -27,6 +27,8 @@ class UidlRenderContext {
     UploadHandler? onUpload,
     DialogHandler? onConfirm,
     ClipboardHandler? onClipboard,
+    SubscriptionHandler? onSubscribe,
+    UnsubscribeHandler? onUnsubscribe,
     void Function()? onStateChanged,
   }) : registry = registry ?? ComponentRegistry() {
     dispatcher = ActionDispatcher(
@@ -42,6 +44,8 @@ class UidlRenderContext {
       onUpload: onUpload,
       onConfirm: onConfirm,
       onClipboard: onClipboard,
+      onSubscribe: onSubscribe,
+      onUnsubscribe: onUnsubscribe,
       onStateChanged: onStateChanged,
     );
   }
@@ -62,6 +66,8 @@ class UidlRenderContext {
     UploadHandler? onUpload,
     DialogHandler? onConfirm,
     ClipboardHandler? onClipboard,
+    SubscriptionHandler? onSubscribe,
+    UnsubscribeHandler? onUnsubscribe,
     void Function()? onStateChanged,
   }) {
     final state = Map<String, dynamic>.from(document.initialState);
@@ -85,6 +91,8 @@ class UidlRenderContext {
       onUpload: onUpload,
       onConfirm: onConfirm,
       onClipboard: onClipboard,
+      onSubscribe: onSubscribe,
+      onUnsubscribe: onUnsubscribe,
       onStateChanged: onStateChanged,
     );
   }
@@ -95,4 +103,12 @@ class UidlRenderContext {
         'session': session,
         'route': route,
       };
+
+  bool isSubscribed(String id) => dispatcher.isSubscribed(id);
+
+  Future<void> cancelSubscription(String id) => dispatcher.cancelSubscription(id);
+
+  void dispose() {
+    dispatcher.dispose();
+  }
 }

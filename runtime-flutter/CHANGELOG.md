@@ -1,3 +1,12 @@
+## 0.3.0
+
+* **Real-Time Streaming Subscriptions**: Added declarative `subscribe` and `unsubscribe` actions supporting continuous SSE and WebSocket event streams.
+* **Flexible State Mutation Modes**: Stream payload updates support `replace` (default scalar/object replace), `merge` (dictionary patch merge for metrics/status), and `append` (event history/live chat list) with optional `maxItems` truncation.
+* **Declarative Lifecycle & Event Handlers**: Stream event-driven sub-actions (`onData`, `onError`) with full `event.*` scope resolution, plus dedicated `errorPath` reporting.
+* **Leak-Free Subscription Management**: Centralized `StreamSubscription` lifecycle tracking with automated disposal across `ActionDispatcher`, `UidlRenderContext`, `UidlDocumentState`, and `UidlRenderer`.
+* **Host Seam Hooks**: Exposed `onSubscribe` and `onUnsubscribe` handlers across document state and renderer widgets.
+* **Quality Assurance**: 177/177 passing tests across action dispatcher, subscription manager, document state, and live widget rendering suites.
+
 ## 0.2.0
 
 * **Layout Primitives**: Added `Wrap`, `Positioned`, `Expanded`, `Flexible`, `AspectRatio`, `SafeArea`, and `RefreshIndicator` with defensive parent-context fallbacks.

@@ -25,6 +25,8 @@ class UidlRenderer extends StatefulWidget {
   final UploadHandler? onUpload;
   final DialogHandler? onConfirm;
   final ClipboardHandler? onClipboard;
+  final SubscriptionHandler? onSubscribe;
+  final UnsubscribeHandler? onUnsubscribe;
   final ThemeData? theme;
 
   const UidlRenderer({
@@ -45,6 +47,8 @@ class UidlRenderer extends StatefulWidget {
     this.onUpload,
     this.onConfirm,
     this.onClipboard,
+    this.onSubscribe,
+    this.onUnsubscribe,
     this.theme,
   });
 
@@ -59,6 +63,14 @@ class _UidlRendererState extends State<UidlRenderer> {
   void initState() {
     super.initState();
     _initContext();
+  }
+
+  @override
+  void dispose() {
+    if (widget.context == null) {
+      _context.dispose();
+    }
+    super.dispose();
   }
 
   void _initContext() {
@@ -79,6 +91,8 @@ class _UidlRendererState extends State<UidlRenderer> {
           onUpload: widget.onUpload,
           onConfirm: widget.onConfirm,
           onClipboard: widget.onClipboard,
+          onSubscribe: widget.onSubscribe,
+          onUnsubscribe: widget.onUnsubscribe,
           onStateChanged: () {
             if (mounted) setState(() {});
           },

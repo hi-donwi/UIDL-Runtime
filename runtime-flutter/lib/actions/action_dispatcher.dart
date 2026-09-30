@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../binding/binding_resolver.dart';
 import '../evaluator/expression_evaluator.dart';
 import '../spec/errors.dart';
@@ -12,6 +14,14 @@ typedef QueryHandler = Future<List<Map<String, dynamic>>> Function(String target
 typedef UploadHandler = Future<Map<String, dynamic>> Function(String url, String filePath, String fieldName, Map<String, String>? headers);
 typedef DialogHandler = Future<bool> Function(String title, String message, String? confirmLabel, String? cancelLabel);
 typedef ClipboardHandler = Future<void> Function(String text);
+typedef SubscriptionHandler = FutureOr<Stream<dynamic>?> Function(
+  String url, {
+  String? protocol,
+  String? topic,
+  Map<String, String>? headers,
+  Map<String, dynamic>? params,
+});
+typedef UnsubscribeHandler = FutureOr<void> Function(String subscriptionId);
 
 class ActionDispatcher {
   final Map<String, dynamic> state;
@@ -26,7 +36,16 @@ class ActionDispatcher {
   final UploadHandler? onUpload;
   final DialogHandler? onConfirm;
   final ClipboardHandler? onClipboard;
+  final SubscriptionHandler? onSubscribe;
+  final UnsubscribeHandler? onUnsubscribe;
   final void Function()? onStateChanged;
+
+  final Map<String, StreamSubscription<dynamic>> _activeSubscriptions = {};
+
+  Map<String, StreamSubscription<dynamic>> get activeSubscriptions =>
+      Map.unmodifiable(_activeSubscriptions);
+
+  bool isSubscribed(String id) => _activeSubscriptions.containsKey(id);
 
   ActionDispatcher({
     required this.state,
@@ -41,8 +60,31 @@ class ActionDispatcher {
     this.onUpload,
     this.onConfirm,
     this.onClipboard,
+    this.onSubscribe,
+    this.onUnsubscribe,
     this.onStateChanged,
   });
+
+  Future<void> cancelSubscription(String id) async {
+    final sub = _activeSubscriptions.remove(id);
+    if (sub != null) {
+      await sub.cancel();
+      await onUnsubscribe?.call(id);
+    }
+  }
+
+  Future<void> cancelAllSubscriptions() async {
+    final entries = _activeSubscriptions.entries.toList();
+    _activeSubscriptions.clear();
+    for (final entry in entries) {
+      await entry.value.cancel();
+      await onUnsubscribe?.call(entry.key);
+    }
+  }
+
+  void dispose() {
+    cancelAllSubscriptions();
+  }
 
   static const Set<String> knownActionKinds = {
     'sequence',
@@ -60,6 +102,8 @@ class ActionDispatcher {
     'upload',
     'confirm',
     'copyToClipboard',
+    'subscribe',
+    'unsubscribe',
   };
 
   static bool isReservedDataEnvelopePath(String path) {
@@ -99,6 +143,9 @@ class ActionDispatcher {
     }
 
     final actionConfig = map[actionKey];
+    final effectiveScope = eventPayload != null
+        ? <String, dynamic>{...scope, 'event': eventPayload}
+        : scope;
 
     switch (actionKey) {
       case 'sequence':
@@ -112,7 +159,7 @@ class ActionDispatcher {
       case 'if':
         if (actionConfig is Map) {
           final cond = actionConfig['condition'] ?? actionConfig['test'];
-          final conditionResult = ExpressionEvaluator.evaluateCondition(cond, scope);
+          final conditionResult = ExpressionEvaluator.evaluateCondition(cond, effectiveScope);
           if (conditionResult) {
             if (actionConfig.containsKey('then')) {
               await execute(actionConfig['then'], eventPayload);
@@ -129,7 +176,7 @@ class ActionDispatcher {
         if (actionConfig is Map) {
           final path = actionConfig['path'] as String? ?? actionConfig['target'] as String?;
           final value = actionConfig.containsKey('value')
-              ? ExpressionEvaluator.evaluate(actionConfig['value'], scope)
+              ? ExpressionEvaluator.evaluate(actionConfig['value'], effectiveScope)
               : eventPayload;
 
           if (path != null) {
@@ -336,6 +383,160 @@ class ActionDispatcher {
           } else {
             onSnackbar?.call('Copied to clipboard');
           }
+        }
+        break;
+
+      case 'subscribe':
+        if (actionConfig is Map) {
+          final url = ExpressionEvaluator.evaluate(actionConfig['url'], scope)?.toString() ?? '';
+          final topic = ExpressionEvaluator.evaluate(
+            actionConfig['topic'] ?? actionConfig['channel'],
+            scope,
+          )?.toString();
+          final protocol = actionConfig['protocol']?.toString() ?? 'sse';
+          final subId = actionConfig['id']?.toString() ??
+              (url.isNotEmpty ? url : (topic ?? 'default_stream'));
+
+          final isCancel = actionConfig['cancel'] == true || actionConfig['unsubscribe'] == true;
+          if (isCancel) {
+            await cancelSubscription(subId);
+            break;
+          }
+
+          final targetPathRaw = (actionConfig['targetState'] ?? actionConfig['resultPath']) as String?;
+          if (targetPathRaw != null && ActionDispatcher.isReservedDataEnvelopePath(targetPathRaw)) {
+            throw UidlException(
+              code: UidlErrorCodes.invalidState,
+              message:
+                  'subscribe target "$targetPathRaw" targets the reserved \$data envelope. Documents may read state.\$data.* but must not write it.',
+            );
+          }
+
+          if (onSubscribe == null) {
+            final errorPath = actionConfig['errorPath'] as String?;
+            if (errorPath != null) {
+              final targetPath = errorPath.startsWith('state.') ? errorPath.substring(6) : errorPath;
+              setByPath(state, targetPath, {'error': 'Subscription handler not configured'});
+              onStateChanged?.call();
+            }
+            if (actionConfig.containsKey('onError')) {
+              await execute(actionConfig['onError'], {'error': 'Subscription handler not configured'});
+            }
+            break;
+          }
+
+          // Cancel prior subscription with identical ID to prevent duplicate listeners
+          if (_activeSubscriptions.containsKey(subId)) {
+            await cancelSubscription(subId);
+          }
+
+          final headers = actionConfig['headers'] is Map
+              ? Map<String, String>.from(
+                  (actionConfig['headers'] as Map).map((k, v) => MapEntry(k.toString(), v.toString())))
+              : null;
+          final params = actionConfig['params'] is Map
+              ? Map<String, dynamic>.from(actionConfig['params'] as Map)
+              : null;
+
+          final targetPath = targetPathRaw != null
+              ? (targetPathRaw.startsWith('state.') ? targetPathRaw.substring(6) : targetPathRaw)
+              : null;
+
+          final mode = actionConfig['mode']?.toString().toLowerCase();
+          final maxItems = actionConfig['maxItems'] as int?;
+
+          try {
+            final stream = await onSubscribe!(
+              url,
+              protocol: protocol,
+              topic: topic,
+              headers: headers,
+              params: params,
+            );
+
+            if (stream == null) {
+              break;
+            }
+
+            // ignore: cancel_subscriptions
+            late final StreamSubscription<dynamic> subscription;
+            subscription = stream.listen(
+              (eventData) async {
+                if (targetPath != null) {
+                  final dynamic dataPayload = (eventData is Map && eventData.containsKey('data'))
+                      ? eventData['data']
+                      : eventData;
+
+                  final currentVal = resolvePath('state.$targetPath', scope);
+
+                  if (mode == 'append' || (mode == null && currentVal is List)) {
+                    final list = currentVal is List ? List<dynamic>.from(currentVal) : <dynamic>[];
+                    list.add(dataPayload);
+                    if (maxItems != null && maxItems > 0 && list.length > maxItems) {
+                      list.removeRange(0, list.length - maxItems);
+                    }
+                    setByPath(state, targetPath, list);
+                  } else if (mode == 'merge' || (mode == null && currentVal is Map && dataPayload is Map)) {
+                    final currentMap = currentVal is Map
+                        ? Map<String, dynamic>.from(currentVal)
+                        : <String, dynamic>{};
+                    if (dataPayload is Map) {
+                      for (final entry in dataPayload.entries) {
+                        currentMap[entry.key.toString()] = entry.value;
+                      }
+                    }
+                    setByPath(state, targetPath, currentMap);
+                  } else {
+                    setByPath(state, targetPath, dataPayload);
+                  }
+
+                  onStateChanged?.call();
+                }
+
+                if (actionConfig.containsKey('onData')) {
+                  await execute(actionConfig['onData'], eventData);
+                }
+              },
+              onError: (dynamic error) async {
+                final errorPath = actionConfig['errorPath'] as String?;
+                if (errorPath != null) {
+                  final targetErrPath = errorPath.startsWith('state.') ? errorPath.substring(6) : errorPath;
+                  setByPath(state, targetErrPath, {'error': error.toString()});
+                  onStateChanged?.call();
+                }
+                if (actionConfig.containsKey('onError')) {
+                  await execute(actionConfig['onError'], {'error': error.toString()});
+                }
+              },
+              onDone: () {
+                _activeSubscriptions.remove(subId);
+              },
+              cancelOnError: false,
+            );
+
+            _activeSubscriptions[subId] = subscription;
+          } catch (e) {
+            final errorPath = actionConfig['errorPath'] as String?;
+            if (errorPath != null) {
+              final targetPath = errorPath.startsWith('state.') ? errorPath.substring(6) : errorPath;
+              setByPath(state, targetPath, {'error': e.toString()});
+              onStateChanged?.call();
+            }
+            if (actionConfig.containsKey('onError')) {
+              await execute(actionConfig['onError'], {'error': e.toString()});
+            }
+          }
+        }
+        break;
+
+      case 'unsubscribe':
+        final subId = actionConfig is Map
+            ? (actionConfig['id'] ?? actionConfig['url'] ?? actionConfig['topic'] ?? actionConfig['channel'])?.toString()
+            : actionConfig?.toString();
+        if (subId != null && subId.isNotEmpty) {
+          await cancelSubscription(subId);
+        } else {
+          await cancelAllSubscriptions();
         }
         break;
 

@@ -4,14 +4,14 @@ This roadmap defines the next architectural iterations for `uidl_flutter`, expan
 
 All planned enhancements maintain 100% backward compatibility with existing UIDL v1.0 specifications and conformance test suites.
 
-## Implementation Progress (v0.2.0)
+## Implementation Progress (v0.3.0)
 - [x] **1. Core Input Reliability & State Stability** — Implemented in v0.2.0 (`UidlTextField` persistent controller)
 - [x] **2. Responsive Flow & Layout Primitives** — Implemented in v0.2.0 (`Wrap`, `Positioned`, `Expanded`, `Flexible`, `AspectRatio`, `SafeArea`, `RefreshIndicator`)
 - [x] **3. Interactive Canvas & Gesture Subsystem** — Implemented in v0.2.0 (`UidlTransform`, `UidlDraggableLayer` / `UidlInteractiveCanvas`)
 - [x] **4. Multimedia & Video Streaming Subsystems** — Implemented in v0.2.0 (`UidlVideoPlayer` with live stream badge & controls)
 - [x] **5. Rich Media Input Components** — Implemented in v0.2.0 (`UidlImagePicker` for gallery and camera)
 - [x] **6. Action Dispatcher Extensions** — Implemented in v0.2.0 (`upload`, `confirm`, `copyToClipboard`)
-- [ ] **7. Real-Time Streaming Subscriptions** — Planned for v0.3.0 (`subscribe` action for SSE/WebSockets)
+- [x] **7. Real-Time Streaming Subscriptions** — Implemented in v0.3.0 (`subscribe` and `unsubscribe` actions for SSE/WebSockets)
 
 ---
 
@@ -117,9 +117,21 @@ All planned enhancements maintain 100% backward compatibility with existing UIDL
   - `targetState`: state path to store the uploaded URL response.
   - `progressState`: state path to report 0–100 upload progress.
 
-### 6.2 `subscribe` Action Kind (SSE / WebSockets)
-- **Purpose**: Continuous event streaming for live metrics and messaging feeds without polling overhead.
-- **Payload**:
-  - `url`: stream endpoint.
-  - `protocol`: `'sse'` | `'websocket'`.
-  - `targetState`: array path in state to append incoming events.
+### 6.2 `subscribe` & `unsubscribe` Action Kinds (SSE / WebSockets) [COMPLETED - v0.3.0]
+- **Purpose**: Continuous event streaming for live metrics, status feeds, and messaging without polling overhead.
+- **Payload (`subscribe`)**:
+  - `url`: stream endpoint (resolvable expression or string).
+  - `protocol`: `'sse'` | `'websocket'` (default `'sse'`).
+  - `topic` / `channel`: optional topic or channel name.
+  - `id`: unique subscription identifier (defaults to `url` or `topic`).
+  - `targetState` / `resultPath`: state path to store/merge/append incoming events.
+  - `mode`: `'replace'` (default for scalar) | `'merge'` (map patching) | `'append'` (list append with optional `maxItems`).
+  - `maxItems`: maximum list size when appending (older events truncated).
+  - `headers`: custom authentication/connection headers.
+  - `params`: query parameters.
+  - `onData`: sub-action(s) executed per event with `event.*` scope bindings.
+  - `onError`: sub-action(s) executed on connection or stream error.
+  - `errorPath`: state path to record error message if failure occurs.
+  - `cancel` / `unsubscribe`: boolean flag to cancel active subscription.
+- **Payload (`unsubscribe`)**:
+  - `id`: subscription identifier to cancel, or all if omitted.
