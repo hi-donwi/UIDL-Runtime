@@ -129,7 +129,7 @@ void main() {
 
   group('UidlDocumentState', () {
     test('manages state and notifies listeners', () {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0',
         id: 'test',
         name: 'Test',
@@ -147,7 +147,7 @@ void main() {
     });
 
     test('executeAction triggers action dispatcher', () async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0',
         id: 'test',
         name: 'Test',

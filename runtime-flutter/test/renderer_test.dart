@@ -5,11 +5,11 @@ import 'package:uidl_flutter/uidl_flutter.dart';
 void main() {
   group('UidlRenderer Widget Tests', () {
     testWidgets('renders basic widget tree with Text and Button', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'basic-screen',
         name: 'Basic Screen',
-        root: const UidlNode(
+        root: UidlNode(
           id: 'root',
           type: 'Column',
           children: [
@@ -28,7 +28,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UidlRenderer(document: doc),
           ),
@@ -40,12 +40,12 @@ void main() {
     });
 
     testWidgets('updates live state on button click action', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'counter-screen',
         name: 'Counter Screen',
         initialState: {'counter': 0},
-        root: const UidlNode(
+        root: UidlNode(
           id: 'root',
           type: 'Column',
           children: [
@@ -78,7 +78,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UidlRenderer(document: doc),
           ),
@@ -99,12 +99,12 @@ void main() {
     });
 
     testWidgets('respects visibility condition', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'visibility-screen',
         name: 'Visibility Screen',
         initialState: {'showSecret': false},
-        root: const UidlNode(
+        root: UidlNode(
           id: 'root',
           type: 'Column',
           children: [
@@ -126,7 +126,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UidlRenderer(document: doc),
           ),
@@ -176,7 +176,7 @@ void main() {
 
   group('data and overlay fidelity', () {
     testWidgets('DataTable paints column labels and row cells', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'table-screen',
         name: 'Table',
@@ -195,7 +195,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
       expect(find.text('Name'), findsOneWidget);
       expect(find.text('Qty'), findsOneWidget);
       expect(find.text('Nails'), findsOneWidget);
@@ -203,7 +203,7 @@ void main() {
     });
 
     testWidgets('Chart paints x labels from rows', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'chart-screen',
         name: 'Chart',
@@ -222,14 +222,14 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
       expect(find.text('Sales'), findsOneWidget);
       expect(find.text('Apr'), findsOneWidget);
       expect(find.text('May'), findsOneWidget);
     });
 
     testWidgets('Dialog shows title when open', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'dialog-screen',
         name: 'Dialog',
@@ -240,13 +240,13 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
       expect(find.text('Confirm'), findsOneWidget);
       expect(find.text('Delete this row?'), findsOneWidget);
     });
 
     testWidgets('QRCode and Barcode show the encoded value', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'codes-screen',
         name: 'Codes',
@@ -261,14 +261,14 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
       expect(find.text('INV-1'), findsOneWidget);
       expect(find.text('1234567890'), findsOneWidget);
       expect(find.text('DM-9'), findsOneWidget);
     });
 
     testWidgets('KanbanBoard shows column titles and card titles', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'kanban-screen',
         name: 'Kanban',
@@ -288,7 +288,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
       expect(find.text('Pipeline'), findsOneWidget);
       expect(find.text('Todo'), findsOneWidget);
       expect(find.text('Doing'), findsOneWidget);
@@ -296,7 +296,7 @@ void main() {
     });
 
     testWidgets('TreeView shows nested item titles', (tester) async {
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'tree-screen',
         name: 'Tree',
@@ -318,7 +318,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body: UidlRenderer(document: doc))));
       expect(find.text('Accounts'), findsOneWidget);
       expect(find.text('Assets'), findsOneWidget);
       expect(find.text('Cash'), findsOneWidget);

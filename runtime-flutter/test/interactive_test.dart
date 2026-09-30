@@ -196,7 +196,7 @@ void main() {
         version: '1.0.0',
         id: 'media-screen',
         name: 'Media Screen',
-        root: const UidlNode(
+        root: UidlNode(
           id: 'root',
           type: 'Column',
           children: [
@@ -230,7 +230,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: UidlRenderer(document: doc),
           ),

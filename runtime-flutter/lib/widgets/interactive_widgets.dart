@@ -29,8 +29,8 @@ class UidlTransform extends StatelessWidget {
     final effectiveScaleY = scaleY ?? scale;
 
     final matrix = Matrix4.identity()
-      ..translate(translateX, translateY)
-      ..scale(effectiveScaleX, effectiveScaleY)
+      ..setTranslationRaw(translateX, translateY, 0.0)
+      ..scaleByDouble(effectiveScaleX, effectiveScaleY, 1.0, 1.0)
       ..rotateZ(rotation);
 
     return Transform(

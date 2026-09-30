@@ -37,7 +37,6 @@ linter:
     - use_key_in_widget_constructors
     - annotate_overrides
     - avoid_unnecessary_containers
-    - prefer_is_not_empty
     - sized_box_for_whitespace
     - use_full_hex_values_for_flutter_colors
     - unnecessary_string_interpolations
@@ -47,7 +46,6 @@ linter:
     - no_leading_underscores_for_local_identifiers
     - unnecessary_nullable_for_final_variable_declarations
     - use_super_parameters
-    - avoid_function_literals_in_foreach_call
     - prefer_collection_literals
     - prefer_adjacent_string_concatenation
     - prefer_interpolation_to_compose_strings

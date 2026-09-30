@@ -1,3 +1,13 @@
+## 0.2.0
+
+* **Layout Primitives**: Added `Wrap`, `Positioned`, `Expanded`, `Flexible`, `AspectRatio`, `SafeArea`, and `RefreshIndicator` with defensive parent-context fallbacks.
+* **Input Stability**: Persistent `TextEditingController` cache with stable cursor and focus retention during rapid state emissions.
+* **Interactive Canvas**: Introduced `UidlTransform` (affine translation, scale, rotation) and `UidlDraggableLayer` / `UidlInteractiveCanvas` with 2D pan tracking.
+* **Multimedia & Streaming**: Implemented `UidlVideoPlayer` with live stream badge indicator, overlay controls, and playback toggle.
+* **Device & Media Pickers**: Implemented `UidlImagePicker` for camera and photo gallery asset selection with real-time preview and file state binding.
+* **Extended Actions**: Added `upload` (multipart API upload), `confirm` (customizable modal dialogs), and `copyToClipboard` actions.
+* **Quality Assurance**: 165/165 passing tests across component registry, parser, evaluation, and interactive integration suites.
+
 ## 0.1.5
 
 * **API Action**: Full HTTP client integration with method, body, headers, and result/error state paths.

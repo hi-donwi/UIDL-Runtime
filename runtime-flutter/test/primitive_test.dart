@@ -145,7 +145,7 @@ void main() {
     testWidgets('renders Wrap, SafeArea, and RefreshIndicator correctly in document', (tester) async {
       bool refreshed = false;
 
-      final doc = UidlDocument(
+      const doc = UidlDocument(
         version: '1.0.0',
         id: 'primitives-screen',
         name: 'Primitives Screen',
@@ -161,7 +161,7 @@ void main() {
                   'action': 'custom',
                 },
               },
-              children: const [
+              children: [
                 UidlNode(
                   id: 'wrap_container',
                   type: 'Wrap',

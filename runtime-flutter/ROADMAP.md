@@ -4,9 +4,18 @@ This roadmap defines the next architectural iterations for `uidl_flutter`, expan
 
 All planned enhancements maintain 100% backward compatibility with existing UIDL v1.0 specifications and conformance test suites.
 
+## Implementation Progress (v0.2.0)
+- [x] **1. Core Input Reliability & State Stability** — Implemented in v0.2.0 (`UidlTextField` persistent controller)
+- [x] **2. Responsive Flow & Layout Primitives** — Implemented in v0.2.0 (`Wrap`, `Positioned`, `Expanded`, `Flexible`, `AspectRatio`, `SafeArea`, `RefreshIndicator`)
+- [x] **3. Interactive Canvas & Gesture Subsystem** — Implemented in v0.2.0 (`UidlTransform`, `UidlDraggableLayer` / `UidlInteractiveCanvas`)
+- [x] **4. Multimedia & Video Streaming Subsystems** — Implemented in v0.2.0 (`UidlVideoPlayer` with live stream badge & controls)
+- [x] **5. Rich Media Input Components** — Implemented in v0.2.0 (`UidlImagePicker` for gallery and camera)
+- [x] **6. Action Dispatcher Extensions** — Implemented in v0.2.0 (`upload`, `confirm`, `copyToClipboard`)
+- [ ] **7. Real-Time Streaming Subscriptions** — Planned for v0.3.0 (`subscribe` action for SSE/WebSockets)
+
 ---
 
-## 1. Core Input Reliability & State Stability
+## 1. Core Input Reliability & State Stability [COMPLETED - v0.2.0]
 
 ### 1.1 Stable Persistent Text Controllers
 - **Problem**: When `TextField` recreates its `TextEditingController` on every state mutation or value change, the virtual keyboard drops focus and cursor position resets.
