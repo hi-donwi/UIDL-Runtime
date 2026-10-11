@@ -14,6 +14,7 @@ export 'actions/action_dispatcher.dart';
 export 'registry/component_registry.dart';
 export 'theme/theme_resolver.dart';
 export 'theme/theme_adapter.dart';
+export 'theme/presets.dart';
 export 'renderer/render_context.dart';
 export 'renderer/uidl_renderer.dart';
 export 'state/uidl_document_state.dart';
