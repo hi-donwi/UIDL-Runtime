@@ -15,7 +15,11 @@ interface ErrorResponse {
     message?: string;
     fields?: Record<string, string>;
   };
+  title?: string;
+  detail?: string;
+  invalidParams?: Array<{ name?: string; reason?: string }>;
 }
+
 
 const STATUS_TO_CODE: Record<number, DataError["code"]> = {
   400: "validation",
@@ -189,8 +193,30 @@ async function toDataError(response: Response): Promise<DataError> {
     parsed = undefined;
   }
   const code = STATUS_TO_CODE[response.status] ?? (response.status >= 500 ? "server" : "validation");
-  return new DataError(parsed?.error?.message ?? `HTTP ${response.status}`, parsed?.error?.code === code ? code : code, parsed?.error?.fields);
+
+  const fields: Record<string, string> = { ...(parsed?.error?.fields ?? {}) };
+  if (Array.isArray(parsed?.invalidParams)) {
+    for (const p of parsed.invalidParams) {
+      if (p.name && p.reason) {
+        fields[p.name] = p.reason;
+      }
+    }
+  }
+
+  const message =
+    parsed?.error?.message ??
+    parsed?.detail ??
+    parsed?.title ??
+    `HTTP ${response.status}`;
+
+  const hasFields = Object.keys(fields).length > 0;
+  return new DataError(
+    message,
+    parsed?.error?.code === code ? code : code,
+    hasFields ? fields : undefined,
+  );
 }
+
 
 export function createHttpAdapter(options: HttpAdapterOptions): HttpAdapter {
   return new HttpAdapter(options);
