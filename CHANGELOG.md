@@ -6,11 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-10-11
+
 ### Added
 - Native Flutter DataAdapter implementations (`runtime-flutter/lib/data/`):
   - `InMemoryDataAdapter` with query path routing, mock responses, and seed data support.
   - `HttpDataAdapter` for remote REST querying with headers, query parameters, timeout handling, and RFC 9457 Problem Details error translation.
-- Comprehensive unit test suite for Flutter DataAdapter with a zero-dependency local HTTP mock server.
+- Native Flutter Theme Presets (`runtime-flutter/lib/theme/presets.dart`):
+  - Canonical `UidlThemePreset` and `UidlPresets` supporting `defaultLight`, `defaultDark`, `meridianLight`, and `meridianDark`.
+  - Converter to Flutter `ThemeData` with brightness, typography, and Material 3 support.
+- Comprehensive unit test suites for Flutter DataAdapter and Theme Presets.
 
 ## [0.1.4] - 2026-09-16
 
