@@ -34,6 +34,7 @@ export function UIDocumentRenderer({
   session,
   dataSources,
   dataAdapter,
+  dataRefreshToken,
   mutationHandler,
   commandHandler,
   downloadHandler,
@@ -68,6 +69,11 @@ export function UIDocumentRenderer({
   useEffect(() => {
     if (!dataAdapter || !stateStore || !effectiveDataSources) return;
 
+    // A host may receive a backend change notification without any query parameter changing.
+    // Reset the fingerprints for this effect run so the notification causes one real fetch while
+    // ordinary unrelated state mutations retain the existing deduplication behavior.
+    lastResolvedQueriesRef.current = {};
+
     const maybeRefetch = () => {
       const scope = { state: stateStore.getValue() as Record<string, unknown>, session };
       const resolved = serializeResolvedQueries(effectiveDataSources, scope);
@@ -96,7 +102,7 @@ export function UIDocumentRenderer({
       // before cleanup can even run.
       lastResolvedQueriesRef.current = {};
     };
-  }, [dataAdapter, stateStore, effectiveDataSources, session]);
+  }, [dataAdapter, stateStore, effectiveDataSources, session, dataRefreshToken]);
 
   const context = useMemo(
     () => {
