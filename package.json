@@ -27,7 +27,7 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev:reference",
+    "dev": "pnpm run dev:reference",
     "dev:core": "vite",
     "dev:reference": "vite --config apps/reference/vite.config.ts",
     "dev:workspace-control": "vite --config apps/workspace-control/vite.config.ts",
@@ -36,7 +36,7 @@
     "mock:api": "node scripts/mock-server.mjs",
     "build:reference": "vite build --config apps/reference/vite.config.ts",
     "preview:reference": "vite preview --config apps/reference/vite.config.ts",
-    "build": "tsc -b && vite build && npm run build:css && npm run build:schema",
+    "build": "tsc -b && vite build && pnpm run build:css && pnpm run build:schema",
     "build:css": "tailwindcss -i packages/core/src/style.css -o dist/style.css --minify",
     "build:schema": "node scripts/generate-json-schema.mjs",
     "preview": "vite preview",
@@ -44,7 +44,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "smoke:package": "npm run build && node scripts/smoke-package-consumer.mjs",
+    "smoke:package": "pnpm run build && node scripts/smoke-package-consumer.mjs",
     "validate": "node bin/validate.mjs",
     "validate:examples": "node bin/validate.mjs packages/templates/src/documents/*.json",
     "validate:spec": "node scripts/validate-spec.mjs",
@@ -96,7 +96,8 @@
     "react-dom": "^18.0.0 || ^19.0.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3",
-    "zustand": "^5.0.15"
+    "zustand": "^5.0.15",
+    "@dnd-kit/core": "6.3.1"
   },
   "description": "A schema-driven React runtime that renders validated JSON UIDL documents into lists, forms, reports and dashboards.",
   "license": "MIT",
@@ -120,5 +121,12 @@
   "homepage": "https://github.com/hi-donwi/UIDL-Runtime#readme",
   "bugs": {
     "url": "https://github.com/hi-donwi/UIDL-Runtime/issues"
+  },
+  "packageManager": "pnpm@10.18.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild"
+    ]
   }
 }

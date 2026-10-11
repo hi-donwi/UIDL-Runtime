@@ -16,39 +16,37 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
-          cache: npm
-
-      - run: npm ci
+      - run: corepack enable && corepack prepare pnpm@10.18.1 --activate && pnpm install --frozen-lockfile
 
       - name: Type-check
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build library and schemas
-        run: npm run build
+        run: pnpm run build
 
       - name: Unit and integration tests
-        run: npm test
+        run: pnpm test
 
       - name: Validate example documents
-        run: npm run validate:examples
+        run: pnpm run validate:examples
 
       - name: Validate specification and conformance cases
-        run: npm run validate:spec
+        run: pnpm run validate:spec
 
       - name: Architecture, maturity and balanced-GL gates
-        run: npm run audit:reference
+        run: pnpm run audit:reference
 
       - name: Build reference application
-        run: npm run build:reference
+        run: pnpm run build:reference
 
       - name: Build companion workspace control app
-        run: npm run build:workspace-control
+        run: pnpm run build:workspace-control
 
       - name: Compiler benchmarks sanity verification
-        run: npm run bench:compilers
+        run: pnpm run bench:compilers
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -95,12 +93,10 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
-          cache: npm
-
-      - run: npm ci
+      - run: corepack enable && corepack prepare pnpm@10.18.1 --activate && pnpm install --frozen-lockfile
 
       - name: Install canonical browser
         run: npx playwright install --with-deps chrome
 
       - name: Run visual reference tests
-        run: npm run test:reference:visual
+        run: pnpm run test:reference:visual

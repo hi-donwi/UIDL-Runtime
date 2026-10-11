@@ -223,7 +223,7 @@ The companion application pairs directly with the local Agent Workspace daemon (
 python3 .agents/bin/ws_web.py --runtime uidl --port 8765
 
 # Or start the companion app in standalone development mode
-npm run dev:workspace-control
+pnpm run dev:workspace-control
 ```
 
 ---
@@ -231,7 +231,7 @@ npm run dev:workspace-control
 ## Development Setup
 
 The rest of this document is for working on `uidl-runtime` itself — the runtime, the
-reference suite, and the build. If you only want to consume the library, `npm install
+reference suite, and the build. If you only want to consume the library, `corepack pnpm install --frozen-lockfile
 uidl-runtime` above is all you need.
 
 ### Prerequisites
@@ -243,15 +243,15 @@ uidl-runtime` above is all you need.
 ```bash
 git clone https://github.com/hi-donwi/UIDL-Runtime.git
 cd UIDL-Runtime
-npm install
-npm run dev
+corepack pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 To exercise the HTTP adapter instead of the in-memory one, run two terminals:
 
 ```bash
-npm run mock:api            # mock API on port 8787
-npm run dev:reference:http
+pnpm run mock:api            # mock API on port 8787
+pnpm run dev:reference:http
 ```
 
 ## Release Automation
@@ -284,25 +284,25 @@ version.
 
 | Command | Purpose |
 |---|---|
-| `npm run dev` | Start the reference application suite in memory |
-| `npm run dev:reference:http` | Start the suite with `VITE_DATA_MODE=http` |
-| `npm run dev:workspace-control` | Start the companion workspace control desk (port 5174) |
-| `npm run mock:api` | Start the local mock API on port 8787 |
-| `npm run typecheck` | Type-check all workspaces |
-| `npm run lint` | Run ESLint |
-| `npm test` | Run Vitest unit and integration tests |
-| `npm run build` | Build the public library and JSON schemas |
-| `npm run build:reference` | Build the reference application suite |
-| `npm run build:workspace-control` | Build the companion app production bundle |
-| `npm run bench:compilers` | Benchmark compiler throughput across all 7 canonical recipes |
-| `npm run audit:reference` | Architecture, maturity and balanced-GL gates |
-| `npm run test:reference` | Playwright acceptance tests, in memory |
-| `npm run test:reference:visual` | Playwright visual baseline tests |
-| `npm run test:reference:update` | Regenerate reviewed visual baselines |
-| `npm run test:reference:http` | Playwright acceptance tests over HTTP |
-| `npm run smoke:package` | Pack and consume the public npm artifact |
-| `npm run validate:examples` | Validate the example UIDL documents |
-| `npm run validate:spec` | Validate the UIDL specification schemas |
+| `pnpm run dev` | Start the reference application suite in memory |
+| `pnpm run dev:reference:http` | Start the suite with `VITE_DATA_MODE=http` |
+| `pnpm run dev:workspace-control` | Start the companion workspace control desk (port 5174) |
+| `pnpm run mock:api` | Start the local mock API on port 8787 |
+| `pnpm run typecheck` | Type-check all workspaces |
+| `pnpm run lint` | Run ESLint |
+| `pnpm test` | Run Vitest unit and integration tests |
+| `pnpm run build` | Build the public library and JSON schemas |
+| `pnpm run build:reference` | Build the reference application suite |
+| `pnpm run build:workspace-control` | Build the companion app production bundle |
+| `pnpm run bench:compilers` | Benchmark compiler throughput across all 7 canonical recipes |
+| `pnpm run audit:reference` | Architecture, maturity and balanced-GL gates |
+| `pnpm run test:reference` | Playwright acceptance tests, in memory |
+| `pnpm run test:reference:visual` | Playwright visual baseline tests |
+| `pnpm run test:reference:update` | Regenerate reviewed visual baselines |
+| `pnpm run test:reference:http` | Playwright acceptance tests over HTTP |
+| `pnpm run smoke:package` | Pack and consume the public npm artifact |
+| `pnpm run validate:examples` | Validate the example UIDL documents |
+| `pnpm run validate:spec` | Validate the UIDL specification schemas |
 
 ## How it works
 
@@ -367,8 +367,8 @@ pub.dev. Android and Java artifacts remain SNAPSHOT libraries in this repository
 
 Visual regression tests are intentionally separate from the default reference command.
 The committed baselines are generated on the canonical Linux CI environment. Run
-`npm run test:reference:visual` locally only on an environment with matching platform
-baselines, and use `npm run test:reference:update` only for a reviewed visual change.
+`pnpm run test:reference:visual` locally only on an environment with matching platform
+baselines, and use `pnpm run test:reference:update` only for a reviewed visual change.
 
 ## Reference suite
 

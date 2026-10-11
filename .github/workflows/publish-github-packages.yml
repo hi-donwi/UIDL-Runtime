@@ -32,7 +32,7 @@ jobs:
           scope: "@hi-donwi"
           package-manager-cache: false
 
-      - run: npm ci
+      - run: corepack enable && corepack prepare pnpm@10.18.1 --activate && pnpm install --frozen-lockfile
 
       - name: Check manual dispatch uses default branch
         if: github.event_name == 'workflow_dispatch'
@@ -82,25 +82,25 @@ jobs:
           fi
 
       - name: Type-check
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build library and schemas
-        run: npm run build
+        run: pnpm run build
 
       - name: Unit and integration tests
-        run: npm test
+        run: pnpm test
 
       - name: Validate example documents
-        run: npm run validate:examples
+        run: pnpm run validate:examples
 
       - name: Architecture, maturity and balanced-GL gates
-        run: npm run audit:reference
+        run: pnpm run audit:reference
 
       - name: Build and smoke-test package artifact
-        run: npm run smoke:package
+        run: pnpm run smoke:package
 
       - name: Rename package for GitHub Packages
         run: npm pkg set name=@hi-donwi/uidl-runtime
