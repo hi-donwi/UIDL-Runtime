@@ -26,6 +26,12 @@ export interface RenderOptions {
    */
   dataAdapter?: DataAdapter;
   /**
+   * Host-controlled invalidation token for live data feeds. When this value changes,
+   * `UIDocumentRenderer` re-runs unchanged `$query` data sources once. A host can increment it
+   * from an SSE/WebSocket change notification without mutating document state or query params.
+   */
+  dataRefreshToken?: unknown;
+  /**
    * Host-owned handler for UIDL `mutate` actions. Wire this to an adapter-backed domain service
    * in demos, and later to the same HTTP contract, so business writes stay outside components.
    */
