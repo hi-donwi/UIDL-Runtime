@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Native Flutter DataAdapter implementations (`runtime-flutter/lib/data/`):
+  - `InMemoryDataAdapter` with query path routing, mock responses, and seed data support.
+  - `HttpDataAdapter` for remote REST querying with headers, query parameters, timeout handling, and RFC 9457 Problem Details error translation.
+- Comprehensive unit test suite for Flutter DataAdapter with a zero-dependency local HTTP mock server.
+
 ## [0.1.4] - 2026-09-16
 
 ### Added
