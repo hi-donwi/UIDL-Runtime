@@ -9,6 +9,7 @@ export 'binding/binding_resolver.dart';
 export 'data/data_source.dart';
 export 'data/in_memory_adapter.dart';
 export 'data/http_adapter.dart';
+export 'data/sse_adapter.dart';
 
 export 'actions/action_dispatcher.dart';
 export 'registry/component_registry.dart';
