@@ -25,10 +25,16 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: path.resolve(__dirname, "packages/core/src/index.ts"),
+      // Two entries: the full runtime, and the page recipes alone. Recipes are pure functions
+      // from metadata to a UIDL document, so a compiler, a server, or a CLI can build pages
+      // without React in its dependency graph (`uidl-runtime/recipes`).
+      entry: {
+        "uidl-runtime": path.resolve(__dirname, "packages/core/src/index.ts"),
+        recipes: path.resolve(__dirname, "packages/core/src/compiler/index.ts"),
+      },
       name: "VisualBuild",
       formats: ["es", "cjs"],
-      fileName: "uidl-runtime",
+      fileName: (format, entryName) => `${entryName}.${format === "es" ? "mjs" : "js"}`,
     },
     rollupOptions: {
       external: ["react", "react-dom"],

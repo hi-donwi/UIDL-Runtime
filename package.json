@@ -11,6 +11,12 @@
       "require": "./dist/uidl-runtime.js",
       "default": "./dist/uidl-runtime.mjs"
     },
+    "./recipes": {
+      "types": "./dist/compiler/index.d.ts",
+      "import": "./dist/recipes.mjs",
+      "require": "./dist/recipes.js",
+      "default": "./dist/recipes.mjs"
+    },
     "./style.css": "./dist/style.css",
     "./schema/*.json": "./dist/schema/*.json"
   },
