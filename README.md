@@ -212,6 +212,21 @@ const page = wrapInShell(
 );
 ```
 
+### Gallery catalog
+
+Ready-made documents for a gallery UI (industry consoles, dashboards, forms) ship as data:
+`uidl-runtime/catalog/gallery.json` holds every entry's metadata and its documents per locale,
+and `uidl-runtime/catalog/<id>.<lang>.json` holds one document. The manifest lives in
+`packages/templates/src/catalog/gallery/`; the build validates every document and refuses to
+publish one that fails. UIDL-Builder reads this instead of keeping copies of its own.
+
+```ts
+import gallery from "uidl-runtime/catalog/gallery.json";
+
+const consoles = gallery.entries.filter((entry) => entry.category === "industry");
+const document = consoles[0].documents.en;
+```
+
 ### 2. Android Native (Kotlin)
 
 ```kotlin

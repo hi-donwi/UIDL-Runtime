@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `uidl-runtime/catalog/gallery.json` and `uidl-runtime/catalog/<id>.<lang>.json`: nine
+  gallery documents (industry consoles, dashboards, an onboarding form) with English and,
+  where they exist, Indonesian variants. The English documents move here from UIDL-Builder,
+  whose copies had drifted; the build validates every document before publishing it.
 - `compileAuthPage`: sign-in, sign-up, forgot-password, and reset-password pages that send
   their values to one allowlisted host command, read a reset token from `route.token`, and
   clear the password from state after the request (ADR-0010).
