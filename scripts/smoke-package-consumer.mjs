@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,6 +52,33 @@ try {
   );
 
   run(path.join(projectRoot, "node_modules", ".bin", "vite"), ["build"], { cwd: tempRoot });
+
+  // `uidl-runtime/recipes` must load with nothing else installed: no React, no zod. The package
+  // is copied, not linked, into a folder with no other node_modules anywhere above it, so a
+  // recipe bundle that imported React would fail to resolve here.
+  const bareRoot = mkdtempSync(path.join(tmpdir(), "uidl-recipes-bare-"));
+  try {
+    cpSync(unpackedPackage, path.join(bareRoot, "node_modules", packageJson.name), { recursive: true });
+    writeFileSync(path.join(bareRoot, "package.json"), `${JSON.stringify({ type: "module", private: true })}\n`);
+    const meta = {
+      name: "invoices",
+      label: { id: "Faktur", en: "Invoices" },
+      titleField: "number",
+      fields: [{ key: "number", label: { id: "Nomor", en: "Number" }, widget: "TextField" }],
+      columns: [{ field: "number" }],
+      defaultSort: { field: "number", dir: "asc" },
+    };
+    const caps = { collections: ["invoices"], commands: [] };
+    const check = (load) =>
+      `${load}\nconst doc = compilePage({ recipe: "list", meta: ${JSON.stringify(meta)}, hostCapabilities: ${JSON.stringify(caps)} });\n` +
+      `if (!doc.root || PAGE_RECIPES.length < 7) throw new Error("recipes did not compile a list page");\n`;
+    writeFileSync(path.join(bareRoot, "esm.mjs"), check(`import { compilePage, PAGE_RECIPES } from "uidl-runtime/recipes";`));
+    writeFileSync(path.join(bareRoot, "cjs.cjs"), check(`const { compilePage, PAGE_RECIPES } = require("uidl-runtime/recipes");`));
+    run(process.execPath, ["esm.mjs"], { cwd: bareRoot });
+    run(process.execPath, ["cjs.cjs"], { cwd: bareRoot });
+  } finally {
+    rmSync(bareRoot, { recursive: true, force: true });
+  }
 } finally {
   for (const entry of [`${packageJson.name}-${packageJson.version}.tgz`]) {
     rmSync(path.join(projectRoot, entry), { force: true });
