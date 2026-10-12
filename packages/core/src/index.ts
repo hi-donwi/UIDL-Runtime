@@ -191,6 +191,20 @@ export { compileAuthPage, AUTH_MODES } from "./compiler/auth.js";
 export type { AuthMode, AuthLink, AuthProvider, AuthPageMeta, CompileAuthOptions } from "./compiler/auth.js";
 export { wrapInShell } from "./compiler/shell.js";
 export type { ShellNavItem, ShellMeta, WrapInShellOptions } from "./compiler/shell.js";
+export { compileLandingPage, LANDING_SECTION_KINDS } from "./compiler/landing.js";
+export type {
+  LandingAction,
+  LandingSection,
+  HeroSection,
+  FeaturesSection,
+  PricingSection,
+  TestimonialsSection,
+  FaqSection,
+  CtaSection,
+  SignupSection,
+  LandingPageMeta,
+  CompileLandingOptions,
+} from "./compiler/landing.js";
 export { compilePage, CapabilityValidationError } from "./compiler/compilePage.js";
 export {
   createRemotePageCompiler,

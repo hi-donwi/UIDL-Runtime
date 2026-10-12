@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UIDocumentRenderer } from "../UIDocumentRenderer";
 import { defaultRegistry } from "../../registry/registry";
 import { compileAuthPage } from "../../compiler/auth";
+import { compileLandingPage } from "../../compiler/landing";
 import { createDocumentState } from "../../state/createDocumentState";
 import type { CommandRequest } from "../../types/actions";
 
@@ -76,5 +77,36 @@ describe("the sign-in recipe, rendered", () => {
 
     expect(await screen.findAllByText("Invalid email or password")).not.toHaveLength(0);
     expect((screen.getByLabelText("Password *") as HTMLInputElement).value).toBe("");
+  });
+});
+
+describe("the landing recipe's signup section, rendered", () => {
+  it("sends the typed email to the host and thanks the visitor", async () => {
+    const doc = compileLandingPage(
+      {
+        name: "home",
+        brand: { name: "Atlas" },
+        sections: [{ kind: "signup", id: "news", title: { id: "Kabar", en: "News" }, command: "newsletter.subscribe" }],
+      },
+      { hostCapabilities: { collections: [], commands: ["newsletter.subscribe"] }, uiPolicy: { lang: "en" } },
+    );
+    const requests: CommandRequest[] = [];
+    render(
+      <UIDocumentRenderer
+        document={doc}
+        stateStore={createDocumentState(doc.state ?? {}).getState()}
+        commandHandler={(request) => {
+          requests.push(request);
+          return { ok: true };
+        }}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "ana@example.com" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
+
+    expect(await screen.findByText("Thanks, we will be in touch.")).toBeTruthy();
+    expect(requests).toEqual([{ name: "newsletter.subscribe", payload: { email: "ana@example.com", source: "news" } }]);
+    expect((screen.getByLabelText("Email") as HTMLInputElement).value).toBe("");
   });
 });

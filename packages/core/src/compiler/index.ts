@@ -46,6 +46,22 @@ export { wrapInShell } from "./shell.js";
 
 export type { ShellNavItem, ShellMeta, WrapInShellOptions } from "./shell.js";
 
+export { compileLandingPage, LANDING_SECTION_KINDS } from "./landing.js";
+
+export type {
+  LandingAction,
+  LandingSection,
+  HeroSection,
+  FeaturesSection,
+  PricingSection,
+  TestimonialsSection,
+  FaqSection,
+  CtaSection,
+  SignupSection,
+  LandingPageMeta,
+  CompileLandingOptions,
+} from "./landing.js";
+
 export type {
   PageRecipe,
   LocalizedText,
