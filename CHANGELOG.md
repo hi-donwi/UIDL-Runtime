@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-10-13
+
+0.1.5 was tagged but never published to npm; this release carries its changes as well.
+
 ### Added
 - `uidl-runtime/catalog/gallery.json` and `uidl-runtime/catalog/<id>.<lang>.json`: nine
   gallery documents (industry consoles, dashboards, an onboarding form) with English and,
