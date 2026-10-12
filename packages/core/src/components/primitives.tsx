@@ -251,6 +251,8 @@ export interface TextFieldProps extends HTMLAttributes<HTMLInputElement> {
   border?: boolean;
   placeholder?: string;
   readOnly?: boolean;
+  /** Mask the value as it is typed, for a password. Flutter's `TextField` reads the same prop. */
+  obscureText?: boolean;
 }
 
 /** Controls/{Base,Data} */
@@ -262,6 +264,7 @@ export function TextField({
   id,
   size = "large",
   border = true,
+  obscureText = false,
   ...props
 }: TextFieldProps) {
   const generatedId = useId();
@@ -275,7 +278,7 @@ export function TextField({
       )}
       <input
         id={fieldId}
-        type="text"
+        type={obscureText ? "password" : "text"}
         spellCheck={false}
         // A bound field whose stored value is null must still render as a controlled input:
         // React drops to uncontrolled and warns, and the field silently stops tracking state.

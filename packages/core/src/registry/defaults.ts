@@ -196,7 +196,7 @@ export const defaultWidgets: WidgetManifest[] = [
     category: "form",
     acceptsChildren: false,
     defaultProps: {},
-    propDescriptors: formControlProps,
+    propDescriptors: [...formControlProps, prop("obscureText", "boolean", "Mask the value as it is typed, for a password.")],
     events: ["onChange", "onBlur", "onFocus"],
     eventDescriptors: [event("onChange", "value"), event("onBlur", "event"), event("onFocus", "event")],
   },
