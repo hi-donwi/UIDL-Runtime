@@ -1,0 +1,103 @@
+{
+  "$schema": "https://uidl.dev/schema/v1/document.json",
+  "version": "1.0.0",
+  "id": "customer-onboarding-form",
+  "name": "Customer Onboarding",
+  "root": {
+    "id": "form_root",
+    "type": "Container",
+    "props": {
+      "className": "max-w-2xl mx-auto p-8 rounded-2xl border border-white/10 bg-slate-900/80 text-white my-8 flex flex-col gap-6"
+    },
+    "children": [
+      {
+        "id": "form_title",
+        "type": "Text",
+        "props": {
+          "heading": "2",
+          "value": "New Account Registration",
+          "className": "text-2xl font-bold"
+        }
+      },
+      {
+        "id": "form_desc",
+        "type": "Text",
+        "props": {
+          "value": "Complete all fields to verify enterprise credentials.",
+          "className": "text-sm text-slate-400 -mt-3"
+        }
+      },
+      {
+        "id": "input_name",
+        "type": "TextField",
+        "props": {
+          "label": "Company / Legal Entity Name",
+          "placeholder": "e.g. PT Maju Bersama",
+          "className": "w-full"
+        }
+      },
+      {
+        "id": "row_contact",
+        "type": "Row",
+        "props": {
+          "className": "grid grid-cols-2 gap-4"
+        },
+        "children": [
+          {
+            "id": "input_email",
+            "type": "TextField",
+            "props": {
+              "label": "Work Email",
+              "placeholder": "admin@company.com"
+            }
+          },
+          {
+            "id": "input_phone",
+            "type": "TextField",
+            "props": {
+              "label": "Official Phone Number",
+              "placeholder": "+62 812-3456-7890"
+            }
+          }
+        ]
+      },
+      {
+        "id": "input_tier",
+        "type": "Select",
+        "props": {
+          "label": "Subscription Plan",
+          "options": [
+            {
+              "value": "starter",
+              "label": "Starter — Free Tier"
+            },
+            {
+              "value": "growth",
+              "label": "Growth — $99/mo"
+            },
+            {
+              "value": "enterprise",
+              "label": "Enterprise — Custom SLA"
+            }
+          ]
+        }
+      },
+      {
+        "id": "switch_terms",
+        "type": "Switch",
+        "props": {
+          "label": "I accept the Master Service Agreement and Data Privacy Policy"
+        }
+      },
+      {
+        "id": "btn_submit",
+        "type": "Button",
+        "props": {
+          "label": "Create Account",
+          "variant": "primary",
+          "className": "w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/25"
+        }
+      }
+    ]
+  }
+}

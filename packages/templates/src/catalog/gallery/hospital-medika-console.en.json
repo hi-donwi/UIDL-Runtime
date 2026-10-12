@@ -1,0 +1,592 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "hospital-medika-console",
+  "name": "Metro Health Medical Center — Hospital EMR & Clinical Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "clinicVisits": [
+      {
+        "label": "Internal Medicine",
+        "value": 142
+      },
+      {
+        "label": "Pediatrics",
+        "value": 98
+      },
+      {
+        "label": "Cardiology",
+        "value": 64
+      },
+      {
+        "label": "Dental & Oral",
+        "value": 45
+      },
+      {
+        "label": "Neurology",
+        "value": 52
+      }
+    ],
+    "patientQueue": [
+      {
+        "ticketNo": "A-012",
+        "recordNo": "MRN-2027-0412",
+        "patientName": "James Wilson",
+        "department": "Internal Medicine",
+        "physician": "Dr. Robert Henderson, MD",
+        "insurance": "BlueCross PPO",
+        "status": "In Examination"
+      },
+      {
+        "ticketNo": "A-013",
+        "recordNo": "MRN-2027-0891",
+        "patientName": "Sarah Jenkins",
+        "department": "Internal Medicine",
+        "physician": "Dr. Robert Henderson, MD",
+        "insurance": "UnitedHealth",
+        "status": "Waiting in Queue"
+      },
+      {
+        "ticketNo": "B-005",
+        "recordNo": "MRN-2027-1102",
+        "patientName": "Liam Cooper",
+        "department": "Pediatrics",
+        "physician": "Dr. Rachel Adams, MD",
+        "insurance": "Aetna Standard",
+        "status": "Awaiting Prescription"
+      },
+      {
+        "ticketNo": "C-008",
+        "recordNo": "MRN-2027-0331",
+        "patientName": "Michael Chen",
+        "department": "Cardiology",
+        "physician": "Dr. Frank Miller, MD",
+        "insurance": "Medicare Part B",
+        "status": "Lab Diagnostics"
+      }
+    ],
+    "pharmacyFefo": [
+      {
+        "itemCode": "MED-AMX-500",
+        "medication": "Amoxicillin 500mg Capsules",
+        "batchNo": "BATCH-2026-X09",
+        "expiryDate": "2027-08-15",
+        "stock": "1,250 units",
+        "dispenseRule": "FEFO Priority (Tier 1)",
+        "status": "In Stock"
+      },
+      {
+        "itemCode": "MED-PAR-SYR",
+        "medication": "Acetaminophen Syrup 160mg/5ml",
+        "batchNo": "BATCH-2026-P44",
+        "expiryDate": "2027-04-30",
+        "stock": "340 bottles",
+        "dispenseRule": "FEFO Priority (Near Expiry)",
+        "status": "Action Required"
+      },
+      {
+        "itemCode": "MED-INS-GLA",
+        "medication": "Insulin Glargine Pen 100IU/ml",
+        "batchNo": "BATCH-2027-IN01",
+        "expiryDate": "2028-01-20",
+        "stock": "180 pens",
+        "dispenseRule": "Cold Chain 2-8°C",
+        "status": "In Stock"
+      }
+    ],
+    "insuranceClaims": [
+      {
+        "claimId": "CLM-2027-009124",
+        "patient": "James Wilson",
+        "diagnosis": "I10 - Essential (primary) hypertension",
+        "amount": "$4,850",
+        "verificationStatus": "Approved (Verified)",
+        "submissionDate": "2027-02-14"
+      },
+      {
+        "claimId": "CLM-2027-009125",
+        "patient": "Michael Chen",
+        "diagnosis": "I20.0 - Unstable angina",
+        "amount": "$12,400",
+        "verificationStatus": "Documentation Pending",
+        "submissionDate": "2027-02-14"
+      },
+      {
+        "claimId": "CLM-2027-009126",
+        "patient": "Eleanor Vance",
+        "diagnosis": "E11.9 - Type 2 diabetes mellitus",
+        "amount": "$3,920",
+        "verificationStatus": "Approved (Verified)",
+        "submissionDate": "2027-02-13"
+      }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "header-tpl",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderWidth": "border-b",
+        "borderColor": "{primitives.color.border}"
+      },
+      "slots": {
+        "title": [],
+        "actions": []
+      }
+    }
+  },
+  "root": {
+    "id": "hospital-console",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4"
+    },
+    "children": [
+      {
+        "id": "hospital-header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "hospital-title",
+              "type": "Text",
+              "props": {
+                "text": "Metro Health Medical Center — Hospital EMR & Clinical Console"
+              },
+              "style": {
+                "fontSize": "text-lg",
+                "fontWeight": "font-bold",
+                "textColor": "{primitives.color.textPrimary}"
+              }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-pendaftaran",
+              "type": "Button",
+              "props": {
+                "label": "+ Register Patient",
+                "variant": "primary"
+              }
+            },
+            {
+              "id": "btn-insurance",
+              "type": "Button",
+              "props": {
+                "label": "Insurance Clearinghouse",
+                "variant": "outline"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "hospital-kpis",
+        "type": "Row",
+        "style": {
+          "gap": "gap-4",
+          "flexWrap": "flex-wrap"
+        },
+        "children": [
+          {
+            "id": "kpi-rawat-jalan",
+            "type": "Card",
+            "style": {
+              "flex": "1",
+              "padding": "p-4",
+              "backgroundColor": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "t-kpi-1",
+                "type": "Text",
+                "props": {
+                  "text": "Outpatient Visits Today"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "{primitives.color.textSecondary}"
+                }
+              },
+              {
+                "id": "v-kpi-1",
+                "type": "Text",
+                "props": {
+                  "text": "401 Patients"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": "font-bold",
+                  "textColor": "{primitives.color.textPrimary}"
+                }
+              },
+              {
+                "id": "s-kpi-1",
+                "type": "Text",
+                "props": {
+                  "text": "5 Active Departments"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "#059669"
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-bed-occupancy",
+            "type": "Card",
+            "style": {
+              "flex": "1",
+              "padding": "p-4",
+              "backgroundColor": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "t-kpi-2",
+                "type": "Text",
+                "props": {
+                  "text": "Bed Occupancy Rate (BOR)"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "{primitives.color.textSecondary}"
+                }
+              },
+              {
+                "id": "v-kpi-2",
+                "type": "Text",
+                "props": {
+                  "text": "82.4%"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": "font-bold",
+                  "textColor": "{primitives.color.textPrimary}"
+                }
+              },
+              {
+                "id": "s-kpi-2",
+                "type": "Text",
+                "props": {
+                  "text": "165 / 200 Beds Occupied"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "{primitives.color.textSecondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-farmasi-resep",
+            "type": "Card",
+            "style": {
+              "flex": "1",
+              "padding": "p-4",
+              "backgroundColor": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "t-kpi-3",
+                "type": "Text",
+                "props": {
+                  "text": "Pharmacy Prescriptions"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "{primitives.color.textSecondary}"
+                }
+              },
+              {
+                "id": "v-kpi-3",
+                "type": "Text",
+                "props": {
+                  "text": "318 Orders"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": "font-bold",
+                  "textColor": "{primitives.color.textPrimary}"
+                }
+              },
+              {
+                "id": "s-kpi-3",
+                "type": "Text",
+                "props": {
+                  "text": "Average Wait Time 12 Mins"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "#059669"
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-claims-cleared",
+            "type": "Card",
+            "style": {
+              "flex": "1",
+              "padding": "p-4",
+              "backgroundColor": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "t-kpi-4",
+                "type": "Text",
+                "props": {
+                  "text": "Insurance Claims Processed"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "{primitives.color.textSecondary}"
+                }
+              },
+              {
+                "id": "v-kpi-4",
+                "type": "Text",
+                "props": {
+                  "text": "$1,482,500"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": "font-bold",
+                  "textColor": "{primitives.color.textPrimary}"
+                }
+              },
+              {
+                "id": "s-kpi-4",
+                "type": "Text",
+                "props": {
+                  "text": "Current Month (98.2% Approval Rate)"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "textColor": "#059669"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hospital-analytics-section",
+        "type": "Row",
+        "style": {
+          "gap": "gap-4"
+        },
+        "children": [
+          {
+            "id": "chart-clinic-card",
+            "type": "Card",
+            "style": {
+              "flex": "1",
+              "padding": "p-4",
+              "backgroundColor": "{primitives.color.surface}"
+            },
+            "children": [
+              {
+                "id": "c-title-1",
+                "type": "Text",
+                "props": {
+                  "text": "Outpatient Clinic Visits by Specialty"
+                },
+                "style": {
+                  "fontSize": "text-sm",
+                  "fontWeight": "font-semibold",
+                  "textColor": "{primitives.color.textPrimary}"
+                }
+              },
+              {
+                "id": "c-chart-1",
+                "type": "Chart",
+                "props": {
+                  "type": "bar",
+                  "data": "$data.clinicVisits"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "table-patient-queue-card",
+        "type": "Card",
+        "style": {
+          "padding": "p-4",
+          "backgroundColor": "{primitives.color.surface}"
+        },
+        "children": [
+          {
+            "id": "t-title-queue",
+            "type": "Text",
+            "props": {
+              "text": "Patient Queue & Electronic Medical Records (EMR ICD-10)"
+            },
+            "style": {
+              "fontSize": "text-sm",
+              "fontWeight": "font-semibold",
+              "textColor": "{primitives.color.textPrimary}"
+            }
+          },
+          {
+            "id": "grid-queue",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.patientQueue",
+              "columns": [
+                {
+                  "key": "ticketNo",
+                  "label": "Queue No."
+                },
+                {
+                  "key": "recordNo",
+                  "label": "MRN"
+                },
+                {
+                  "key": "patientName",
+                  "label": "Patient Name"
+                },
+                {
+                  "key": "department",
+                  "label": "Department"
+                },
+                {
+                  "key": "physician",
+                  "label": "Attending Physician"
+                },
+                {
+                  "key": "insurance",
+                  "label": "Insurance Provider"
+                },
+                {
+                  "key": "status",
+                  "label": "Care Status"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-pharmacy-card",
+        "type": "Card",
+        "style": {
+          "padding": "p-4",
+          "backgroundColor": "{primitives.color.surface}"
+        },
+        "children": [
+          {
+            "id": "t-title-pharm",
+            "type": "Text",
+            "props": {
+              "text": "Pharmacy Inventory & Expiry Control (FEFO — First Expired First Out)"
+            },
+            "style": {
+              "fontSize": "text-sm",
+              "fontWeight": "font-semibold",
+              "textColor": "{primitives.color.textPrimary}"
+            }
+          },
+          {
+            "id": "grid-pharm",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.pharmacyFefo",
+              "columns": [
+                {
+                  "key": "itemCode",
+                  "label": "Item Code"
+                },
+                {
+                  "key": "medication",
+                  "label": "Medication & Dosage"
+                },
+                {
+                  "key": "batchNo",
+                  "label": "Batch No."
+                },
+                {
+                  "key": "expiryDate",
+                  "label": "Expiration Date"
+                },
+                {
+                  "key": "stock",
+                  "label": "Physical Stock"
+                },
+                {
+                  "key": "dispenseRule",
+                  "label": "Dispense Rule"
+                },
+                {
+                  "key": "status",
+                  "label": "Inventory Status"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-claims-card",
+        "type": "Card",
+        "style": {
+          "padding": "p-4",
+          "backgroundColor": "{primitives.color.surface}"
+        },
+        "children": [
+          {
+            "id": "t-title-claims",
+            "type": "Text",
+            "props": {
+              "text": "Healthcare Insurance Claims & DRG Settlement"
+            },
+            "style": {
+              "fontSize": "text-sm",
+              "fontWeight": "font-semibold",
+              "textColor": "{primitives.color.textPrimary}"
+            }
+          },
+          {
+            "id": "grid-claims",
+            "type": "DataTable",
+            "props": {
+              "data": "$data.insuranceClaims",
+              "columns": [
+                {
+                  "key": "claimId",
+                  "label": "Claim ID"
+                },
+                {
+                  "key": "patient",
+                  "label": "Patient Name"
+                },
+                {
+                  "key": "diagnosis",
+                  "label": "ICD-10 Diagnosis"
+                },
+                {
+                  "key": "amount",
+                  "label": "Settlement Amount"
+                },
+                {
+                  "key": "verificationStatus",
+                  "label": "Adjudication Status"
+                },
+                {
+                  "key": "submissionDate",
+                  "label": "Service Date"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

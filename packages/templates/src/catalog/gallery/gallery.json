@@ -1,0 +1,146 @@
+{
+  "gallery": "0.1",
+  "description": "Ready-made UIDL documents for galleries such as UIDL-Builder. Each entry lists one document per locale; the documents are the source of truth, and consumers read them from the published package (uidl-runtime/catalog/gallery.json) instead of keeping copies.",
+  "entries": [
+    {
+      "id": "invoicing-erp-console",
+      "name": "Kerangka Invoicing & Billing ERP",
+      "category": "industry",
+      "description": "Multi-currency invoicing, Customer entities, receivable aging metrics, and state transitions (draft/sent/paid/void) generated with Kerangka.",
+      "tags": [
+        "ERP",
+        "Billing",
+        "Invoicing",
+        "Kerangka",
+        "Finance"
+      ],
+      "locales": {
+        "en": "invoicing-erp-console.en.json"
+      }
+    },
+    {
+      "id": "hospital-medika-console",
+      "name": "Healthcare & Hospital EMR",
+      "category": "industry",
+      "description": "Outpatient queue, clinic visit metrics, FEFO drug inventory, and clinical claims verification console.",
+      "tags": [
+        "Healthcare",
+        "EMR",
+        "Hospital",
+        "Clinical"
+      ],
+      "locales": {
+        "en": "hospital-medika-console.en.json",
+        "id": "../../documents/hospital-medika-console.json"
+      }
+    },
+    {
+      "id": "koperasi-bmt-console",
+      "name": "Credit Union & Banking",
+      "category": "industry",
+      "description": "Member share capital, dividend allocation tree, commercial loan facilities, and treasury accounts.",
+      "tags": [
+        "Finance",
+        "Banking",
+        "CreditUnion",
+        "Treasury"
+      ],
+      "locales": {
+        "en": "koperasi-bmt-console.en.json",
+        "id": "../../documents/koperasi-bmt-console.json"
+      }
+    },
+    {
+      "id": "helpdesk-console",
+      "name": "CloudDesk IT Service & Helpdesk",
+      "category": "industry",
+      "description": "Incident management, priority queue, SLA countdowns, and knowledge base canned responses.",
+      "tags": [
+        "ITSM",
+        "Tickets",
+        "Helpdesk",
+        "Support"
+      ],
+      "locales": {
+        "en": "helpdesk-console.en.json",
+        "id": "../../documents/helpdesk-console.json"
+      }
+    },
+    {
+      "id": "crm-pipeline-console",
+      "name": "Sales CRM & Deal Pipeline",
+      "category": "industry",
+      "description": "Opportunity pipeline stages, quota attainment, lead tracking, and sales activity cards.",
+      "tags": [
+        "CRM",
+        "Sales",
+        "Pipeline",
+        "Deals"
+      ],
+      "locales": {
+        "en": "crm-pipeline-console.en.json",
+        "id": "../../documents/crm-pipeline-console.json"
+      }
+    },
+    {
+      "id": "school-abc-console",
+      "name": "School Academic & Fee Console",
+      "category": "industry",
+      "description": "Tuition collection trends, student receivables, payroll payables, and balanced ledger postings.",
+      "tags": [
+        "Education",
+        "Academic",
+        "Billing",
+        "School"
+      ],
+      "locales": {
+        "en": "school-abc-console.en.json",
+        "id": "../../documents/school-abc-console.json"
+      }
+    },
+    {
+      "id": "saas-growth-suite",
+      "name": "SaaS Growth & MRR Analytics",
+      "category": "dashboard",
+      "description": "Multi-funnel conversion rates, MRR growth trends, cohort churn, and subscription plans.",
+      "tags": [
+        "SaaS",
+        "Growth",
+        "MRR",
+        "Funnel"
+      ],
+      "locales": {
+        "en": "../../documents/saas-growth-suite.json"
+      }
+    },
+    {
+      "id": "saas-metrics-dashboard",
+      "name": "SaaS Metrics Dashboard",
+      "category": "dashboard",
+      "description": "Executive KPI dashboard with stat cards, revenue chart, and recent customer activity.",
+      "tags": [
+        "Metrics",
+        "KPI",
+        "Cards",
+        "Charts"
+      ],
+      "locales": {
+        "en": "saas-metrics-dashboard.en.json"
+      }
+    },
+    {
+      "id": "customer-onboarding-form",
+      "name": "Customer Onboarding Form",
+      "category": "form",
+      "description": "Full registration form with validation, multi-column inputs, and action triggers.",
+      "tags": [
+        "Form",
+        "Inputs",
+        "Registration"
+      ],
+      "locales": {
+        "en": "customer-onboarding-form.en.json"
+      }
+    }
+  ]
+}

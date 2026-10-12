@@ -1,0 +1,318 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "crm-pipeline-console",
+  "name": "Pipeline CRM Opportunity Pipeline Console",
+  "theme": "theme-light",
+  "dataSources": {
+    "dealCards": [
+      {
+        "id": "deal-1",
+        "columnId": "lead",
+        "title": "Oceanic Freight & Logistics",
+        "subtitle": "Supply Chain ERP (50 Seats)",
+        "value": "$240,000",
+        "badge": "Warm Lead"
+      },
+      {
+        "id": "deal-2",
+        "columnId": "lead",
+        "title": "Apex Health Network",
+        "subtitle": "Clinical Care POS + Inventory",
+        "value": "$45,000",
+        "badge": "Referral"
+      },
+      {
+        "id": "deal-3",
+        "columnId": "demo",
+        "title": "Vanguard Precision Manufacturing",
+        "subtitle": "Discrete MRP + Quality Gates",
+        "value": "$380,000",
+        "badge": "Demo Scheduled"
+      },
+      {
+        "id": "deal-4",
+        "columnId": "demo",
+        "title": "Horizon Hospitality Group",
+        "subtitle": "Multi-location POS + Kitchen Display",
+        "value": "$72,000",
+        "badge": "POC Active"
+      },
+      {
+        "id": "deal-5",
+        "columnId": "proposal",
+        "title": "OmniRetail International",
+        "subtitle": "Omnichannel Commerce + Loyalty",
+        "value": "$520,000",
+        "badge": "Proposal Sent"
+      },
+      {
+        "id": "deal-6",
+        "columnId": "proposal",
+        "title": "GreenHarvest Agro Corp",
+        "subtitle": "Enterprise Resource Accounting",
+        "value": "$310,000",
+        "badge": "Budget Approved"
+      },
+      {
+        "id": "deal-7",
+        "columnId": "negotiation",
+        "title": "Capital Financial Partners",
+        "subtitle": "Core Banking & Ledger Engine",
+        "value": "$650,000",
+        "badge": "Legal Review"
+      },
+      {
+        "id": "deal-8",
+        "columnId": "won",
+        "title": "Pinnacle Global Enterprises",
+        "subtitle": "Full ERP + Custom Dimensions",
+        "value": "$420,000",
+        "badge": "Contract Signed"
+      }
+    ],
+    "salesActivity": [
+      {
+        "rep": "Alex Morgan",
+        "calls": 24,
+        "demos": 6,
+        "proposals": 3,
+        "wonValue": "$420,000",
+        "quotaTarget": "$600,000"
+      },
+      {
+        "rep": "Sarah Jenkins",
+        "calls": 38,
+        "demos": 8,
+        "proposals": 5,
+        "wonValue": "$350,000",
+        "quotaTarget": "$500,000"
+      },
+      {
+        "rep": "David Kim",
+        "calls": 19,
+        "demos": 4,
+        "proposals": 2,
+        "wonValue": "$180,000",
+        "quotaTarget": "$400,000"
+      }
+    ]
+  },
+  "definitions": {
+    "headerTpl": {
+      "id": "crm-header-tpl",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderWidth": "border-b",
+        "borderColor": "{primitives.color.border}"
+      },
+      "slots": {
+        "title": [],
+        "actions": []
+      }
+    }
+  },
+  "root": {
+    "id": "crm-console",
+    "type": "Column",
+    "style": {
+      "gap": "gap-4",
+      "padding": "p-4"
+    },
+    "children": [
+      {
+        "id": "crm-nav",
+        "type": "Navbar",
+        "componentId": "headerTpl",
+        "slots": {
+          "title": [
+            {
+              "id": "crm-title",
+              "type": "Text",
+              "props": {
+                "value": "Pipeline CRM — Opportunity & Pipeline Hub"
+              },
+              "style": {
+                "fontSize": "text-xl",
+                "fontWeight": 700
+              }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-new-deal",
+              "type": "Button",
+              "props": {
+                "label": "+ Add Opportunity"
+              }
+            },
+            {
+              "id": "btn-forecast",
+              "type": "Button",
+              "props": {
+                "label": "Export Forecast"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "crm-kpis",
+        "type": "GridView",
+        "style": {
+          "display": "grid",
+          "gap": "gap-3",
+          "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))"
+        },
+        "children": [
+          {
+            "id": "crm-kpi-pipe",
+            "type": "Text",
+            "props": {
+              "value": "Total Pipeline Value\n$2.63M"
+            },
+            "style": {
+              "padding": "p-4",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}"
+            }
+          },
+          {
+            "id": "crm-kpi-weighted",
+            "type": "Text",
+            "props": {
+              "value": "Weighted Forecast\n$1.48M"
+            },
+            "style": {
+              "padding": "p-4",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}"
+            }
+          },
+          {
+            "id": "crm-kpi-winrate",
+            "type": "Text",
+            "props": {
+              "value": "Win Rate\n68.4%"
+            },
+            "style": {
+              "padding": "p-4",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}"
+            }
+          },
+          {
+            "id": "crm-kpi-deals",
+            "type": "Text",
+            "props": {
+              "value": "Active Deals\n8 Opportunities"
+            },
+            "style": {
+              "padding": "p-4",
+              "borderWidth": "border",
+              "borderRadius": "rounded-lg",
+              "background": "{primitives.color.surface}"
+            }
+          }
+        ]
+      },
+      {
+        "id": "crm-board-section",
+        "type": "Column",
+        "style": {
+          "gap": "gap-2"
+        },
+        "children": [
+          {
+            "id": "board-title",
+            "type": "Text",
+            "props": {
+              "value": "Active Deal Pipeline Board"
+            },
+            "style": {
+              "fontSize": "text-lg",
+              "fontWeight": 600
+            }
+          },
+          {
+            "id": "crm-kanban",
+            "type": "Kanban",
+            "props": {
+              "dataSource": "dealCards",
+              "columns": [
+                {
+                  "id": "lead",
+                  "title": "New Lead"
+                },
+                {
+                  "id": "demo",
+                  "title": "Discovery & Demo"
+                },
+                {
+                  "id": "proposal",
+                  "title": "Proposal Sent"
+                },
+                {
+                  "id": "negotiation",
+                  "title": "Legal & Terms"
+                },
+                {
+                  "id": "won",
+                  "title": "Closed Won"
+                }
+              ],
+              "cardTitleKey": "title",
+              "cardSubtitleKey": "subtitle",
+              "cardValueKey": "value",
+              "cardBadgeKey": "badge"
+            }
+          }
+        ]
+      },
+      {
+        "id": "crm-rep-activity",
+        "type": "DataTable",
+        "props": {
+          "title": "Sales Representative Quota Attainment",
+          "dataSource": "salesActivity",
+          "columns": [
+            {
+              "key": "rep",
+              "label": "Sales Executive"
+            },
+            {
+              "key": "calls",
+              "label": "Calls Logged",
+              "align": "right"
+            },
+            {
+              "key": "demos",
+              "label": "Demos Completed",
+              "align": "right"
+            },
+            {
+              "key": "proposals",
+              "label": "Proposals Delivered",
+              "align": "right"
+            },
+            {
+              "key": "wonValue",
+              "label": "Closed Won Value",
+              "align": "right"
+            },
+            {
+              "key": "quotaTarget",
+              "label": "Quarterly Target",
+              "align": "right"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

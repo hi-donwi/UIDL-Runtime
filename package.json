@@ -18,7 +18,8 @@
       "default": "./dist/recipes.mjs"
     },
     "./style.css": "./dist/style.css",
-    "./schema/*.json": "./dist/schema/*.json"
+    "./schema/*.json": "./dist/schema/*.json",
+    "./catalog/*.json": "./dist/catalog/*.json"
   },
   "bin": {
     "uidl-validate": "bin/validate.mjs",
@@ -42,7 +43,7 @@
     "mock:api": "node scripts/mock-server.mjs",
     "build:reference": "vite build --config apps/reference/vite.config.ts",
     "preview:reference": "vite preview --config apps/reference/vite.config.ts",
-    "build": "tsc -b && vite build && pnpm run build:css && pnpm run build:schema",
+    "build": "tsc -b && vite build && pnpm run build:css && pnpm run build:schema && pnpm run build:catalog",
     "build:css": "tailwindcss -i packages/core/src/style.css -o dist/style.css --minify",
     "build:schema": "node scripts/generate-json-schema.mjs",
     "preview": "vite preview",
@@ -52,14 +53,15 @@
     "test:watch": "vitest",
     "smoke:package": "pnpm run build && node scripts/smoke-package-consumer.mjs",
     "validate": "node bin/validate.mjs",
-    "validate:examples": "node bin/validate.mjs packages/templates/src/documents/*.json",
+    "validate:examples": "node bin/validate.mjs packages/templates/src/documents/*.json packages/templates/src/catalog/gallery/*.en.json",
     "validate:spec": "node scripts/validate-spec.mjs",
     "audit:reference": "tsx scripts/audit-reference-coverage.mts",
     "bench:compilers": "tsx scripts/benchmark-compilers.mts",
     "test:reference": "playwright test e2e/real-reference-acceptance.spec.ts",
     "test:reference:visual": "playwright test e2e/visual-regression.spec.ts e2e/meridian-reference.spec.ts --grep \"visual baseline|matches its visual baseline\"",
     "test:reference:update": "playwright test e2e/visual-regression.spec.ts e2e/meridian-reference.spec.ts --grep \"visual baseline|matches its visual baseline\" --update-snapshots",
-    "test:reference:http": "PLAYWRIGHT_DATA_MODE=http playwright test e2e/real-reference-acceptance.spec.ts"
+    "test:reference:http": "PLAYWRIGHT_DATA_MODE=http playwright test e2e/real-reference-acceptance.spec.ts",
+    "build:catalog": "node scripts/build-catalog.mjs"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

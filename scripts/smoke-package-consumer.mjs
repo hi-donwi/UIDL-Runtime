@@ -76,6 +76,15 @@ try {
     writeFileSync(path.join(bareRoot, "cjs.cjs"), check(`const { compilePage, PAGE_RECIPES } = require("uidl-runtime/recipes");`));
     run(process.execPath, ["esm.mjs"], { cwd: bareRoot });
     run(process.execPath, ["cjs.cjs"], { cwd: bareRoot });
+
+    // The gallery ships as data, so a gallery UI can read it without a copy of its own.
+    writeFileSync(
+      path.join(bareRoot, "catalog.cjs"),
+      `const gallery = require("uidl-runtime/catalog/gallery.json");\n` +
+        `if (!Array.isArray(gallery.entries) || gallery.entries.length === 0) throw new Error("empty gallery");\n` +
+        `for (const e of gallery.entries) if (!e.documents || !e.documents.en) throw new Error(e.id + " has no English document");\n`,
+    );
+    run(process.execPath, ["catalog.cjs"], { cwd: bareRoot });
   } finally {
     rmSync(bareRoot, { recursive: true, force: true });
   }

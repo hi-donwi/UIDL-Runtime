@@ -1,0 +1,385 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "invoicing-erp-console",
+  "name": "Kerangka Invoicing & Billing ERP Console",
+  "theme": "meridian-dark",
+  "dataSources": {
+    "invoices": [
+      {
+        "id": "inv-001",
+        "number": "INV-2026-001",
+        "customer": "Apex Health Network",
+        "issuedOn": "2026-10-01",
+        "dueDate": "2026-10-15",
+        "total": 45000,
+        "status": "paid",
+        "paidAt": "2026-10-08T14:30:00Z",
+        "lines": [
+          {
+            "description": "Clinical Care POS License",
+            "qty": 10,
+            "unitPrice": 3500
+          },
+          {
+            "description": "Implementation & Training",
+            "qty": 1,
+            "unitPrice": 10000
+          }
+        ]
+      },
+      {
+        "id": "inv-002",
+        "number": "INV-2026-002",
+        "customer": "Vanguard Precision Manufacturing",
+        "issuedOn": "2026-10-04",
+        "dueDate": "2026-10-18",
+        "total": 128500,
+        "status": "sent",
+        "paidAt": null,
+        "lines": [
+          {
+            "description": "MRP Engine Annual Subscription",
+            "qty": 1,
+            "unitPrice": 95000
+          },
+          {
+            "description": "Quality Gate Automation Module",
+            "qty": 1,
+            "unitPrice": 33500
+          }
+        ]
+      },
+      {
+        "id": "inv-003",
+        "number": "INV-2026-003",
+        "customer": "OmniRetail International",
+        "issuedOn": "2026-10-10",
+        "dueDate": "2026-10-24",
+        "total": 64200,
+        "status": "draft",
+        "paidAt": null,
+        "lines": [
+          {
+            "description": "Omnichannel Commerce Connector",
+            "qty": 2,
+            "unitPrice": 32100
+          }
+        ]
+      }
+    ],
+    "summaryMetrics": [
+      {
+        "id": "met-1",
+        "title": "Total Invoiced",
+        "value": "$237,700.00",
+        "delta": "+18.4% vs last mo"
+      },
+      {
+        "id": "met-2",
+        "title": "Awaiting Settlement",
+        "value": "$192,700.00",
+        "delta": "2 invoices pending"
+      },
+      {
+        "id": "met-3",
+        "title": "Realized Revenue",
+        "value": "$45,000.00",
+        "delta": "100% on-time paid"
+      }
+    ]
+  },
+  "definitions": {
+    "metricCardTpl": {
+      "id": "tpl-metric-card",
+      "type": "Card",
+      "style": {
+        "padding": "p-5",
+        "backgroundColor": "{colors.surface.card}",
+        "borderRadius": "rounded-xl",
+        "borderWidth": "border",
+        "borderColor": "{colors.border.subtle}"
+      },
+      "slots": {
+        "content": []
+      }
+    }
+  },
+  "root": {
+    "id": "invoicing-root",
+    "type": "Column",
+    "style": {
+      "gap": "gap-6",
+      "padding": "p-6",
+      "maxWidth": "max-w-7xl",
+      "margin": "mx-auto"
+    },
+    "children": [
+      {
+        "id": "inv-header",
+        "type": "Row",
+        "style": {
+          "justifyContent": "space-between",
+          "alignItems": "center",
+          "padding": "p-4",
+          "borderWidth": "border-b",
+          "borderColor": "{colors.border.subtle}"
+        },
+        "children": [
+          {
+            "id": "header-title-box",
+            "type": "Column",
+            "style": {
+              "gap": "gap-1"
+            },
+            "children": [
+              {
+                "id": "app-title",
+                "type": "Heading",
+                "props": {
+                  "level": 1,
+                  "text": "Billing & Invoicing Console"
+                }
+              },
+              {
+                "id": "app-subtitle",
+                "type": "Text",
+                "props": {
+                  "text": "Kerangka Declarative State Engine & UIDL Multi-Stack Operations",
+                  "variant": "subtle"
+                }
+              }
+            ]
+          },
+          {
+            "id": "header-actions",
+            "type": "Row",
+            "style": {
+              "gap": "gap-3"
+            },
+            "children": [
+              {
+                "id": "btn-new-invoice",
+                "type": "Button",
+                "props": {
+                  "label": "Create Invoice",
+                  "variant": "primary",
+                  "icon": "plus"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "action": "openModal",
+                      "target": "modal-new-invoice"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "btn-sync-ledger",
+                "type": "Button",
+                "props": {
+                  "label": "Sync Ledger",
+                  "variant": "secondary",
+                  "icon": "refresh-cw"
+                },
+                "events": {
+                  "onClick": [
+                    {
+                      "action": "callApi",
+                      "endpoint": "/api/invoices/sync",
+                      "method": "POST"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "metrics-grid",
+        "type": "Grid",
+        "style": {
+          "columns": 3,
+          "gap": "gap-4"
+        },
+        "children": [
+          {
+            "id": "metric-total",
+            "type": "Card",
+            "componentId": "metricCardTpl",
+            "slots": {
+              "content": [
+                {
+                  "id": "m1-title",
+                  "type": "Text",
+                  "props": {
+                    "text": "Total Invoiced",
+                    "variant": "subtle"
+                  }
+                },
+                {
+                  "id": "m1-val",
+                  "type": "Heading",
+                  "props": {
+                    "level": 2,
+                    "text": "$237,700.00"
+                  }
+                },
+                {
+                  "id": "m1-delta",
+                  "type": "Badge",
+                  "props": {
+                    "text": "+18.4% vs last mo",
+                    "variant": "success"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "metric-pending",
+            "type": "Card",
+            "componentId": "metricCardTpl",
+            "slots": {
+              "content": [
+                {
+                  "id": "m2-title",
+                  "type": "Text",
+                  "props": {
+                    "text": "Awaiting Settlement",
+                    "variant": "subtle"
+                  }
+                },
+                {
+                  "id": "m2-val",
+                  "type": "Heading",
+                  "props": {
+                    "level": 2,
+                    "text": "$192,700.00"
+                  }
+                },
+                {
+                  "id": "m2-delta",
+                  "type": "Badge",
+                  "props": {
+                    "text": "2 invoices pending",
+                    "variant": "warning"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "metric-realized",
+            "type": "Card",
+            "componentId": "metricCardTpl",
+            "slots": {
+              "content": [
+                {
+                  "id": "m3-title",
+                  "type": "Text",
+                  "props": {
+                    "text": "Realized Revenue",
+                    "variant": "subtle"
+                  }
+                },
+                {
+                  "id": "m3-val",
+                  "type": "Heading",
+                  "props": {
+                    "level": 2,
+                    "text": "$45,000.00"
+                  }
+                },
+                {
+                  "id": "m3-delta",
+                  "type": "Badge",
+                  "props": {
+                    "text": "100% on-time paid",
+                    "variant": "info"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-card",
+        "type": "Card",
+        "style": {
+          "padding": "p-5",
+          "backgroundColor": "{colors.surface.card}",
+          "borderRadius": "rounded-xl",
+          "borderWidth": "border",
+          "borderColor": "{colors.border.subtle}"
+        },
+        "children": [
+          {
+            "id": "table-header-row",
+            "type": "Row",
+            "style": {
+              "justifyContent": "space-between",
+              "alignItems": "center",
+              "marginBottom": "mb-4"
+            },
+            "children": [
+              {
+                "id": "table-heading",
+                "type": "Heading",
+                "props": {
+                  "level": 3,
+                  "text": "Active Accounts & Invoices"
+                }
+              },
+              {
+                "id": "table-filter",
+                "type": "Input",
+                "props": {
+                  "placeholder": "Filter by invoice or customer...",
+                  "icon": "search"
+                }
+              }
+            ]
+          },
+          {
+            "id": "invoices-table",
+            "type": "Table",
+            "props": {
+              "dataSource": "invoices",
+              "columns": [
+                {
+                  "key": "number",
+                  "label": "Invoice Number"
+                },
+                {
+                  "key": "customer",
+                  "label": "Customer"
+                },
+                {
+                  "key": "issuedOn",
+                  "label": "Issued Date"
+                },
+                {
+                  "key": "dueDate",
+                  "label": "Due Date"
+                },
+                {
+                  "key": "total",
+                  "label": "Amount ($)",
+                  "format": "currency"
+                },
+                {
+                  "key": "status",
+                  "label": "Lifecycle Status"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

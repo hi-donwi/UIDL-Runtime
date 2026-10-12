@@ -1,0 +1,589 @@
+{
+  "$schema": "https://uidl-runtime.local/schemas/document.json",
+  "version": "1.0.0",
+  "id": "koperasi-bmt-console",
+  "name": "Apex Credit Union & Community Banking Console",
+  "theme": "default-light",
+  "dataSources": {
+    "savingsComposition": [
+      {
+        "label": "Core Member Shares",
+        "value": 723
+      },
+      {
+        "label": "Mandatory Reserves",
+        "value": 2169
+      },
+      {
+        "label": "Voluntary Term Deposits",
+        "value": 1928
+      }
+    ],
+    "shuDistributionTree": [
+      {
+        "id": "shu-root",
+        "label": "Total Net Surplus & Member Dividend Allocation",
+        "subtitle": "Approved by Board of Directors & Annual General Meeting (AGM)",
+        "badge": "100%",
+        "value": "$4,200,000",
+        "children": [
+          {
+            "id": "shu-modal",
+            "label": "1. Member Share Capital Dividend",
+            "subtitle": "Distributed proportionally based on qualifying share capital balance",
+            "badge": "40%",
+            "value": "$1,680,000"
+          },
+          {
+            "id": "shu-usaha",
+            "label": "2. Member Patronage Rebate",
+            "subtitle": "Volume-based patronage refund on loan interest & debit services",
+            "badge": "30%",
+            "value": "$1,260,000"
+          },
+          {
+            "id": "shu-cadangan",
+            "label": "3. Institutional Capital Reserve",
+            "subtitle": "Retained earnings to strengthen regulatory capital solvency buffer",
+            "badge": "20%",
+            "value": "$840,000"
+          },
+          {
+            "id": "shu-sosial",
+            "label": "4. Community & Financial Literacy Fund",
+            "subtitle": "Community endowments, scholarships, and director governance training",
+            "badge": "10%",
+            "value": "$420,000"
+          }
+        ]
+      }
+    ],
+    "financings": [
+      {
+        "accountNo": "COM-2027-0104",
+        "member": "Horizon Logistics LLC",
+        "akad": "Working Capital",
+        "object": "Fleet Expansion & Warehousing",
+        "plafond": "$750,000",
+        "margin": "$90,000 (12%)",
+        "tenor": "24 Months",
+        "installment": "$35,000 / mo",
+        "status": "Performing (Tier 1)"
+      },
+      {
+        "accountNo": "CRE-2027-0052",
+        "member": "GreenField Medical Clinic",
+        "akad": "Equipment Lease",
+        "object": "Diagnostic Imaging System",
+        "plafond": "$250,000",
+        "margin": "$25,000 (10%)",
+        "tenor": "12 Months",
+        "installment": "$22,910 / mo",
+        "status": "Performing (Tier 1)"
+      },
+      {
+        "accountNo": "AGR-2027-0089",
+        "member": "Valley Grain Millers",
+        "akad": "Commercial Term",
+        "object": "Automated Milling Plant",
+        "plafond": "$1,200,000",
+        "margin": "$168,000 (14%)",
+        "tenor": "36 Months",
+        "installment": "$38,000 / mo",
+        "status": "Watchlist (Tier 2)"
+      }
+    ],
+    "membersSavings": [
+      {
+        "memberId": "MBR-00142",
+        "name": "Sarah Jenkins",
+        "branch": "Downtown Branch",
+        "simpananPokok": "$5,000",
+        "simpananWajib": "$36,000",
+        "simpananSukarela": "$425,000",
+        "totalBalance": "$466,000"
+      },
+      {
+        "memberId": "MBR-00188",
+        "name": "David Kim",
+        "branch": "Westside Branch",
+        "simpananPokok": "$5,000",
+        "simpananWajib": "$24,000",
+        "simpananSukarela": "$142,000",
+        "totalBalance": "$171,000"
+      },
+      {
+        "memberId": "MBR-00204",
+        "name": "Elena Rostova",
+        "branch": "Metro North",
+        "simpananPokok": "$5,000",
+        "simpananWajib": "$48,000",
+        "simpananSukarela": "$89,000",
+        "totalBalance": "$142,000"
+      }
+    ],
+    "taxCompliance": [
+      {
+        "taxItem": "Corporate Value Added Tax (VAT 15%)",
+        "basis": "$8,420,000",
+        "taxAmount": "$926,200",
+        "status": "Filed & Reconciled",
+        "dueDate": "Month-End"
+      },
+      {
+        "taxItem": "Payroll Withholding Tax (PAYE)",
+        "basis": "$685,000 (14 Staff)",
+        "taxAmount": "$34,250",
+        "status": "Payment Scheduled",
+        "dueDate": "10th of Next Month"
+      },
+      {
+        "taxItem": "Employer Pension & Social Security",
+        "basis": "$685,000",
+        "taxAmount": "$63,300",
+        "status": "Direct Debit Settled",
+        "dueDate": "15th of Each Month"
+      },
+      {
+        "taxItem": "Statutory Healthcare Contributions",
+        "basis": "$685,000",
+        "taxAmount": "$34,250",
+        "status": "Direct Debit Settled",
+        "dueDate": "10th of Each Month"
+      }
+    ]
+  },
+  "definitions": {
+    "pageHeader": {
+      "id": "page-header-template",
+      "type": "Navbar",
+      "style": {
+        "justifyContent": "space-between",
+        "padding": "p-4",
+        "borderWidth": "border-b",
+        "borderColor": "{primitives.color.border}",
+        "background": "{primitives.color.surface}"
+      },
+      "slots": {
+        "title": [],
+        "actions": []
+      }
+    },
+    "kpiCard": {
+      "id": "kpi-card-template",
+      "type": "Column",
+      "style": {
+        "padding": "p-4",
+        "borderRadius": "rounded-lg",
+        "borderWidth": "border",
+        "borderColor": "{primitives.color.border}",
+        "background": "{primitives.color.surface}",
+        "gap": "gap-1"
+      }
+    }
+  },
+  "root": {
+    "id": "koperasi-page",
+    "type": "Column",
+    "style": {
+      "gap": "gap-6",
+      "padding": "p-6",
+      "background": "{primitives.color.background}",
+      "minHeight": "min-h-screen"
+    },
+    "children": [
+      {
+        "id": "header",
+        "type": "Navbar",
+        "componentId": "pageHeader",
+        "slots": {
+          "title": [
+            {
+              "id": "title-text",
+              "type": "Text",
+              "props": {
+                "value": "Apex Credit Union & Community Banking Console"
+              },
+              "style": {
+                "fontSize": "text-2xl",
+                "fontWeight": 700,
+                "color": "{primitives.color.text-primary}"
+              }
+            },
+            {
+              "id": "subtitle-text",
+              "type": "Text",
+              "props": {
+                "value": "Member Shares, Dividend Allocation, Commercial Lending & Statutory Compliance"
+              },
+              "style": {
+                "fontSize": "text-xs",
+                "color": "{primitives.color.text-secondary}"
+              }
+            }
+          ],
+          "actions": [
+            {
+              "id": "btn-akad",
+              "type": "Button",
+              "props": {
+                "label": "+ New Commercial Loan"
+              },
+              "style": {
+                "padding": "p-2",
+                "fontSize": "text-sm",
+                "borderRadius": "rounded-md",
+                "borderWidth": "border"
+              }
+            },
+            {
+              "id": "btn-shu",
+              "type": "Button",
+              "props": {
+                "label": "Calculate Dividends"
+              },
+              "style": {
+                "padding": "p-2",
+                "fontSize": "text-sm",
+                "borderRadius": "rounded-md",
+                "background": "{primitives.color.text-primary}",
+                "color": "{primitives.color.background}"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "kpi-grid",
+        "type": "GridView",
+        "style": {
+          "display": "grid",
+          "gridTemplateColumns": "repeat(auto-fit, minmax(220px, 1fr))",
+          "gap": "gap-4"
+        },
+        "children": [
+          {
+            "id": "kpi-simpanan",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              {
+                "id": "kpi-lbl-1",
+                "type": "Text",
+                "props": {
+                  "value": "Total Member Deposits"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "kpi-val-1",
+                "type": "Text",
+                "props": {
+                  "value": "$48.2M"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700,
+                  "color": "{primitives.color.text-primary}"
+                }
+              },
+              {
+                "id": "kpi-sub-1",
+                "type": "Text",
+                "props": {
+                  "value": "1,240 Active Members"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "#10b981"
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-pembiayaan",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              {
+                "id": "kpi-lbl-2",
+                "type": "Text",
+                "props": {
+                  "value": "Active Loan Portfolio"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "kpi-val-2",
+                "type": "Text",
+                "props": {
+                  "value": "$64.5M"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700,
+                  "color": "{primitives.color.text-primary}"
+                }
+              },
+              {
+                "id": "kpi-sub-2",
+                "type": "Text",
+                "props": {
+                  "value": "Loan-to-Deposit: 133.8%"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}"
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-npf",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              {
+                "id": "kpi-lbl-3",
+                "type": "Text",
+                "props": {
+                  "value": "Gross Non-Performing Loans (NPL)"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "kpi-val-3",
+                "type": "Text",
+                "props": {
+                  "value": "1.42%"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700,
+                  "color": "#10b981"
+                }
+              },
+              {
+                "id": "kpi-sub-3",
+                "type": "Text",
+                "props": {
+                  "value": "Health Status: Prime (< 2.5%)"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "#10b981"
+                }
+              }
+            ]
+          },
+          {
+            "id": "kpi-shu",
+            "type": "Column",
+            "componentId": "kpiCard",
+            "children": [
+              {
+                "id": "kpi-lbl-4",
+                "type": "Text",
+                "props": {
+                  "value": "Estimated Annual Surplus"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.text-secondary}",
+                  "fontWeight": 600
+                }
+              },
+              {
+                "id": "kpi-val-4",
+                "type": "Text",
+                "props": {
+                  "value": "$4.20M"
+                },
+                "style": {
+                  "fontSize": "text-xl",
+                  "fontWeight": 700,
+                  "color": "{primitives.color.accent}"
+                }
+              },
+              {
+                "id": "kpi-sub-4",
+                "type": "Text",
+                "props": {
+                  "value": "Ready for AGM Distribution"
+                },
+                "style": {
+                  "fontSize": "text-xs",
+                  "color": "{primitives.color.accent}"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "middle-grid",
+        "type": "GridView",
+        "style": {
+          "display": "grid",
+          "gridTemplateColumns": "1fr 1.4fr",
+          "gap": "gap-6"
+        },
+        "children": [
+          {
+            "id": "chart-savings",
+            "type": "Chart",
+            "props": {
+              "title": "Member Capital & Deposit Composition (in Thousands)",
+              "chartType": "donut",
+              "dataSource": "savingsComposition",
+              "xKey": "label",
+              "yKey": "value"
+            }
+          },
+          {
+            "id": "tree-shu",
+            "type": "TreeView",
+            "props": {
+              "title": "Hierarchical Surplus Allocation Structure (AGM Approved)",
+              "dataSource": "shuDistributionTree"
+            }
+          }
+        ]
+      },
+      {
+        "id": "table-financing",
+        "type": "DataTable",
+        "props": {
+          "title": "Commercial & Member Lending Facilities",
+          "dataSource": "financings",
+          "columns": [
+            {
+              "key": "accountNo",
+              "label": "Facility ID"
+            },
+            {
+              "key": "member",
+              "label": "Borrower Name"
+            },
+            {
+              "key": "akad",
+              "label": "Facility Type"
+            },
+            {
+              "key": "object",
+              "label": "Commercial Purpose"
+            },
+            {
+              "key": "plafond",
+              "label": "Limit",
+              "align": "right"
+            },
+            {
+              "key": "margin",
+              "label": "Interest Margin",
+              "align": "right"
+            },
+            {
+              "key": "tenor",
+              "label": "Term"
+            },
+            {
+              "key": "installment",
+              "label": "Monthly Payment",
+              "align": "right"
+            },
+            {
+              "key": "status",
+              "label": "Credit Rating"
+            }
+          ]
+        }
+      },
+      {
+        "id": "table-members",
+        "type": "DataTable",
+        "props": {
+          "title": "Member Share Accounts & Term Deposits",
+          "dataSource": "membersSavings",
+          "columns": [
+            {
+              "key": "memberId",
+              "label": "Member ID"
+            },
+            {
+              "key": "name",
+              "label": "Member Name"
+            },
+            {
+              "key": "branch",
+              "label": "Branch"
+            },
+            {
+              "key": "simpananPokok",
+              "label": "Core Shares",
+              "align": "right"
+            },
+            {
+              "key": "simpananWajib",
+              "label": "Reserve Shares",
+              "align": "right"
+            },
+            {
+              "key": "simpananSukarela",
+              "label": "Term Deposits",
+              "align": "right"
+            },
+            {
+              "key": "totalBalance",
+              "label": "Total Balance",
+              "align": "right"
+            }
+          ]
+        }
+      },
+      {
+        "id": "table-tax",
+        "type": "DataTable",
+        "props": {
+          "title": "Statutory Tax & Regulatory Filings Compliance",
+          "dataSource": "taxCompliance",
+          "columns": [
+            {
+              "key": "taxItem",
+              "label": "Statutory / Regulatory Obligation"
+            },
+            {
+              "key": "basis",
+              "label": "Taxable Basis"
+            },
+            {
+              "key": "taxAmount",
+              "label": "Statutory Amount",
+              "align": "right"
+            },
+            {
+              "key": "status",
+              "label": "Filing Status"
+            },
+            {
+              "key": "dueDate",
+              "label": "Due Date"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
