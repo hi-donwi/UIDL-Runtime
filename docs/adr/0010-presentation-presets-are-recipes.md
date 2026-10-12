@@ -1,4 +1,4 @@
-# ADR-0010: Presentation presets are recipes, and auth and shell sit beside the seven
+# ADR-0010: Presentation presets are recipes, and auth, shell, and landing sit beside the seven
 
 * **Status:** Accepted (2026-10-12)
 * **Deciders:** Project maintainers
@@ -38,11 +38,15 @@ Three things stood in the way here:
   a `permission` is shown only when `session.permissions.<permission>` is truthy. That is
   cosmetic gating, as everywhere in UIDL; the host still refuses the request. Sign-out is a
   host command and is allowlisted the same way.
-- **Neither is an eighth `PageRecipe`.** The seven recipes are mirrored by the Java
+- **`compileLandingPage(meta, options)`** assembles a marketing page from an ordered list of
+  sections: `hero`, `features`, `pricing`, `testimonials`, `faq`, `cta`, and `signup`. Only
+  `signup` talks to the host, sending an email to one allowlisted command; the rest is text
+  and navigation. Section ids become node ids and state keys, so they must be identifiers.
+- **None of them is an eighth `PageRecipe`.** The seven recipes are mirrored by the Java
   generator (`server/uidl-generator`), and a recipe added to one implementation only would
-  be drift that nothing reports. Both functions are exported beside the seven, from the
-  main entry and from `uidl-runtime/recipes`. They join `PageRecipe` when the Java side
-  gets them too.
+  be drift that nothing reports. All three are exported beside the seven, from the main
+  entry and from `uidl-runtime/recipes`. They join `PageRecipe` when the Java side gets
+  them too.
 - **`obscureText` is a declared `TextField` prop.** The React renderer sets
   `type="password"` for it, so web and Flutter agree. Android has no default widgets yet
   and is unaffected.
@@ -51,15 +55,16 @@ Three things stood in the way here:
 
 ### Positive
 
-- A host gets working auth screens and a permission-aware shell from metadata alone, and
+- A host gets working auth screens, a permission-aware shell, and a marketing site from
+  metadata alone, and
   Kerangka's projector can call the same functions without React.
 - Every name these recipes emit is checked against the host's allowlist before a document
   exists, which is the same fail-closed rule the seven recipes follow.
 
 ### Negative
 
-- `uidl-compile` and the remote compiler cannot produce auth pages or a shell yet, because
-  they dispatch on `PageRecipe`.
+- `uidl-compile` and the remote compiler cannot produce auth pages, a shell, or a landing page
+  yet, because they dispatch on `PageRecipe`.
 
 ### Neutral
 

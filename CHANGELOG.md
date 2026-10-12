@@ -12,6 +12,9 @@ All notable changes to this project are documented here. The format follows
   clear the password from state after the request (ADR-0010).
 - `wrapInShell`: puts any page inside a sidebar and top bar; items are gated by
   `session.permissions`, the current route is marked, and sign-out is an allowlisted command.
+- `compileLandingPage`: a marketing page from ordered sections (`hero`, `features`, `pricing`,
+  `testimonials`, `faq`, `cta`, `signup`); a `signup` section sends an email to one allowlisted
+  host command.
 - `TextField` `obscureText` is a declared prop, and the React renderer masks the input with
   it, matching Flutter.
 - `uidl-runtime/recipes`: the seven page recipes, `compilePage`, and the recipe contract types
