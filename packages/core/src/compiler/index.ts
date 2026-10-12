@@ -38,6 +38,14 @@ export { compileWizardPage } from "./wizard.js";
 
 export type { CompileWizardOptions } from "./wizard.js";
 
+export { compileAuthPage, AUTH_MODES } from "./auth.js";
+
+export type { AuthMode, AuthLink, AuthProvider, AuthPageMeta, CompileAuthOptions } from "./auth.js";
+
+export { wrapInShell } from "./shell.js";
+
+export type { ShellNavItem, ShellMeta, WrapInShellOptions } from "./shell.js";
+
 export type {
   PageRecipe,
   LocalizedText,

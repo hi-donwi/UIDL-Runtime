@@ -187,6 +187,10 @@ export { compileTreePage } from "./compiler/tree.js";
 export type { CompileTreeOptions } from "./compiler/tree.js";
 export { compileWizardPage } from "./compiler/wizard.js";
 export type { CompileWizardOptions } from "./compiler/wizard.js";
+export { compileAuthPage, AUTH_MODES } from "./compiler/auth.js";
+export type { AuthMode, AuthLink, AuthProvider, AuthPageMeta, CompileAuthOptions } from "./compiler/auth.js";
+export { wrapInShell } from "./compiler/shell.js";
+export type { ShellNavItem, ShellMeta, WrapInShellOptions } from "./compiler/shell.js";
 export { compilePage, CapabilityValidationError } from "./compiler/compilePage.js";
 export {
   createRemotePageCompiler,
