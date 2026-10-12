@@ -25,7 +25,7 @@ describe("HttpAdapter RFC 9457 Problem Details Support", () => {
 
     const adapter = createHttpAdapter({
       baseUrl: "http://api.example.com",
-      fetchImpl: mockFetch as any,
+      fetchImpl: mockFetch as unknown as typeof fetch,
     });
 
     try {
@@ -34,11 +34,12 @@ describe("HttpAdapter RFC 9457 Problem Details Support", () => {
         data: {},
       });
       expect.unreachable("should have thrown DataError");
-    } catch (err: any) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataError);
-      expect(err.code).toBe("validation");
-      expect(err.message).toBe("The payload failed validation checks");
-      expect(err.fields).toEqual({
+      const error = err as DataError;
+      expect(error.code).toBe("validation");
+      expect(error.message).toBe("The payload failed validation checks");
+      expect(error.fields).toEqual({
         title: "Title is required",
         dueDate: "Due date cannot be in the past",
       });
@@ -61,16 +62,17 @@ describe("HttpAdapter RFC 9457 Problem Details Support", () => {
 
     const adapter = createHttpAdapter({
       baseUrl: "http://api.example.com",
-      fetchImpl: mockFetch as any,
+      fetchImpl: mockFetch as unknown as typeof fetch,
     });
 
     try {
       await adapter.remove("Task", "123");
       expect.unreachable("should have thrown DataError");
-    } catch (err: any) {
+    } catch (err) {
       expect(err).toBeInstanceOf(DataError);
-      expect(err.code).toBe("forbidden");
-      expect(err.message).toBe("Forbidden Operation");
+      const error = err as DataError;
+      expect(error.code).toBe("forbidden");
+      expect(error.message).toBe("Forbidden Operation");
     }
   });
 });
