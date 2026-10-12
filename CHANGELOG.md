@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `uidl-runtime/recipes`: the seven page recipes, `compilePage`, and the recipe contract types
+  as a separate entry point with no runtime dependencies (no React, no zod). A guard test walks
+  the entry's value imports, and `smoke:package` loads it from the packed tarball with nothing
+  else installed.
+
+### Fixed
+- Lint on `main`: `http.rfc9457.test.ts` used `any` four times, which failed CI before build
+  and tests ran.
+
 ## [0.1.5] - 2026-10-11
 
 ### Added

@@ -157,6 +157,33 @@ export function App() {
 }
 ```
 
+### Page recipes without React
+
+The page recipes (`list`, `form`, `report`, `dashboard`, `settings`, `tree`, `wizard`) are
+pure functions from metadata to a UIDL document. `uidl-runtime/recipes` exports them with
+nothing else: no React, no zod, no package at all. A compiler, a server, or a CLI can then
+build pages and hand them to any runtime.
+
+```ts
+import { compilePage } from "uidl-runtime/recipes";
+
+const page = compilePage({
+  recipe: "list",
+  meta: {
+    name: "invoices",
+    label: { id: "Faktur", en: "Invoices" },
+    titleField: "number",
+    fields: [{ key: "number", label: { id: "Nomor", en: "Number" }, widget: "TextField" }],
+    columns: [{ field: "number" }],
+    defaultSort: { field: "number", dir: "asc" },
+  },
+  hostCapabilities: { collections: ["invoices"], commands: [] },
+});
+```
+
+`pnpm run smoke:package` loads this entry from the packed tarball in a folder where nothing
+else is installed, so a recipe that started importing React would fail the release check.
+
 ### 2. Android Native (Kotlin)
 
 ```kotlin
