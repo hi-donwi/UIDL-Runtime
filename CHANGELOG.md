@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `compileAuthPage`: sign-in, sign-up, forgot-password, and reset-password pages that send
+  their values to one allowlisted host command, read a reset token from `route.token`, and
+  clear the password from state after the request (ADR-0010).
+- `wrapInShell`: puts any page inside a sidebar and top bar; items are gated by
+  `session.permissions`, the current route is marked, and sign-out is an allowlisted command.
+- `TextField` `obscureText` is a declared prop, and the React renderer masks the input with
+  it, matching Flutter.
 - `uidl-runtime/recipes`: the seven page recipes, `compilePage`, and the recipe contract types
   as a separate entry point with no runtime dependencies (no React, no zod). A guard test walks
   the entry's value imports, and `smoke:package` loads it from the packed tarball with nothing

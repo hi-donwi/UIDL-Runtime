@@ -184,6 +184,32 @@ const page = compilePage({
 `pnpm run smoke:package` loads this entry from the packed tarball in a folder where nothing
 else is installed, so a recipe that started importing React would fail the release check.
 
+Two presets sit beside the seven recipes (ADR-0010). `compileAuthPage` builds sign-in,
+sign-up, forgot-password, and reset-password pages that send their values to one host
+command. `wrapInShell` puts any page inside a sidebar and top bar whose items are gated by
+`session.permissions`. Every command they emit must be in `hostCapabilities.commands`.
+
+```ts
+import { compileAuthPage, wrapInShell } from "uidl-runtime/recipes";
+
+const caps = { collections: [], commands: ["auth.signIn", "auth.signOut"] };
+const signIn = compileAuthPage(
+  { name: "sign-in", mode: "sign-in", command: "auth.signIn", successRoute: "/" },
+  { hostCapabilities: caps, uiPolicy: { lang: "en" } },
+);
+const page = wrapInShell(
+  invoicesPage,
+  {
+    name: "app",
+    title: { id: "Konsol", en: "Console" },
+    items: [{ id: "invoices", label: { id: "Faktur", en: "Invoices" }, route: "/invoices", permission: "invoices.read" }],
+    signOutCommand: "auth.signOut",
+    signOutRoute: "/sign-in",
+  },
+  { hostCapabilities: caps, currentRoute: "/invoices" },
+);
+```
+
 ### 2. Android Native (Kotlin)
 
 ```kotlin
