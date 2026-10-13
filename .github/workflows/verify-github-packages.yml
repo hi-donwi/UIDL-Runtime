@@ -33,6 +33,19 @@ jobs:
           npm init -y >/dev/null
           npm install "${package}" --ignore-scripts
           node --input-type=module -e '
+            const { compilePage, PAGE_RECIPES } = await import("@hi-donwi/uidl-runtime/recipes");
+            const doc = compilePage({
+              recipe: "list",
+              meta: { name: "items", label: { id: "Item", en: "Items" }, titleField: "name", fields: [{ key: "name", label: { id: "Nama", en: "Name" }, widget: "TextField" }], columns: [{ field: "name" }], defaultSort: { field: "name", dir: "asc" } },
+              hostCapabilities: { collections: ["items"], commands: [] },
+            });
+            if (!doc.root || PAGE_RECIPES.length < 7) throw new Error("recipes did not compile a list page");
+          '
+          # GitHub Packages serves no peerDependenciesMeta, so npm may install the optional React
+          # peers here on its own; the React-free install is checked against npm. A renderer host
+          # installs React itself either way.
+          npm install react react-dom --ignore-scripts
+          node --input-type=module -e '
             const m = await import("@hi-donwi/uidl-runtime");
             for (const name of ["DocumentSchema", "UIDocumentRenderer", "meridianLightTheme"]) {
               if (!m[name]) throw new Error(`missing expected export: ${name}`);

@@ -30,6 +30,24 @@ jobs:
           package="uidl-runtime@${VERSION#v}"
           npm init -y >/dev/null
           npm install "${package}" --ignore-scripts
+          # The page recipes need nothing else: React is the renderer's optional peer.
+          for name in react react-dom; do
+            if [ -e "node_modules/${name}" ]; then
+              echo "npm installed ${name} with ${package} alone" >&2
+              exit 1
+            fi
+          done
+          node --input-type=module -e '
+            const { compilePage, PAGE_RECIPES } = await import("uidl-runtime/recipes");
+            const doc = compilePage({
+              recipe: "list",
+              meta: { name: "items", label: { id: "Item", en: "Items" }, titleField: "name", fields: [{ key: "name", label: { id: "Nama", en: "Name" }, widget: "TextField" }], columns: [{ field: "name" }], defaultSort: { field: "name", dir: "asc" } },
+              hostCapabilities: { collections: ["items"], commands: [] },
+            });
+            if (!doc.root || PAGE_RECIPES.length < 7) throw new Error("recipes did not compile a list page");
+          '
+          # A renderer host installs React itself, as the peer requires.
+          npm install react react-dom --ignore-scripts
           node --input-type=module -e '
             const m = await import("uidl-runtime");
             for (const name of ["DocumentSchema", "UIDocumentRenderer", "meridianLightTheme"]) {
