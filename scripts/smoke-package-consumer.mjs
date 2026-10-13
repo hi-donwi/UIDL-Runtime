@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -87,6 +87,22 @@ try {
     run(process.execPath, ["catalog.cjs"], { cwd: bareRoot });
   } finally {
     rmSync(bareRoot, { recursive: true, force: true });
+  }
+
+  // What npm installs for a project that depends on this package and nothing else. React is the
+  // renderer's optional peer, so a project that only compiles pages must not receive it; npm
+  // installs a dependency's required peers on its own, which is how 0.1.7 still installed React
+  // (it listed react, and @dnd-kit that requires React, as dependencies).
+  const installRoot = mkdtempSync(path.join(tmpdir(), "uidl-install-"));
+  try {
+    writeFileSync(path.join(installRoot, "package.json"), `${JSON.stringify({ private: true })}\n`);
+    run("npm", ["install", "--no-audit", "--no-fund", "--ignore-scripts", "--prefer-offline", tarball], { cwd: installRoot });
+    const installed = ["react", "react-dom"].filter((name) => existsSync(path.join(installRoot, "node_modules", name)));
+    if (installed.length > 0) {
+      throw new Error(`npm installed ${installed.join(" and ")} with ${packageJson.name} alone; only the renderer needs React`);
+    }
+  } finally {
+    rmSync(installRoot, { recursive: true, force: true });
   }
 } finally {
   for (const entry of [`${packageJson.name}-${packageJson.version}.tgz`]) {
