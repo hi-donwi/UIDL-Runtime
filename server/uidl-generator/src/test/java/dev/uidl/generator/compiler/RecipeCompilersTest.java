@@ -179,4 +179,28 @@ class RecipeCompilersTest {
         assertThat(json).contains("wizard-next-btn");
         assertThat(json).contains("wizard-submit-btn");
     }
+
+    @Test
+    void testDashboardKpiBoundToData() throws Exception {
+        // A binding used to be printed with String.valueOf, so it reached the runtime as text.
+        var meta = new DashboardPageMeta(
+                "Ops",
+                new LocalizedText("Operasional", "Operations"),
+                List.of(
+                        new DashboardKpi(new LocalizedText("Terbuka", "Open"), Map.of("$bind", "state.$data.open.total"), "integer"),
+                        new DashboardKpi(new LocalizedText("Tetap", "Static"), 7)
+                ),
+                null,
+                null,
+                null
+        );
+        var caps = new HostCapabilities(List.of("Ops"));
+        var input = new CompilePageInput.DashboardInput(meta, caps, new UiPolicy("en", null, null, null), RoutePolicy.DEFAULT);
+
+        JsonNode root = mapper.readTree(UidlJsonWriter.write(compiler.compilePage(input)));
+        var bound = root.findValues("value").stream().filter(JsonNode::isObject).findFirst().orElseThrow();
+        assertThat(bound.get("$bind").asText()).isEqualTo("state.$data.open.total");
+        assertThat(root.findValues("format").stream().map(JsonNode::asText).toList()).contains("integer");
+        assertThat(root.findValues("value").stream().filter(JsonNode::isTextual).map(JsonNode::asText).toList()).contains("7");
+    }
 }

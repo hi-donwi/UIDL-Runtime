@@ -97,3 +97,26 @@ describe("Dashboard recipe — metrics/filter/summary/chart states", () => {
     expect(id.name).toBe("Ringkasan Penjualan");
   });
 });
+
+describe("compileDashboardPage with KPIs bound to data", () => {
+  // A KPI used to be printed with String(value), so a binding became "[object Object]" and a
+  // dashboard could only show numbers the host computed before compiling it.
+  const bound: DashboardPageMeta = {
+    name: "ops",
+    label: { id: "Operasional", en: "Operations" },
+    kpis: [
+      { label: { id: "Terbuka", en: "Open" }, value: { $bind: "state.$data.open.total" }, format: "integer" },
+      { label: { id: "Tetap", en: "Static" }, value: 7 },
+    ],
+    dataSources: { open: { $query: { collection: "tickets", filters: [{ field: "status", op: "eq", value: "open" }] } } },
+  };
+
+  it("passes a binding and its format through, and still prints a literal as text", () => {
+    const doc = compileDashboardPage(bound, { hostCapabilities: caps(), uiPolicy: { lang: "en" } });
+    const values = collectNodes(doc.root, (n) => n.id?.endsWith("-value") === true) as Array<{ props: Record<string, unknown> }>;
+    expect(values[0]?.props).toEqual({ value: { $bind: "state.$data.open.total" }, format: "integer" });
+    expect(values[1]?.props).toEqual({ value: "7" });
+    expect(doc.dataSources).toMatchObject({ open: { $query: { collection: "tickets" } } });
+    expect(DocumentSchema.safeParse(doc).success).toBe(true);
+  });
+});

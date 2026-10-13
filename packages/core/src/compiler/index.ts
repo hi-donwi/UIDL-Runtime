@@ -80,6 +80,7 @@ export type {
   ReportFilter,
   ReportPageMeta,
   DashboardKpi,
+  KpiBinding,
   DashboardChart,
   DashboardShortcut,
   DashboardPageMeta,

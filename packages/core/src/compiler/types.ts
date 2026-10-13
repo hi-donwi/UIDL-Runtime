@@ -209,9 +209,19 @@ export interface ReportPageMeta {
   summaries?: Array<{ label: LocalizedText; value?: string | number; agg?: "sum" | "count" | "avg"; field?: string; format?: CellFormat }>;
 }
 
+/** A value read from document state instead of written into the document. */
+export type KpiBinding = { $bind: string } | { $expr: unknown };
+
 export interface DashboardKpi {
   label: LocalizedText;
-  value: string | number;
+  /**
+   * A literal, or a binding into document state such as `{ $bind: "state.$data.open.total" }`,
+   * so a KPI can show what a declared `$query` data source returned rather than a number the
+   * host computed before compiling.
+   */
+  value: string | number | KpiBinding;
+  /** How a bound value is printed, as a list cell would print it. */
+  format?: CellFormat;
 }
 
 export interface DashboardChart {

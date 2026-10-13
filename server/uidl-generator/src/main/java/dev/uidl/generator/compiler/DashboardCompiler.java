@@ -79,8 +79,14 @@ public final class DashboardCompiler {
                         .style(Map.of("fontSize", "text-sm", "color", TEXT_SECONDARY))
                         .build();
 
+                // A binding passes through for the runtime to resolve; a literal becomes text.
+                var valueProps = new LinkedHashMap<String, Object>();
+                valueProps.put("value", kpi.value() instanceof Map<?, ?> ? kpi.value() : String.valueOf(kpi.value()));
+                if (kpi.format() != null) {
+                    valueProps.put("format", kpi.format());
+                }
                 var valNode = node("dashboard-kpis-kpi-" + i + "-value", "Text")
-                        .props(Map.of("value", String.valueOf(kpi.value())))
+                        .props(valueProps)
                         .style(Map.of("fontSize", "text-xl", "fontWeight", 600))
                         .build();
 

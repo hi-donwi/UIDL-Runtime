@@ -7,7 +7,7 @@
 
 import type { UIDLDocument, UIDLNode } from "../types";
 import type { Language } from "../utils/i18n";
-import type { DashboardPageMeta, HostCapabilities, RoutePolicy, UiPolicy } from "./types.js";
+import type { DashboardKpi, DashboardPageMeta, HostCapabilities, RoutePolicy, UiPolicy } from "./types.js";
 
 export interface CompileDashboardOptions {
   hostCapabilities: HostCapabilities;
@@ -32,22 +32,39 @@ function pageHeader(title: string, actions: UIDLNode[]): UIDLNode {
   };
 }
 
-function kpiRow(id: string, pairs: Array<[string, string]>): UIDLNode {
+interface KpiCell {
+  label: string;
+  /** Text for a literal; the binding itself for a bound value, resolved by the runtime. */
+  value: unknown;
+  format?: string;
+}
+
+function kpiRow(id: string, cells: KpiCell[]): UIDLNode {
   return {
     id,
     type: "GridView",
-    props: { style: { display: "grid", gridTemplateColumns: `repeat(${pairs.length}, minmax(0, 1fr))` } },
+    props: { style: { display: "grid", gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))` } },
     style: { borderWidth: "border-b", borderColor: BORDER_COLOR },
-    children: pairs.map(([label, value], idx) => ({
+    children: cells.map((cell, idx) => ({
       id: `${id}-kpi-${idx}`,
       type: "Column",
-      style: { padding: "p-4", gap: "gap-1", ...(idx < pairs.length - 1 ? { borderWidth: "border-e", borderColor: BORDER_COLOR } : {}) },
+      style: { padding: "p-4", gap: "gap-1", ...(idx < cells.length - 1 ? { borderWidth: "border-e", borderColor: BORDER_COLOR } : {}) },
       children: [
-        { id: `${id}-kpi-${idx}-label`, type: "Text", props: { value: label }, style: { fontSize: "text-sm", color: TEXT_SECONDARY } },
-        { id: `${id}-kpi-${idx}-value`, type: "Text", props: { value }, style: { fontSize: "text-xl", fontWeight: 600 } },
+        { id: `${id}-kpi-${idx}-label`, type: "Text", props: { value: cell.label }, style: { fontSize: "text-sm", color: TEXT_SECONDARY } },
+        {
+          id: `${id}-kpi-${idx}-value`,
+          type: "Text",
+          props: { value: cell.value, ...(cell.format ? { format: cell.format } : {}) },
+          style: { fontSize: "text-xl", fontWeight: 600 },
+        },
       ],
     })),
   };
+}
+
+/** A binding passes through for the runtime to resolve; a literal becomes text, as before. */
+function kpiValue(value: DashboardKpi["value"]): unknown {
+  return value !== null && typeof value === "object" ? value : String(value);
 }
 
 function dashboardSection(id: string, content: UIDLNode[], opts: { border?: boolean; grid?: boolean } = {}): UIDLNode {
@@ -75,8 +92,12 @@ export function compileDashboardPage(meta: DashboardPageMeta, options: CompileDa
   }
 
   if (meta.kpis && meta.kpis.length > 0) {
-    const pairs: Array<[string, string]> = meta.kpis.map((kpi) => [kpi.label[lang] ?? "", String(kpi.value)]);
-    children.push(kpiRow("dashboard-kpis", pairs));
+    const cells: KpiCell[] = meta.kpis.map((kpi) => ({
+      label: kpi.label[lang] ?? "",
+      value: kpiValue(kpi.value),
+      ...(kpi.format ? { format: kpi.format } : {}),
+    }));
+    children.push(kpiRow("dashboard-kpis", cells));
   }
 
   if (meta.shortcuts && meta.shortcuts.length > 0) {
