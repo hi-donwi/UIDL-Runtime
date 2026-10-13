@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-10-13
+
+### Added
+- A dashboard KPI's `value` may be a binding (`{ "$bind": "state.$data.open.total" }`) with an
+  optional `format`, so a KPI shows what a declared `$query` returned instead of a number the host
+  computed before compiling. Literals still print as text. The Java generator does the same.
+
+### Changed
+- `react` and `react-dom` are optional peers. `uidl-runtime/recipes` needs neither, and npm no
+  longer installs React into a project that only compiles pages (a server, a CLI, Kerangka).
+
 ## [0.1.6] - 2026-10-13
 
 0.1.5 was tagged but never published to npm; this release carries its changes as well.
