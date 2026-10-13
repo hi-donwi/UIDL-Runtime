@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-10-13
+
+### Fixed
+- npm no longer installs React with `uidl-runtime`. 0.1.7 made `react` and `react-dom` optional
+  peers but still listed them as dependencies, beside `@dnd-kit/*`, which requires React, so the
+  0.1.7 entry below did not hold. The library bundles everything except React, so `@dnd-kit/*`,
+  `clsx`, `tailwind-merge`, and `zustand` are now development dependencies, and `zod` (named by
+  the type declarations) is the only runtime dependency. A React host installs `react` and
+  `react-dom` itself, as a peer requires. `smoke:package` now installs the packed package into an
+  empty project and fails if React arrives with it.
+
 ## [0.1.7] - 2026-10-13
 
 ### Added
