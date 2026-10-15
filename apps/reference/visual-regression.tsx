@@ -61,5 +61,5 @@ if (!suiteDocument) {
       : {}),
   });
 
-  root.render(<React.StrictMode>{rendered}</React.StrictMode>);
+  root.render(<React.StrictMode><div style={{ fontFamily: visualTheme.primitives.font.sans }}>{rendered}</div></React.StrictMode>);
 }
