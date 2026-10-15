@@ -177,6 +177,8 @@ export {
 } from "./compiler/list.js";
 export type { CompileListOptions } from "./compiler/list.js";
 export { compileFormPage } from "./compiler/form.js";
+export { createAdminForm, createAdminHeader, createAdminSection, createAdminActionBar } from "./compiler/adminLayout.js";
+export type { AdminGroupOptions, AdminHeadingOptions, AdminHeaderOptions, AdminSectionOptions, AdminFormOptions } from "./compiler/adminLayout.js";
 export type { CompileFormOptions } from "./compiler/form.js";
 export { compileReportPage } from "./compiler/report.js";
 export type { CompileReportOptions } from "./compiler/report.js";

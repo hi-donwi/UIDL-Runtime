@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../../../packages/core/src/meridian-theme.css";
+@import "../../../packages/core/src/administration.css";
 
 /*
  * Inter variable font, bundled locally (see assets/fonts/NOTICE.md). Meridian's whole

@@ -53,6 +53,7 @@
  * these — see src/meridian-theme.css for where each value comes from upstream.
  */
 @import "./meridian-theme.css";
+@import "./administration.css";
 
 /*
  * Editor chrome light/dark: <Editor />'s `themeMode` state (default "light", same store field

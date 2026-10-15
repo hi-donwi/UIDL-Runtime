@@ -28,3 +28,4 @@ An ADR with no rejected alternatives records a preference, not a decision.
 | [0008](0008-queries-approved.md) | Approve the queries semantics (queries.md) | Accepted | 2026-09-15 |
 | [0009](0009-style-approved.md) | Approve the style semantics (style.md) | Accepted | 2026-09-15 |
 | [0010](0010-presentation-presets-are-recipes.md) | Presentation presets are recipes; auth, shell, and landing sit beside the seven | Accepted | 2026-10-12 |
+| [0011](0011-opt-in-administration-layouts.md) | Opt-in administration compositions and stable control geometry | Accepted | 2026-10-15 |

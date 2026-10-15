@@ -15,6 +15,8 @@ export {
 export type { CompileListOptions } from "./list.js";
 
 export { compileFormPage } from "./form.js";
+export { createAdminForm, createAdminHeader, createAdminSection, createAdminActionBar } from "./adminLayout.js";
+export type { AdminGroupOptions, AdminHeadingOptions, AdminHeaderOptions, AdminSectionOptions, AdminFormOptions } from "./adminLayout.js";
 
 export type { CompileFormOptions } from "./form.js";
 

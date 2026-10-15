@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-10-15
+
+### Added
+- React-free administration header, section, form, and action compositions with opt-in layout hooks.
+- Browser acceptance checks for spacing, contrast, reflow, and host CSS compatibility.
+
+### Fixed
+- Pagination controls keep square targets and readable status under host button styles.
+- Static administration layouts bound form width, separate fields/actions, and preserve wide line tables.
+
 ## [0.1.8] - 2026-10-13
 
 ### Fixed

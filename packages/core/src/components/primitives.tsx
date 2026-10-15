@@ -6,6 +6,7 @@ import type {
   ButtonHTMLAttributes,
   RefObject,
   ChangeEvent,
+  CSSProperties,
 } from "react";
 import { cn } from "../utils/cn";
 import { formatCellValue, isNumericFormat, statusColor, type CellFormat } from "../utils/listCell";
@@ -874,7 +875,7 @@ interface PaginatorProps {
 }
 
 /**
- * Paginator — a 50px-tall three-column grid: range on the
+ * Paginator — an intrinsically wrapping row: range on the
  * start edge, page stepper centered, page-size selector on the end edge. The size selector is
  * hidden until there are more rows than the smallest page size, which is why short demo lists
  * show only "1 - 3" and "1 / 1".
@@ -894,67 +895,69 @@ function Paginator({
   );
 
   return (
-    <div
-      className="grid select-none grid-cols-3 items-center px-4 text-sm text-gray-800 dark:text-gray-100"
-      style={{ height: "50px" }}
-    >
-      <div className="justify-self-start">
-        {`${(pageNo - 1) * count + 1} - ${Math.min(pageNo * count, itemCount)}`}
+    <nav aria-label="Pagination" className="uidl-pagination text-sm">
+      <div className="uidl-pagination-range">
+        {`${itemCount === 0 ? 0 : (pageNo - 1) * count + 1} - ${Math.min(pageNo * count, itemCount)}`}
       </div>
 
-      <div className="flex items-center gap-1 justify-self-center">
+      <div className="uidl-pagination-stepper">
         <button
           type="button"
           aria-label="Previous page"
           onClick={() => onPageNo(pageNo - 1)}
           disabled={pageNo <= 1}
-          className={cn(
-            "flex h-4 w-4 items-center justify-center",
-            pageNo > 1 ? "cursor-pointer text-gray-600 dark:text-gray-500" : "text-transparent",
-          )}
+          className="uidl-pagination-button"
+          style={PAGINATION_TARGET_STYLE}
         >
           <ChevronIcon direction="left" />
         </button>
-        <div className="flex gap-1 rounded bg-gray-100 px-1 dark:bg-gray-890">
-          <span className="w-7 text-end">{pageNo}</span>
-          <span className="text-gray-600">/</span>
-          <span className="w-7">{maxPages}</span>
+        <div className="uidl-pagination-status" role="status" aria-label={`Page ${pageNo} of ${maxPages}`}>
+          <span>{pageNo}</span>
+          <span aria-hidden="true">/</span>
+          <span>{maxPages}</span>
         </div>
         <button
           type="button"
           aria-label="Next page"
           onClick={() => onPageNo(pageNo + 1)}
           disabled={pageNo >= maxPages}
-          className={cn(
-            "flex h-4 w-4 items-center justify-center",
-            pageNo < maxPages ? "cursor-pointer text-gray-600 dark:text-gray-500" : "text-transparent",
-          )}
+          className="uidl-pagination-button"
+          style={PAGINATION_TARGET_STYLE}
         >
           <ChevronIcon direction="right" />
         </button>
       </div>
 
-      {visibleSizes.length > 0 && (
-        <div className="flex justify-self-end rounded border border-gray-100 dark:border-gray-800">
-          {visibleSizes.map((size) => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => onPageSize(size)}
-              className={cn(
-                "w-9",
-                (activePageSize === size || (activePageSize === itemCount && size === -1)) &&
-                  "rounded bg-gray-100 dark:bg-gray-890",
-              )}
-            >
-              {size === -1 ? "All" : size}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+      <div className="uidl-pagination-sizes">
+        {visibleSizes.length > 0 && (
+          <div role="group" aria-label="Items per page" className="uidl-pagination-size-options">
+            {visibleSizes.map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => onPageSize(size)}
+                aria-pressed={activePageSize === size || (activePageSize === itemCount && size === -1)}
+                className="uidl-pagination-size"
+              >
+                {size === -1 ? "All" : size}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </nav>
   );
 }
+
+// Keep hit geometry independent of broad host action-button rules. The glyph remains 16px.
+const PAGINATION_TARGET_STYLE: CSSProperties = {
+  inlineSize: "2.5rem",
+  blockSize: "2.5rem",
+  minInlineSize: "2.5rem",
+  minBlockSize: "2.5rem",
+  padding: "0.625rem",
+  flexShrink: 0,
+};
 
 export interface PageBarProps extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
   /** Rows in the whole result, not just the loaded page — a server total. */

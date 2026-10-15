@@ -43,7 +43,23 @@ for (const suite of suites) {
     await page.goto(`/visual-regression.html?doc=${suite.id}`);
     await expect(page.getByText(suite.expectedText).first()).toBeVisible();
 
+    expect(await page.evaluate(async () => {
+      await document.fonts.load("16px Inter");
+      return document.fonts.check("16px Inter");
+    })).toBe(true);
+    await expect(page.getByText(suite.expectedText).first()).toHaveCSS("font-family", /Inter/);
+
     expect(consoleErrors, `console errors on ${suite.id}: ${consoleErrors.join("\n")}`).toEqual([]);
+
+    // A snapshot update must not conceal a missing component stylesheet in this host.
+    const pagination = page.getByRole("navigation", { name: "Pagination", includeHidden: true }).first();
+    const previous = await pagination.getByRole("button", { name: "Previous page", includeHidden: true }).boundingBox();
+    const next = await pagination.getByRole("button", { name: "Next page", includeHidden: true }).boundingBox();
+    expect(previous).not.toBeNull();
+    expect(next).not.toBeNull();
+    expect(previous!.width).toBeGreaterThanOrEqual(32);
+    expect(Math.abs(previous!.width - previous!.height)).toBeLessThanOrEqual(1);
+    expect(Math.abs(previous!.y - next!.y)).toBeLessThanOrEqual(1);
 
     await expect(page).toHaveScreenshot(`${suite.id}.png`, { fullPage: true });
   });

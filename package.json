@@ -1,6 +1,6 @@
 {
   "name": "uidl-runtime",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "main": "./dist/uidl-runtime.js",
   "module": "./dist/uidl-runtime.mjs",
   "types": "./dist/index.d.ts",
@@ -51,6 +51,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:layout": "npm run build:css && playwright test --config playwright.layout.config.ts",
     "smoke:package": "pnpm run build && node scripts/smoke-package-consumer.mjs",
     "validate": "node bin/validate.mjs",
     "validate:examples": "node bin/validate.mjs packages/templates/src/documents/*.json packages/templates/src/catalog/gallery/*.en.json",
