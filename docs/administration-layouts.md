@@ -3,7 +3,7 @@
 The administration compositions are opt-in helpers exported by the root package
 and by the React-free uidl-runtime/recipes entry. They build ordinary UIDL nodes;
 they do not register new widget types or change generic Row/Column/Form defaults.
-They are additive in unreleased source after 0.1.8; check package exports before use.
+They are available from 0.1.9; check package exports before use.
 
     import { createAdminHeader, createAdminForm, createAdminSection } from "uidl-runtime/recipes";
 
