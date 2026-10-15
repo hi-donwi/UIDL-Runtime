@@ -43,6 +43,12 @@ for (const suite of suites) {
     await page.goto(`/visual-regression.html?doc=${suite.id}`);
     await expect(page.getByText(suite.expectedText).first()).toBeVisible();
 
+    expect(await page.evaluate(async () => {
+      await document.fonts.load("16px Inter");
+      return document.fonts.check("16px Inter");
+    })).toBe(true);
+    await expect(page.getByText(suite.expectedText).first()).toHaveCSS("font-family", /Inter/);
+
     expect(consoleErrors, `console errors on ${suite.id}: ${consoleErrors.join("\n")}`).toEqual([]);
 
     // A snapshot update must not conceal a missing component stylesheet in this host.

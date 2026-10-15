@@ -10,6 +10,15 @@ import saasGrowthSuiteDocument from "@uidl-runtime/templates/documents/saas-grow
 import financeOpsSuiteDocument from "@uidl-runtime/templates/documents/finance-ops-suite.json";
 import knowledgePackSuiteDocument from "@uidl-runtime/templates/documents/knowledge-pack-suite.json";
 
+// Suite snapshots must use the bundled font rather than each Linux image's system fallback.
+const visualTheme = {
+  ...defaultLightTheme,
+  primitives: {
+    ...defaultLightTheme.primitives,
+    font: { ...defaultLightTheme.primitives.font, sans: 'Inter, sans-serif' },
+  },
+};
+
 const agentSession = {
   user: { id: "usr_1", name: "Finance Manager" },
   roles: ["Finance Manager"],
@@ -45,7 +54,7 @@ if (!suiteDocument) {
   document.title = `visual-regression: ${docId}`;
   const needsSession = docId === "finance-ops-suite";
   const rendered = renderUIDocument(suiteDocument, {
-    theme: defaultLightTheme,
+    theme: visualTheme,
     dataSources: suiteDocument.dataSources,
     ...(needsSession
       ? { stateStore: createDocumentState(suiteDocument.state).getState(), session: agentSession }
