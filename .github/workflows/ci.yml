@@ -103,3 +103,13 @@ jobs:
 
       - name: Verify administration layout geometry and contrast
         run: pnpm run test:layout
+
+      - name: Preserve visual evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-reference-failure
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
