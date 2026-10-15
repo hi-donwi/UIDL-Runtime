@@ -100,3 +100,6 @@ jobs:
 
       - name: Run visual reference tests
         run: pnpm run test:reference:visual
+
+      - name: Verify administration layout geometry and contrast
+        run: pnpm run test:layout

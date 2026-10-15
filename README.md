@@ -488,3 +488,10 @@ Outline icons are from [Heroicons](https://heroicons.com) (MIT). The interface t
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Administration layouts
+
+For bounded forms, meaningful sections, wrapping actions, and stable pagination,
+see [Administration layout compositions](docs/administration-layouts.md). These
+helpers are additive in unreleased source after 0.1.8. Validate a host with the
+matching stylesheet and run `npm run test:layout` for shared geometry regressions.
