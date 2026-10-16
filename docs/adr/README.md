@@ -29,3 +29,4 @@ An ADR with no rejected alternatives records a preference, not a decision.
 | [0009](0009-style-approved.md) | Approve the style semantics (style.md) | Accepted | 2026-09-15 |
 | [0010](0010-presentation-presets-are-recipes.md) | Presentation presets are recipes; auth, shell, and landing sit beside the seven | Accepted | 2026-10-12 |
 | [0011](0011-opt-in-administration-layouts.md) | Opt-in administration compositions and stable control geometry | Accepted | 2026-10-15 |
+| [0012](0012-host-integration-for-generated-modules-and-exported-apps.md) | Host integration for generated business modules and exported standalone apps (UX-01 to UX-08) | Proposed | 2026-10-16 |
