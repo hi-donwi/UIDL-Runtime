@@ -38,15 +38,22 @@ uidl-admin-section, uidl-admin-section-title, and uidl-admin-actions hooks can a
 be emitted by a generator using existing widgets. The runtime stylesheet owns their
 implementation. Structural fallback utilities help consumers with older stylesheets.
 
-Forms use a 42rem maximum width, 16px field gaps, 24px section spacing, and an
-8px wrapping action gap at the default root size. Add uidl-admin-form-wide for a
-line-table form that needs its container's width. Override scoped CSS properties
---uidl-form-max-width, --uidl-field-gap, --uidl-section-gap, and --uidl-action-gap
-when a surface needs another density. Foreground and font values come from the
-renderer's theme variables. Supporting copy defaults to readable primary ink;
-override --uidl-admin-description-color only with a validated foreground/background
-pair. Validate contrast in the actual brand; a theme switch
+Forms use a 42rem maximum width, 16px field gaps (`--uidl-field-gap: 1rem`), 24px section
+spacing (`--uidl-section-gap: 1.5rem`), and a 16px wrapping action gap (`--uidl-action-gap: 1rem`)
+at the default root size. Add uidl-admin-form-wide for a line-table form that needs its
+container's width. Scoped CSS properties `--uidl-radius-control` (0.375rem / 6px) and
+`--uidl-radius-card` (0.75rem / 12px) guarantee uniform corner curvature across form controls
+and cards. Override scoped CSS properties --uidl-form-max-width, --uidl-field-gap,
+--uidl-section-gap, --uidl-action-gap, and --uidl-radius-* when a surface needs another density.
+Foreground and font values come from the renderer's theme variables. Supporting copy
+defaults to readable primary ink; override --uidl-admin-description-color only with a validated
+foreground/background pair. Validate contrast in the actual brand; a theme switch
 must update the renderer and host mode together.
+
+Enterprise applications built with UIDL must strictly adhere to the professional enterprise
+visual standards: minimum 16px element spacing to ensure finger/mouse ergonomics, uniform
+corner radius tokens, consistent card elevation shadows, and a zero-emoji policy (use semantic
+SVG icons and badge components instead of playful emojis).
 
 PageBar/DataTable pagination uses separate uidl-pagination-* hooks. Pointer targets
 are 40px squares at the default root size; glyphs remain 16px. Page-size buttons
