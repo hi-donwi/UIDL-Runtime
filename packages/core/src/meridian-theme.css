@@ -217,6 +217,17 @@
 .meridian-ui *::before,
 .meridian-ui *::after {
   --tw-border-style: solid;
+  border-color: var(--color-gray-200, #e8ecf1);
+}
+
+:host(.dark),
+.meridian-ui.dark,
+.dark .meridian-ui,
+.meridian-overlay.dark,
+.dark .meridian-overlay,
+.dark .meridian-ui *,
+.dark .meridian-overlay * {
+  border-color: var(--color-gray-800, #262626);
 }
 
 /*

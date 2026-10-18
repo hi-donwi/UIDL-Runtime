@@ -65,6 +65,16 @@
  * text-text-primary, etc) stays the same string in both modes; only the CSS variable *values*
  * change, which is why plain `.dark { --color-x: ... }` overrides are enough here.
  */
+
+/* Universal border softening: prevent browser fallback to dark currentColor */
+*, *::before, *::after {
+  --tw-border-color: #e8ecf1;
+}
+
+.dark *, .dark *::before, .dark *::after {
+  --tw-border-color: #262626;
+}
+
 @theme {
   --color-background: #ffffff;
   --color-surface: #f5f5f5;
@@ -124,7 +134,8 @@
  * vocabulary. h-80 is the top/bottom drawer's default height; w-80 already ships (line above).
  * opacity-0/opacity-100 come from the {sm:...}opacity-{0..100..5} pattern below.
  */
-@source inline("pointer-events-none pointer-events-auto outline-none inset-x-0 inset-y-0 h-80 border-s border-e");
+@source inline("pointer-events-none pointer-events-auto outline-none inset-x-0 inset-y-0 h-80 h-96 h-[32rem] h-[40rem] border-s border-e");
+@source inline("w-80 w-full max-w-md max-w-lg max-w-xl max-w-2xl max-w-5xl sm:w-[28rem] sm:w-[32rem] sm:w-[36rem] sm:w-[48rem]");
 @source inline("transition-transform transition-opacity duration-200 duration-300 ease-out");
 @source inline("translate-x-0 translate-y-0 translate-x-full -translate-x-full translate-y-full -translate-y-full");
 
@@ -149,6 +160,7 @@
 @source inline("text-black text-white text-gray-500 text-gray-600 text-gray-700 text-gray-800 text-gray-900 text-red-600 placeholder-gray-500 text-end");
 @source inline("dark:text-black dark:text-white dark:text-gray-25 dark:text-gray-100 dark:text-gray-200 dark:text-gray-300 dark:text-gray-400 dark:text-gray-500 dark:text-gray-600 dark:text-red-400");
 @source inline("border-gray-100 border-gray-200 border-gray-300 border-t border-b border-s-4 dark:border-gray-700 dark:border-gray-800 dark:border-red-800 border-red-300");
+@source inline("border-slate-50 border-slate-100 border-slate-200 border-slate-300 border-gray-50 border-neutral-100 border-neutral-200 dark:border-slate-700 dark:border-slate-800");
 @source inline("focus:bg-gray-100 dark:focus:bg-gray-850 focus:outline-none dark:font-semibold shadow-2xl shadow-button");
 /* Badge/StatusPill color pairs — getBgTextColorClass in utils/colors.ts. */
 @source inline("bg-{gray,orange,green,red,yellow,blue,indigo,pink,purple,teal}-200");

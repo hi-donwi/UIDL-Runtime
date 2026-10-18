@@ -36,7 +36,7 @@ function ErrorText({ error }: { error?: string }) {
 const CONTROL_LABEL_CLASS = "mb-1 text-sm text-gray-600 dark:text-gray-500";
 const CONTROL_INPUT_CLASS =
   "w-full rounded bg-transparent text-base text-gray-900 placeholder-gray-500 focus:outline-none dark:text-gray-100";
-const CONTROL_BORDER_CLASS = "border border-gray-200 bg-gray-25 dark:border-gray-800 dark:bg-gray-875";
+const CONTROL_BORDER_CLASS = "border border-slate-200/80 bg-slate-50/40 dark:border-gray-800 dark:bg-gray-875";
 
 function controlSizeClass(size: "small" | "large"): string {
   return size === "small" ? "px-2 py-1" : "px-3 py-2";
@@ -1545,24 +1545,58 @@ function useOverlayBehavior(
   }, [open, containerRef]);
 }
 
+export type DrawerSize = "sm" | "md" | "lg" | "xl" | "full";
+
 export interface DrawerProps extends HTMLAttributes<HTMLDivElement> {
+  closeButton?: boolean;
   open?: boolean;
   onClose?: () => void;
   title?: string;
+  /** Subtitle or helper description displayed under the title in the header. */
+  subtitle?: string;
   /** Which screen edge the drawer slides from. Defaults to "right". */
   side?: "left" | "right" | "top" | "bottom";
+  /** Size variant controlling drawer dimensions. Defaults to "md" for CRUD/forms, or "sm" (320px). */
+  size?: DrawerSize;
   /** Show the dimming backdrop (click-to-close). Defaults to true. */
   backdrop?: boolean;
+  /** Optional sticky footer content (e.g. Cancel and Submit buttons). */
+  footer?: ReactNode;
   children?: ReactNode;
 }
 
-/** Side strip + the one border that joins the panel to the page, as QuickEditForm does. */
-const DRAWER_SIDE_CLASSES: Record<NonNullable<DrawerProps["side"]>, string> = {
-  left: "inset-y-0 left-0 w-80 border-e",
-  right: "inset-y-0 right-0 w-80 border-s",
-  top: "inset-x-0 top-0 h-80 border-b",
-  bottom: "inset-x-0 bottom-0 h-80 border-t",
+const DRAWER_SIZE_WIDTHS: Record<DrawerSize, string> = {
+  sm: "w-80",
+  md: "w-full max-w-md sm:w-[28rem]",
+  lg: "w-full max-w-xl sm:w-[36rem]",
+  xl: "w-full max-w-2xl sm:w-[48rem]",
+  full: "w-full max-w-5xl",
 };
+
+const DRAWER_SIZE_HEIGHTS: Record<DrawerSize, string> = {
+  sm: "h-80",
+  md: "h-96",
+  lg: "h-[32rem]",
+  xl: "h-[40rem]",
+  full: "h-screen",
+};
+
+function drawerSideClasses(side: NonNullable<DrawerProps["side"]>, size?: DrawerSize): string {
+  if (side === "left") {
+    const width = size ? DRAWER_SIZE_WIDTHS[size] : "w-80";
+    return `inset-y-0 left-0 ${width} border-e`;
+  }
+  if (side === "right") {
+    const width = size ? DRAWER_SIZE_WIDTHS[size] : "w-80";
+    return `inset-y-0 right-0 ${width} border-s`;
+  }
+  if (side === "top") {
+    const height = size ? DRAWER_SIZE_HEIGHTS[size] : "h-80";
+    return `inset-x-0 top-0 ${height} border-b`;
+  }
+  const height = size ? DRAWER_SIZE_HEIGHTS[size] : "h-80";
+  return `inset-x-0 bottom-0 ${height} border-t`;
+}
 
 /** Off-screen starting translate per drawer side — the slide always comes from the screen edge. */
 const DRAWER_START_TRANSLATE: Record<NonNullable<DrawerProps["side"]>, string> = {
@@ -1668,7 +1702,7 @@ function useOverlayPresence(open: boolean | undefined): { mounted: boolean; clos
   return { mounted, closing, entered };
 }
 
-export function Drawer({ open, onClose, title, side = "right", backdrop = true, children, ...props }: DrawerProps) {
+export function Drawer({ open, onClose, title, subtitle, side = "right", size, backdrop = true, closeButton = false, footer, children, ...props }: DrawerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   // Engage the overlay behavior only while the overlay is actually in the DOM: mounting is
   // deferred by one commit (useOverlayPresence flips `mounted` after the first render), so
@@ -1702,23 +1736,49 @@ export function Drawer({ open, onClose, title, side = "right", backdrop = true, 
         aria-label={title}
         {...props}
         className={cn(
-          // Meridian's closest equivalent is the quick-edit pane (QuickEditForm): a plain
-          // white surface joined to the page by one border, with a `h-row-large` title bar
-          // in FormHeader's `text-xl font-semibold` — not a floating card.
-          "pointer-events-auto fixed flex flex-col border-gray-200 bg-white shadow-md outline-none dark:border-gray-800 dark:bg-gray-890",
+          "pointer-events-auto fixed flex flex-col border-slate-200/80 bg-white shadow-md outline-none dark:border-gray-800 dark:bg-gray-890",
           motion.surface,
-          DRAWER_SIDE_CLASSES[side],
+          drawerSideClasses(side, size),
           translate,
           closing && "pointer-events-none",
           props.className,
         )}
       >
-        {title && (
-          <h3 className="h-row-large flex flex-shrink-0 items-center border-b border-gray-200 px-4 text-xl font-semibold dark:border-gray-800 dark:text-gray-25">
-            {title}
-          </h3>
+        {(title || subtitle || closeButton) && (
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-200/80 px-6 py-4 bg-slate-50/50 dark:bg-gray-875 dark:border-gray-800">
+            <div className="flex flex-col pr-4 min-w-0">
+              {title && (
+                <h3 className="text-base font-semibold tracking-tight text-slate-900 truncate dark:text-slate-100">
+                  {title}
+                </h3>
+              )}
+              {subtitle && (
+                <p className="mt-0.5 text-xs text-slate-500 line-clamp-2 dark:text-slate-400">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+            {closeButton && onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close drawer"
+                className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 dark:hover:text-slate-200"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
+          </div>
         )}
-        <div className="custom-scroll flex-1 overflow-y-auto p-4 text-base">{children}</div>
+        <div className="custom-scroll flex-1 overflow-y-auto p-6 text-sm">{children}</div>
+        {footer && (
+          <div className="flex flex-shrink-0 items-center justify-end gap-3 border-t border-slate-200/80 bg-slate-50/50 px-6 py-3.5 dark:bg-gray-875 dark:border-gray-800">
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
