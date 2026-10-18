@@ -515,4 +515,17 @@ export const defaultWidgets: WidgetManifest[] = [
     propDescriptors: [prop("value", "string"), prop("size", "number")],
     hideFromPalette: true,
   },
+  {
+    type: "custom",
+    component: Container,
+    category: "advanced",
+    acceptsChildren: true,
+    defaultProps: {},
+    propDescriptors: [
+      prop("component", "string", "Name of the registered host custom component."),
+      prop("className", "string"),
+      prop("style", "object"),
+    ],
+    hideFromPalette: true,
+  },
 ];

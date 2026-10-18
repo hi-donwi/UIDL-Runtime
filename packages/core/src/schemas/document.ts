@@ -39,6 +39,13 @@ export const NodeSchema: z.ZodType<UIDLNode> = z.object({
 
 export const ThemePresetsSchema = z.array(ThemePresetSchema);
 
+export const LayoutConfigSchema = z.object({
+  container: z.enum(["full", "constrained", "narrow", "prose"]).optional(),
+  maxWidth: z.string().optional(),
+  padding: z.union([z.enum(["none", "compact", "standard", "responsive", "spacious"]), z.string()]).optional(),
+  centered: z.boolean().optional(),
+});
+
 export const DocumentSchema = z.object({
   $schema: z.string().optional(),
   version: z.string(),
@@ -46,6 +53,7 @@ export const DocumentSchema = z.object({
   name: z.string(),
   route: z.string().optional(),
   theme: z.string().optional(),
+  layout: LayoutConfigSchema.optional(),
   state: z.record(z.string(), z.unknown()).optional(),
   // Each entry is either an inline array (resolved synchronously, as it always has been) or a
   // `{ "$query": { collection, filters, sort, page, search, fields } }` descriptor resolved

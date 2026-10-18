@@ -1,5 +1,5 @@
 import React from "react";
-import type { ComponentRegistry, UIDLDocument, Theme } from "../types";
+import type { ComponentRegistry, UIDLDocument, Theme, LayoutConfig } from "../types";
 import { renderNode } from "./RenderNode";
 import { getTheme } from "../theme/registry";
 import { themeToCssVariablesMap } from "../theme/tailwind";
@@ -10,6 +10,7 @@ import { ActionInterpreter, type ApiAllowlist } from "../actions/interpreter";
 import { assertSupportedDocumentVersion } from "../version";
 import type { DataAdapter } from "../data/types";
 import type { CommandHandler, DownloadHandler, MutationHandler } from "../types/actions";
+import { resolveContainerStyles } from "../components/primitives";
 
 export interface RenderOptions {
   theme?: Theme;
@@ -43,6 +44,11 @@ export interface RenderOptions {
   onRouteChange?: (route: string | Record<string, unknown>) => void;
   registry?: ComponentRegistry;
   /**
+   * Optional custom React components accessible inside UIDL documents via
+   * `{ "type": "custom", "props": { "component": "MyCustomComponent" } }` or `{ "type": "slot" }`.
+   */
+  customComponents?: Record<string, React.ComponentType<any>>;
+  /**
    * Hosts a document's `api` actions are allowed to call. `api` actions refuse to run unless
    * this is set — see `ActionInterpreter`'s constructor for why the default is fail-closed.
    */
@@ -58,6 +64,7 @@ export interface RenderContext {
   data: Record<string, unknown>;
   stateSnapshot: Record<string, unknown> | undefined;
   session: Record<string, unknown> | undefined;
+  customComponents?: Record<string, React.ComponentType<any>>;
   eventBus: EventBus;
   interpreter: ActionInterpreter;
 }
@@ -92,7 +99,7 @@ export function createRenderContext(document: UIDLDocument, options: RenderOptio
     }
   }
 
-  const stateSnapshot = stateStore?.getValue() as Record<string, unknown> | undefined;
+  const stateSnapshot = (stateStore?.getValue() as Record<string, unknown> | undefined) ?? document.state;
 
   const eventBus = createEventBus();
   if (options.onRouteChange) {
@@ -116,7 +123,15 @@ export function createRenderContext(document: UIDLDocument, options: RenderOptio
     apiMaxConcurrentCalls: options.apiMaxConcurrentCalls,
   });
 
-  return { theme, data, stateSnapshot, session: options.session, eventBus, interpreter };
+  return {
+    theme,
+    data,
+    stateSnapshot,
+    session: options.session,
+    customComponents: options.customComponents,
+    eventBus,
+    interpreter,
+  };
 }
 
 /**
@@ -153,7 +168,7 @@ export function renderUIDocument(
   options: RenderOptions = {},
 ): React.ReactNode {
   warnIfUnresolvedQuery(document);
-  const { theme, data, stateSnapshot, session, interpreter } = createRenderContext(document, options);
+  const { theme, data, stateSnapshot, session, customComponents, interpreter } = createRenderContext(document, options);
 
   const rendered = renderNode(document.root, {
     theme,
@@ -163,9 +178,32 @@ export function renderUIDocument(
     actionInterpreter: interpreter,
     registry: options.registry,
     definitions: document.definitions,
+    customComponents,
   });
 
-  return withThemeCssVariables(rendered, theme);
+  const themed = withThemeCssVariables(rendered, theme);
+  return withDocumentLayout(themed, document.layout);
+}
+
+/**
+ * Wraps rendered document content in a container shell conforming to document.layout constraints.
+ * Provides consistent maximum widths ("constrained" -> 80rem, "narrow" -> 48rem), responsive padding,
+ * and centering out of the box without requiring manual consumer CSS patches.
+ */
+export function withDocumentLayout(rendered: React.ReactNode, layout?: LayoutConfig): React.ReactNode {
+  if (!layout) return rendered;
+  const { className, style } = resolveContainerStyles(layout);
+  if (!className && !style) return rendered;
+
+  return React.createElement(
+    "div",
+    {
+      "data-uidl-layout-shell": "true",
+      className,
+      style,
+    },
+    rendered,
+  );
 }
 
 /**

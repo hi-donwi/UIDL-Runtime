@@ -71,6 +71,15 @@ export interface DataAdapter {
     signal?: AbortSignal,
   ): Promise<{ record: T; meta: RecordMeta }>;
   report<T = unknown>(name: string, params: Record<string, unknown>, signal?: AbortSignal): Promise<T>;
+  /**
+   * Optional realtime/streaming subscription. Returns an unsubscribe function.
+   * Enables live telemetry, IoT metrics, or push updates to stream into document state.
+   */
+  subscribe?<T = Record<string, unknown>>(
+    query: Query,
+    onData: (data: QueryResult<T> | T | unknown) => void,
+    onError?: (err: Error) => void,
+  ): () => void;
 }
 
 export { DataError, isDataError } from "./errors";

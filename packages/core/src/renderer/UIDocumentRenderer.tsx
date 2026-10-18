@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { UIDLDocument } from "../types";
 import type { RenderOptions } from "./renderDocument";
-import { createRenderContext, withThemeCssVariables } from "./renderDocument";
+import { createRenderContext, withThemeCssVariables, withDocumentLayout } from "./renderDocument";
 import { renderNode } from "./RenderNode";
 import { Dialog, Snackbar } from "../components/primitives";
-import { runDataSources, serializeResolvedQueries } from "../state/dataSources";
+import { runDataSources, serializeResolvedQueries, isQueryDataSource } from "../state/dataSources";
+import type { Query, QueryResult } from "../data/types";
 
 export interface UIDocumentRendererProps extends RenderOptions {
   document: UIDLDocument;
@@ -40,6 +41,7 @@ export function UIDocumentRenderer({
   downloadHandler,
   onRouteChange,
   registry,
+  customComponents,
   apiAllowlist,
   apiMaxResponseBytes,
   apiMaxConcurrentCalls,
@@ -104,6 +106,49 @@ export function UIDocumentRenderer({
     };
   }, [dataAdapter, stateStore, effectiveDataSources, session, dataRefreshToken]);
 
+  // Realtime / streaming subscription support (DataAdapter.subscribe)
+  useEffect(() => {
+    if (!dataAdapter?.subscribe || !stateStore || !effectiveDataSources) return;
+
+    const unsubs: (() => void)[] = [];
+
+    for (const [name, config] of Object.entries(effectiveDataSources)) {
+      if (!isQueryDataSource(config)) continue;
+      try {
+        const queryDesc = (config as { $query: Query }).$query;
+        const unsub = dataAdapter.subscribe(
+          queryDesc,
+          (incoming) => {
+            if (incoming && typeof incoming === "object" && "rows" in incoming) {
+              const res = incoming as QueryResult;
+              stateStore.setState(`$data.${name}.rows`, res.rows);
+              stateStore.setState(`$data.${name}.total`, res.total);
+              stateStore.setState(`$data.${name}.status`, "success");
+            } else if (Array.isArray(incoming)) {
+              stateStore.setState(`$data.${name}.rows`, incoming);
+              stateStore.setState(`$data.${name}.total`, incoming.length);
+              stateStore.setState(`$data.${name}.status`, "success");
+            } else {
+              stateStore.setState(`$data.${name}.data`, incoming);
+              stateStore.setState(`$data.${name}.status`, "success");
+            }
+          },
+          (err: Error) => {
+            stateStore.setState(`$data.${name}.status`, "error");
+            stateStore.setState(`$data.${name}.error`, err.message);
+          },
+        );
+        if (typeof unsub === "function") unsubs.push(unsub);
+      } catch (_err) {
+        // Fall back gracefully if subscription not supported for this query
+      }
+    }
+
+    return () => {
+      unsubs.forEach((u) => u());
+    };
+  }, [dataAdapter, stateStore, effectiveDataSources, session]);
+
   const context = useMemo(
     () => {
       // stateVersion is deliberately referenced only as a cache-busting dep: the store's
@@ -121,6 +166,7 @@ export function UIDocumentRenderer({
         downloadHandler,
         onRouteChange,
         registry,
+        customComponents,
         apiAllowlist,
         apiMaxResponseBytes,
         apiMaxConcurrentCalls,
@@ -138,6 +184,7 @@ export function UIDocumentRenderer({
       downloadHandler,
       onRouteChange,
       registry,
+      customComponents,
       apiAllowlist,
       apiMaxResponseBytes,
       apiMaxConcurrentCalls,
@@ -173,11 +220,15 @@ export function UIDocumentRenderer({
     actionInterpreter: context.interpreter,
     registry,
     definitions: document.definitions,
+    customComponents,
   });
+
+  const themed = withThemeCssVariables(rendered, context.theme);
+  const layoutWrapped = withDocumentLayout(themed, document.layout);
 
   return (
     <>
-      {withThemeCssVariables(rendered, context.theme)}
+      {layoutWrapped}
       <Dialog
         open={dialog !== null}
         title={dialog?.title}

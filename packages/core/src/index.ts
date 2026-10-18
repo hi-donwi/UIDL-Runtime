@@ -8,7 +8,7 @@ export { reportDocumentVersion, assertSupportedDocumentVersion, DocumentVersionE
 export type { DocumentVersionReport, DocumentVersionStatus } from "./version";
 export { resolvePath, isBindPath, RENDER_SCOPE_PREFIXES } from "./state/bindings";
 export type { BindingScope, RenderScopePrefix } from "./state/bindings";
-export type { UIDLDocument, UIDLNode, DesignTokens, WidgetManifest, ComponentRegistry, ComponentPropDescriptor, ComponentPropType, ComponentEventDescriptor, Theme, ThemePreset, PrimitiveTokens, SemanticTokens, TypographyToken, ComponentVariant, StyleIntent, ResponsiveValue } from "./types";
+export type { UIDLDocument, UIDLNode, LayoutConfig, DesignTokens, WidgetManifest, ComponentRegistry, ComponentPropDescriptor, ComponentPropType, ComponentEventDescriptor, Theme, ThemePreset, PrimitiveTokens, SemanticTokens, TypographyToken, ComponentVariant, StyleIntent, ResponsiveValue } from "./types";
 export type {
   Action,
   SetStateAction,
@@ -40,7 +40,7 @@ export type {
   SequenceAction,
   IfAction,
 } from "./types/actions";
-export { DocumentSchema, DesignTokensSchema, ThemePresetsSchema } from "./schemas/document";
+export { DocumentSchema, LayoutConfigSchema, DesignTokensSchema, ThemePresetsSchema } from "./schemas/document";
 export { ActionSchema, ActionsSchema } from "./schemas/actions";
 export { generateJsonSchemas } from "./schema/jsonSchema";
 export type { JsonSchemaExport } from "./schema/jsonSchema";

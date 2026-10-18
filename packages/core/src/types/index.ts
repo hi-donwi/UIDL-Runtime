@@ -1,3 +1,14 @@
+export interface LayoutConfig {
+  /** High-level container width constraint */
+  container?: "full" | "constrained" | "narrow" | "prose";
+  /** Explicit max-width value, e.g. "80rem", "1280px", "100%" */
+  maxWidth?: string;
+  /** Responsive padding mode or explicit padding */
+  padding?: "none" | "compact" | "standard" | "responsive" | "spacious" | string;
+  /** Center the container horizontally with margin auto */
+  centered?: boolean;
+}
+
 export interface UIDLDocument {
   $schema?: string;
   version: string;
@@ -5,6 +16,7 @@ export interface UIDLDocument {
   name: string;
   route?: string;
   theme?: string;
+  layout?: LayoutConfig;
   state?: Record<string, unknown>;
   dataSources?: Record<string, unknown>;
   /**

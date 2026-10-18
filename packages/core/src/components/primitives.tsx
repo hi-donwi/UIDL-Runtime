@@ -44,10 +44,88 @@ function controlSizeClass(size: "small" | "large"): string {
 
 export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
+  container?: "full" | "constrained" | "narrow" | "prose";
+  maxWidth?: string;
+  padding?: "none" | "compact" | "standard" | "responsive" | "spacious" | string;
+  centered?: boolean;
 }
 
-export function Container({ children, ...props }: ContainerProps) {
-  return <div {...props}>{children}</div>;
+export function resolveContainerStyles(options?: {
+  container?: "full" | "constrained" | "narrow" | "prose";
+  maxWidth?: string;
+  padding?: "none" | "compact" | "standard" | "responsive" | "spacious" | string;
+  centered?: boolean;
+}): { className?: string; style?: CSSProperties } {
+  if (!options) return {};
+  const { container, maxWidth, padding, centered = true } = options;
+  const classes: string[] = [];
+  const style: CSSProperties = {};
+
+  if (maxWidth) {
+    style.maxWidth = maxWidth;
+  } else if (container === "constrained") {
+    style.maxWidth = "80rem";
+    classes.push("max-w-7xl");
+  } else if (container === "narrow") {
+    style.maxWidth = "48rem";
+    classes.push("max-w-3xl");
+  } else if (container === "prose") {
+    classes.push("max-w-prose");
+  } else if (container === "full") {
+    classes.push("w-full");
+  }
+
+  if (centered && (container || maxWidth)) {
+    classes.push("mx-auto");
+    style.marginLeft = "auto";
+    style.marginRight = "auto";
+  }
+
+  if (padding === "responsive") {
+    style.padding = "clamp(1.25rem, 3vw, 2.5rem)";
+    classes.push("px-4 sm:px-6 lg:px-8 py-6");
+  } else if (padding === "compact") {
+    classes.push("p-3");
+  } else if (padding === "standard") {
+    classes.push("p-6");
+  } else if (padding === "spacious") {
+    classes.push("p-10");
+  } else if (padding === "none") {
+    classes.push("p-0");
+  } else if (typeof padding === "string" && padding) {
+    if (padding.startsWith("p-") || padding.startsWith("px-")) {
+      classes.push(padding);
+    } else {
+      style.padding = padding;
+    }
+  }
+
+  return {
+    className: classes.length > 0 ? classes.join(" ") : undefined,
+    style: Object.keys(style).length > 0 ? style : undefined,
+  };
+}
+
+export function Container({
+  children,
+  container,
+  maxWidth,
+  padding,
+  centered,
+  className,
+  style,
+  ...props
+}: ContainerProps) {
+  const layout = resolveContainerStyles({ container, maxWidth, padding, centered });
+  return (
+    <div
+      {...props}
+      className={cn(layout.className, className)}
+      style={{ ...layout.style, ...style }}
+    >
+      {children}
+    </div>
+  );
 }
 
 export interface RowProps extends HTMLAttributes<HTMLDivElement> {

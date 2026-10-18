@@ -20,6 +20,8 @@ interface RenderScope extends ExprRenderScope {
   definitions?: Record<string, UIDLNode>;
   /** componentIds currently being expanded, ancestor-first — used to detect circular references. */
   componentStack?: string[];
+  /** Host-registered custom React components accessible via { type: "custom", props: { component: "Name" } } */
+  customComponents?: Record<string, React.ComponentType<any>>;
 }
 
 const FORM_WIDGETS = new Set(["TextField", "Checkbox", "Switch", "Slider", "Select", "Textarea", "RadioGroup"]);
@@ -55,6 +57,71 @@ export function renderNode(node: UIDLNode, scope: RenderScope = {}): React.React
       ...scope,
       componentStack: [...(scope.componentStack ?? []), node.componentId],
     });
+  }
+
+  // First-class custom component slot / extension escape-hatch
+  if (node.type === "custom" || node.type === "slot") {
+    const customName =
+      (node.props?.component as string | undefined) ||
+      (node.props?.name as string | undefined) ||
+      node.name ||
+      node.componentId ||
+      node.ref ||
+      "";
+    const CustomComponent = scope.customComponents?.[customName];
+
+    const normalized = normalizeNodeResponsive(node);
+    const visibility = resolveVisibility(normalized, scope);
+    if (!visibility) return null;
+
+    const mergedProps = resolveProps(normalized.props ?? {}, scope);
+    const handlers = resolveEvents(normalized.events ?? {}, scope.actionInterpreter, normalized.type);
+
+    if (CustomComponent) {
+      return (
+        <CustomComponent
+          {...mergedProps}
+          id={normalized.id}
+          data-node-id={normalized.id}
+          data-testid={normalized.testId}
+          state={scope.state}
+          session={scope.session}
+          data={scope.data}
+          onAction={(action: Action | Action[], payload?: unknown) => {
+            if (!scope.actionInterpreter) return;
+            const sequence = Array.isArray(action) ? action : [action];
+            scope.actionInterpreter.execute({ sequence }, payload);
+          }}
+          {...handlers}
+        >
+          {normalized.children?.map((child) => (
+            <React.Fragment key={child.id}>
+              {renderNode(child, scope)}
+            </React.Fragment>
+          ))}
+        </CustomComponent>
+      );
+    }
+
+    // Graceful fallback slot placeholder when component is not in registry
+    return (
+      <div
+        data-node-id={normalized.id}
+        data-testid={normalized.testId}
+        data-custom-slot={customName || normalized.id}
+        className={cn(
+          "rounded border border-dashed border-gray-300 p-4 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400",
+          mergedProps.className as string | undefined,
+        )}
+      >
+        {customName ? `Custom Slot: ${customName}` : `Slot: ${normalized.id}`}
+        {normalized.children?.map((child) => (
+          <React.Fragment key={child.id}>
+            {renderNode(child, scope)}
+          </React.Fragment>
+        ))}
+      </div>
+    );
   }
 
   const registry = scope.registry ?? defaultRegistry;
