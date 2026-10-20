@@ -139,7 +139,7 @@ export function UIDocumentRenderer({
           },
         );
         if (typeof unsub === "function") unsubs.push(unsub);
-      } catch (_err) {
+      } catch {
         // Fall back gracefully if subscription not supported for this query
       }
     }

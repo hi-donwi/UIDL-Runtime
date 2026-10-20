@@ -21,7 +21,7 @@ interface RenderScope extends ExprRenderScope {
   /** componentIds currently being expanded, ancestor-first — used to detect circular references. */
   componentStack?: string[];
   /** Host-registered custom React components accessible via { type: "custom", props: { component: "Name" } } */
-  customComponents?: Record<string, React.ComponentType<any>>;
+  customComponents?: Record<string, React.ComponentType<Record<string, unknown>>>;
 }
 
 const FORM_WIDGETS = new Set(["TextField", "Checkbox", "Switch", "Slider", "Select", "Textarea", "RadioGroup"]);

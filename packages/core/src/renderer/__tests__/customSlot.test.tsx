@@ -2,13 +2,14 @@ import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { UIDocumentRenderer } from "../UIDocumentRenderer";
 import type { UIDLDocument } from "../../types";
+import type { Action } from "../../types/actions";
 
 describe("Custom Component Slot and Extension Escape Hatch", () => {
   it("renders a registered custom React component with evaluated props and onAction callback", () => {
     function TelemetryChart(props: {
       deviceId?: string;
       title?: string;
-      onAction?: (action: any, payload?: any) => void;
+      onAction?: (action: Action | Action[], payload?: unknown) => void;
     }) {
       return (
         <div data-testid="telemetry-chart">

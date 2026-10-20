@@ -47,7 +47,7 @@ export interface RenderOptions {
    * Optional custom React components accessible inside UIDL documents via
    * `{ "type": "custom", "props": { "component": "MyCustomComponent" } }` or `{ "type": "slot" }`.
    */
-  customComponents?: Record<string, React.ComponentType<any>>;
+  customComponents?: Record<string, React.ComponentType<Record<string, unknown>>>;
   /**
    * Hosts a document's `api` actions are allowed to call. `api` actions refuse to run unless
    * this is set — see `ActionInterpreter`'s constructor for why the default is fail-closed.
@@ -64,7 +64,7 @@ export interface RenderContext {
   data: Record<string, unknown>;
   stateSnapshot: Record<string, unknown> | undefined;
   session: Record<string, unknown> | undefined;
-  customComponents?: Record<string, React.ComponentType<any>>;
+  customComponents?: Record<string, React.ComponentType<Record<string, unknown>>>;
   eventBus: EventBus;
   interpreter: ActionInterpreter;
 }
