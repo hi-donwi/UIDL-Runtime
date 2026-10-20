@@ -4,16 +4,48 @@
   "title": "UIDL Conformance Case",
   "description": "One testable behaviour. Active cases are run by the reference runtime; planned cases are authored but skip.",
   "type": "object",
-  "required": ["$schema", "id", "class", "status", "spec", "input", "context", "expected"],
+  "required": [
+    "$schema",
+    "id",
+    "class",
+    "status",
+    "spec",
+    "input",
+    "context",
+    "expected"
+  ],
   "additionalProperties": false,
   "properties": {
-    "$schema": { "const": "https://uidl.dev/schema/v1/conformance-case.schema.json" },
-    "id": { "type": "string" },
-    "class": { "enum": ["expression", "binding", "condition", "render", "data", "error", "action", "action-exec"] },
-    "status": { "enum": ["active", "planned"] },
-    "spec": { "const": "v1" },
+    "$schema": {
+      "const": "https://uidl.dev/schema/v1/conformance-case.schema.json"
+    },
+    "id": {
+      "type": "string"
+    },
+    "class": {
+      "enum": [
+        "expression",
+        "binding",
+        "condition",
+        "render",
+        "data",
+        "error",
+        "action",
+        "action-exec",
+        "theme"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "planned"
+      ]
+    },
+    "spec": {
+      "const": "v1"
+    },
     "input": {
-      "description": "For expression/binding: the raw expression to evaluate. For condition: the same.",
+      "description": "For expression/binding: the raw expression to evaluate. For condition: the same. For theme: {theme, ref} where theme is a shipped theme id and ref a token reference (braced refs resolve to CSS custom properties; bare paths resolve via resolveToken).",
       "type": "object"
     },
     "context": {
@@ -22,7 +54,14 @@
     },
     "expected": {
       "description": "The expected result for active cases. For planned render/data cases: not executed.",
-      "type": ["object", "array", "boolean", "number", "string", "null"]
+      "type": [
+        "object",
+        "array",
+        "boolean",
+        "number",
+        "string",
+        "null"
+      ]
     }
   }
 }

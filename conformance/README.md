@@ -21,6 +21,8 @@ conformance/
     render/       ← renderUIDocument() must produce a valid element from the document
     data/         ← createRenderContext() resolves the dataSource entry (inline array → as-is;
                     unstarted $query → [])
+    theme/        ← the theme engine resolves a token reference (braced ref → CSS custom
+                    property via tokenRefToCssVar; bare path → primitive/semantic value)
 ```
 
 ## Running
@@ -54,6 +56,8 @@ conformance/
   accepts `input`. They do **not** execute the action.
 - `action-exec`-class active cases run `input` against `context.state` and compare
   `{ ok, state, code? }`. Existing `action` fixtures stay schema-accept.
+- `theme`-class active cases take `input: {theme, ref}` over a shipped theme and assert either the
+  CSS custom property (`{...}` braced refs) or the resolved value (`resolveToken`).
 - `data`-class active cases take `input: {key, config}` and assert `createRenderContext`
   resolves the dataSource to `expected` (inline array → as-is; a `$query` that has never
   started → `[]`).

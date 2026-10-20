@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Tonal surface container tokens (`surface-container-low`, `surface-container`, `surface-container-high` and their `bg-surface-container-*` semantics) on the default and Meridian light/dark themes, giving host surfaces declared tonal elevation instead of per-component shadow decisions.
+- A `theme` conformance class (`conformance/cases/theme/`) resolving token references against the shipped themes: braced refs to CSS custom properties via `tokenRefToCssVar` (now exported), bare paths via `resolveToken`.
+- Theme invariant tests in `packages/core/src/theme/__tests__/theme.invariants.test.ts`: every semantics/variant token reference resolves, on-color pairing (`text-on-primary`, `text-inverse`), monotonic radius scale, and ordered tonal surfaces.
+
+### Fixed
+- `resolveToken` now joins dotted key parts with `-`, matching `tokenRefToCssVar`, so `{primitives.border.width.thin}` resolves like the canonical `{primitives.border.width-thin}` form.
+- The default theme's card/textfield/button variants referenced `{primitives.border.width.thin}` / `{primitives.border.width.0}`, which the engine cannot resolve for direct value lookups; they now use the canonical hyphenated keys.
+
 ## [0.1.9] - 2026-10-15
 
 ### Added

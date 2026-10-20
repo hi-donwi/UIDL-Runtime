@@ -11,6 +11,9 @@ import { assertSupportedDocumentVersion, DocumentVersionError } from "../../vers
 import { ActionInterpreter } from "../../actions/interpreter";
 import { createDocumentState } from "../../state/createDocumentState";
 import { renderUIDocument, createRenderContext } from "../../renderer/renderDocument";
+import { createThemeEngine, tokenRefToCssVar } from "../../theme/engine";
+import { defaultDarkTheme, defaultLightTheme } from "../../theme/presets";
+import { meridianDarkTheme, meridianLightTheme } from "../../theme/meridianPreset";
 import type { UIDLDocument } from "../../types";
 import type { Action } from "../../types/actions";
 
@@ -29,7 +32,7 @@ function* walk(dir: string): Iterable<string> {
 
 interface ConformanceCase {
   id: string;
-  class: "expression" | "binding" | "condition" | "render" | "data" | "error" | "action" | "action-exec";
+  class: "expression" | "binding" | "condition" | "render" | "data" | "error" | "action" | "action-exec" | "theme";
   status: "active" | "planned";
   spec: string;
   input: unknown;
@@ -90,6 +93,28 @@ describe("conformance (spec v1)", () => {
           expect(report.error?.code).toBe(expected.code);
         }
         expect(store.getState().state).toEqual(expected.state);
+      });
+    }
+  });
+
+  describe("theme", () => {
+    const themes = {
+      "default-light": defaultLightTheme,
+      "default-dark": defaultDarkTheme,
+      "meridian-light": meridianLightTheme,
+      "meridian-dark": meridianDarkTheme,
+    } as const;
+    for (const c of active.filter((x) => x.class === "theme")) {
+      it(`resolves ${c.id}`, () => {
+        const input = c.input as { theme: string; ref: string };
+        const theme = themes[input.theme as keyof typeof themes];
+        expect(theme, `case ${c.id} names a shipped theme`).toBeDefined();
+        const engine = createThemeEngine(theme);
+        if (input.ref.startsWith("{")) {
+          expect(tokenRefToCssVar(input.ref) ?? null).toEqual(c.expected);
+        } else {
+          expect(engine.resolveToken(input.ref) ?? null).toEqual(c.expected);
+        }
       });
     }
   });

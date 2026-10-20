@@ -50,7 +50,7 @@ function isTokenRef(value: unknown): value is string {
 }
 
 /** Turns a `{primitives.color.primary}` token reference into `var(--color-primary)`. */
-function tokenRefToCssVar(ref: string): string | undefined {
+export function tokenRefToCssVar(ref: string): string | undefined {
   const path = ref.slice(1, -1);
   const parts = path.split(".");
   if (parts[0] !== "primitives" || parts.length < 3) return undefined;
@@ -117,7 +117,11 @@ export function createThemeEngine(theme: Theme): ThemeEngine {
   function resolveToken(path: string): unknown {
     if (path.startsWith("primitives.")) {
       const rest = path.slice("primitives.".length);
-      const [category, key] = rest.split(".");
+      // Dotted key parts join with "-" to match tokenRefToCssVar, so
+      // `primitives.border.width.thin` and `primitives.border.width-thin` both hit
+      // `--border-width-thin`. Exported tokenRefToCssVar shares that behaviour.
+      const [category, ...keyParts] = rest.split(".");
+      const key = keyParts.join("-");
       switch (category) {
         case "color":
           return primitiveColorMap.get(key);
@@ -138,7 +142,8 @@ export function createThemeEngine(theme: Theme): ThemeEngine {
 
     if (path.startsWith("semantics.")) {
       const rest = path.slice("semantics.".length);
-      const [category, key] = rest.split(".");
+      const [category, ...keyParts] = rest.split(".");
+      const key = keyParts.join("-");
       switch (category) {
         case "color":
           return semanticColorMap.get(key);

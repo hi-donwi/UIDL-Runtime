@@ -1,0 +1,1 @@
+{"$schema": "https://uidl.dev/schema/v1/conformance-case.schema.json", "id": "theme-resolve-semantic-color-holder", "class": "theme", "status": "active", "spec": "v1", "input": {"theme": "default-light", "ref": "semantics.color.text-on-primary"}, "context": {}, "expected": "{primitives.color.text-inverse}"}
