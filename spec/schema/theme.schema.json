@@ -10,6 +10,8 @@
     "spacing": { "type": "object", "additionalProperties": true },
     "typography": { "type": "object", "additionalProperties": true },
     "radius": { "type": "object", "additionalProperties": true },
-    "components": { "type": "object", "additionalProperties": true }
+    "components": { "type": "object", "additionalProperties": true },
+    "primitives": { "type": "object", "additionalProperties": true },
+    "semantics": { "type": "object", "additionalProperties": true }
   }
 }

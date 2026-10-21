@@ -5,6 +5,7 @@
  * - Compiles every *.schema.json under spec/schema/ and conformance/schema/ (draft 2020-12).
  * - Validates every real shipped document against document.schema.json.
  * - Validates every conformance case against the case schema.
+ * - Validates every exported theme (conformance/themes) against theme.schema.json.
  *
  * Zero network: it only parses identifiers. Exit 1 on the first failure.
  */
@@ -78,6 +79,16 @@ for (const glob of scanJson(join(root, "conformance", "cases"))) {
   } else caseCount += 1;
 }
 if (errors.length === 0) console.log(`conformance: ${caseCount} cases validated`);
+
+const validateTheme = sherpa.getSchema("https://uidl.dev/schema/v1/theme.schema.json");
+let themeCount = 0;
+for (const themeFile of scanJson(join(root, "conformance", "themes"))) {
+  const data = load(themeFile);
+  if (!validateTheme(data)) {
+    errors.push(`theme invalid ${themeFile}: ${validateTheme.errors.map((e) => `${e.instancePath} ${e.message}`).join(", ")}`);
+  } else themeCount += 1;
+}
+if (errors.length === 0) console.log(`conformance: ${themeCount} themes validated`);
 
 if (errors.length > 0) {
   console.error(`\n[schema-validate] ${errors.length} problem(s)`);

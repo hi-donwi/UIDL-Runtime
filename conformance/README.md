@@ -23,6 +23,10 @@ conformance/
                     unstarted $query → [])
     theme/        ← the theme engine resolves a token reference (braced ref → CSS custom
                     property via tokenRefToCssVar; bare path → primitive/semantic value)
+  themes/
+    <theme>.json  ← shipped theme token data, generated from the reference runtime's
+                    presets (`pnpm export:themes`); every harness resolves theme cases
+                    against these files
 ```
 
 ## Running
@@ -30,8 +34,12 @@ conformance/
 - `npx vitest run packages/core/src/conformance`: reads all `active` cases and
   executes them with the reference runtime.
 - `node scripts/validate-spec.mjs`: validates every `*.schema.json` against itself,
-  validates the 25 real shipped documents against `document.schema.json`, and
-  validates every conformance case against the case schema.
+  validates the 25 real shipped documents against `document.schema.json`, validates
+  every conformance case against the case schema, and validates every theme under
+  `themes/` against `theme.schema.json`.
+- `npx vitest run packages/core/src/theme`: guards that `themes/*.json` still mirrors
+  the TypeScript presets; regenerate deliberately with `pnpm export:themes` after
+  changing a preset.
 
 ## Adding a case
 
@@ -57,7 +65,9 @@ conformance/
 - `action-exec`-class active cases run `input` against `context.state` and compare
   `{ ok, state, code? }`. Existing `action` fixtures stay schema-accept.
 - `theme`-class active cases take `input: {theme, ref}` over a shipped theme and assert either the
-  CSS custom property (`{...}` braced refs) or the resolved value (`resolveToken`).
+  CSS custom property (`{...}` braced refs) or the resolved value (`resolveToken`). The theme
+  named by `input.theme` must exist as `themes/<theme>.json`; a case naming a theme with no
+  exported file fails on every harness.
 - `data`-class active cases take `input: {key, config}` and assert `createRenderContext`
   resolves the dataSource to `expected` (inline array → as-is; a `$query` that has never
   started → `[]`).

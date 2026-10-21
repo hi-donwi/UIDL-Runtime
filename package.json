@@ -46,6 +46,7 @@
     "build": "tsc -b && vite build && pnpm run build:css && pnpm run build:schema && pnpm run build:catalog",
     "build:css": "tailwindcss -i packages/core/src/style.css -o dist/style.css --minify",
     "build:schema": "node scripts/generate-json-schema.mjs",
+    "export:themes": "tsx scripts/export-theme-presets.mts",
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
