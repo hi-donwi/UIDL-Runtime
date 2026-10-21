@@ -98,8 +98,8 @@ export type {
 export { createEventBus, ActionInterpreter } from "./actions";
 export { ERROR_CODES, ERROR_CODE_VALUES } from "./errors/errors";
 export type { ErrorCode } from "./errors/errors";
-export { Editor } from "./editor";
-export type { EditorProps } from "./editor";
+export { Editor, createEditorStore } from "./editor";
+export type { EditorProps, EditorEdit, EditorHistoryOwner, EditorStore, EditorStoreOptions } from "./editor";
 export { QRCodeSVG, BarcodeSVG, DataMatrixSVG } from "./components/BarcodeAndQRCode";
 export { Icon, IconWidget } from "./components/icons";
 export type { IconProps } from "./components/icons";

@@ -1,9 +1,22 @@
 import { create } from "zustand";
 import type { UIDLDocument, UIDLNode } from "../types";
 import { buildFlatNodeMap, findParentId, removeChildFromNode } from "./document";
+import type { EditorEdit, EditorHistoryOwner } from "./edits";
+
+export interface EditorStoreOptions {
+  /** Called after every edit, with the intent and the resulting document. */
+  onEdit?: (edit: EditorEdit, document: UIDLDocument) => void;
+  /** Called when the selected node changes. */
+  onSelectionChange?: (nodeId: string | null) => void;
+  /** Who owns the undo history. See `EditorHistoryOwner`. */
+  historyOwner?: EditorHistoryOwner;
+}
 
 export interface EditorStore {
   document: UIDLDocument;
+  /** The host's callbacks. Updated through `setCallbacks` so a host may pass new ones. */
+  onEdit?: (edit: EditorEdit, document: UIDLDocument) => void;
+  onSelectionChange?: (nodeId: string | null) => void;
   flatNodeMap: Map<string, UIDLNode>;
   history: { past: UIDLDocument[]; future: UIDLDocument[] };
   selectedNodeId: string | null;
@@ -20,9 +33,15 @@ export interface EditorStore {
   isDirty: boolean;
   canUndo: boolean;
   canRedo: boolean;
+  /** When true, every edit is refused. A host that only inspects a document uses it. */
+  readOnly: boolean;
 
   selectNode: (nodeId: string | null) => void;
   hoverNode: (nodeId: string | null) => void;
+  /** Report an edit to the host. */
+  emit: (edit: EditorEdit) => void;
+  /** Replace the host callbacks without recreating the store. */
+  setCallbacks: (callbacks: { onEdit?: (edit: EditorEdit, document: UIDLDocument) => void; onSelectionChange?: (nodeId: string | null) => void }) => void;
   updateNode: (nodeId: string, changes: Partial<UIDLNode>) => void;
   addChild: (parentId: string, childType: string, index?: number) => void;
   deleteNode: (nodeId: string) => void;
@@ -31,14 +50,24 @@ export interface EditorStore {
   setThemeMode: (mode: "light" | "dark") => void;
   togglePanel: (panel: keyof EditorStore["panelVisibility"]) => void;
   setDocument: (document: UIDLDocument) => void;
+  /**
+   * Adopt a document the host owns.
+   *
+   * Unlike `setDocument`, this keeps the selection when the selected node still
+   * exists, because a host that reloads a draft does not want the author to lose
+   * their place. The history is cleared either way: it belongs to whoever owns it.
+   */
+  replaceDocument: (document: UIDLDocument) => void;
+  setReadOnly: (readOnly: boolean) => void;
   setValidationErrors: (errors: Array<{ path: string; message: string; severity: "error" | "warning" }>) => void;
   markClean: () => void;
   undo: () => void;
   redo: () => void;
 }
 
-export function createEditorStore(initialDocument?: UIDLDocument) {
+export function createEditorStore(initialDocument?: UIDLDocument, options: EditorStoreOptions = {}) {
   const initialFlatNodeMap = initialDocument ? buildFlatNodeMap(initialDocument.root) : new Map();
+  const ownsHistory = options.historyOwner !== "host";
 
   return create<EditorStore>()((set, get) => ({
     document: initialDocument ?? createEmptyDocument(),
@@ -58,17 +87,34 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
     isDirty: false,
     canUndo: false,
     canRedo: false,
+    readOnly: false,
 
-    selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
+    onEdit: options.onEdit,
+    onSelectionChange: options.onSelectionChange,
+
+    /** Report an edit to the host, with the document it produced. */
+    emit: (edit) => get().onEdit?.(edit, get().document),
+
+    setCallbacks: (callbacks) => set({ ...callbacks }),
+
+    selectNode: (nodeId) => {
+      if (get().selectedNodeId === nodeId) return;
+      set({ selectedNodeId: nodeId });
+      get().onSelectionChange?.(nodeId);
+    },
 
     hoverNode: (nodeId) => set({ hoveredNodeId: nodeId }),
 
     updateNode: (nodeId, changes) => {
-      const { flatNodeMap, document, history } = get();
+      const { flatNodeMap, document, history, readOnly } = get();
+      if (readOnly) return;
       const node = flatNodeMap.get(nodeId);
       if (!node) return;
 
       const updatedNode = { ...node, ...changes };
+      // An edit that changes nothing is not an edit. Reporting it would push a
+      // pointless change into the host's history and its draft.
+      if (shallowEqual(node, updatedNode)) return;
       const newFlatNodeMap = new Map(flatNodeMap);
       newFlatNodeMap.set(nodeId, updatedNode);
 
@@ -78,15 +124,17 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
       set({
         document: newDocument,
         flatNodeMap: newFlatNodeMap,
-        history: { past: [...history.past, document], future: [] },
+        history: ownsHistory ? { past: [...history.past, document], future: [] } : history,
         isDirty: true,
-        canUndo: true,
+        canUndo: ownsHistory,
         canRedo: false,
       });
+      get().emit({ type: "update-node", nodeId, changes });
     },
 
     addChild: (parentId, childType, _index) => {
-      const { flatNodeMap, document, history } = get();
+      const { flatNodeMap, document, history, readOnly } = get();
+      if (readOnly) return;
       const parent = flatNodeMap.get(parentId);
       if (!parent) return;
 
@@ -101,6 +149,7 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
       const newFlatNodeMap = new Map(flatNodeMap);
       newFlatNodeMap.set(newChild.id, newChild);
 
+      const index = (parent.children ?? []).length;
       const updatedParent = {
         ...parent,
         children: [...(parent.children ?? []), newChild],
@@ -114,15 +163,18 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
         document: newDocument,
         flatNodeMap: newFlatNodeMap,
         selectedNodeId: newChild.id,
-        history: { past: [...history.past, document], future: [] },
+        history: ownsHistory ? { past: [...history.past, document], future: [] } : history,
         isDirty: true,
-        canUndo: true,
+        canUndo: ownsHistory,
         canRedo: false,
       });
+      get().onSelectionChange?.(newChild.id);
+      get().emit({ type: "add-child", parentId, childType, index, node: newChild });
     },
 
     deleteNode: (nodeId) => {
-      const { flatNodeMap, document, selectedNodeId, history } = get();
+      const { flatNodeMap, document, selectedNodeId, history, readOnly } = get();
+      if (readOnly) return;
       if (nodeId === document.root.id) return;
 
       const parentId = findParentId(flatNodeMap, nodeId);
@@ -144,15 +196,22 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
         document: newDocument,
         flatNodeMap: newFlatNodeMap,
         selectedNodeId: selectedNodeId === nodeId ? parentId : selectedNodeId,
-        history: { past: [...history.past, document], future: [] },
+        history: ownsHistory ? { past: [...history.past, document], future: [] } : history,
         isDirty: true,
-        canUndo: true,
+        canUndo: ownsHistory,
         canRedo: false,
+      });
+      get().emit({
+        type: "delete-node",
+        nodeId,
+        parentId,
+        index: (parent.children ?? []).findIndex((child) => child.id === nodeId),
       });
     },
 
     moveNode: (nodeId, targetParentId, _index) => {
-      const { flatNodeMap, document, history } = get();
+      const { flatNodeMap, document, history, readOnly } = get();
+      if (readOnly) return;
       const node = flatNodeMap.get(nodeId);
       if (!node) return;
 
@@ -184,11 +243,12 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
       set({
         document: newDocument,
         flatNodeMap: newFlatNodeMap,
-        history: { past: [...history.past, document], future: [] },
+        history: ownsHistory ? { past: [...history.past, document], future: [] } : history,
         isDirty: true,
-        canUndo: true,
+        canUndo: ownsHistory,
         canRedo: false,
       });
+      get().emit({ type: "move-node", nodeId, fromParentId: currentParentId, toParentId: targetParentId, index: insertIndex });
     },
 
     setBreakpoint: (breakpoint) => set({ activeBreakpoint: breakpoint }),
@@ -216,12 +276,31 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
       });
     },
 
+    replaceDocument: (document) => {
+      const { selectedNodeId } = get();
+      const flatNodeMap = buildFlatNodeMap(document.root);
+      set({
+        document,
+        flatNodeMap,
+        history: { past: [], future: [] },
+        isDirty: false,
+        canUndo: false,
+        canRedo: false,
+        // A host that reloads a draft keeps the author's place when the node they were
+        // looking at still exists.
+        selectedNodeId: selectedNodeId && flatNodeMap.has(selectedNodeId) ? selectedNodeId : null,
+      });
+    },
+
+    setReadOnly: (readOnly) => set({ readOnly }),
+
     setValidationErrors: (errors) => set({ validationErrors: errors }),
 
     markClean: () => set({ isDirty: false }),
 
     undo: () => {
       const { history, document } = get();
+      if (!ownsHistory) return;
       const previous = history.past[history.past.length - 1];
       if (!previous) return;
 
@@ -241,6 +320,7 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
 
     redo: () => {
       const { history, document } = get();
+      if (!ownsHistory) return;
       const [next, ...restFuture] = history.future;
       if (!next) return;
 
@@ -259,8 +339,16 @@ export function createEditorStore(initialDocument?: UIDLDocument) {
   }));
 }
 
-function createEmptyDocument(): UIDLDocument {
-  return {
+/** True when two nodes carry the same fields. Used to refuse an edit that changes nothing. */
+function shallowEqual(left: UIDLNode, right: UIDLNode): boolean {
+  const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
+  for (const key of keys) {
+    if (left[key as keyof UIDLNode] !== right[key as keyof UIDLNode]) return false;
+  }
+  return true;
+}
+
+function createEmptyDocument(): UIDLDocument {  return {
     version: "1.0.0",
     id: "empty-document",
     name: "Untitled",

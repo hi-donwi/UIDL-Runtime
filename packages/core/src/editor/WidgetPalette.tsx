@@ -3,6 +3,8 @@ import { defaultRegistry } from "../registry/registry";
 export interface WidgetPaletteProps {
   onSelectWidget: (widgetType: string) => void;
   selectedNodeId: string | null;
+  /** Disables insertion, so a read-only editor does not offer an action it refuses. */
+  readOnly?: boolean;
   className?: string;
 }
 
@@ -18,6 +20,7 @@ const categories = [
 export function WidgetPalette({
   onSelectWidget,
   selectedNodeId,
+  readOnly = false,
   className,
 }: WidgetPaletteProps) {
   const widgets = defaultRegistry.list().filter((widget) => !widget.hideFromPalette);
@@ -50,7 +53,7 @@ export function WidgetPalette({
                   <button
                     key={widget.type}
                     onClick={() => onSelectWidget(widget.type)}
-                    disabled={!selectedNodeId}
+                    disabled={readOnly || !selectedNodeId}
                     className="rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:border-border-hover hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
                     title={widget.type}
                   >

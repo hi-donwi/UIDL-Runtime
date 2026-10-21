@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { UIDLDocument } from "../types";
 import { DocumentSchema } from "../schemas/document";
 import { createEditorStore } from "./store";
+import type { EditorEdit } from "./edits";
 import { createDocumentState } from "../state/createDocumentState";
 import { Canvas } from "./Canvas";
 import { WidgetPalette } from "./WidgetPalette";
@@ -15,6 +16,32 @@ import type { CommandHandler, MutationHandler } from "../types/actions";
 
 export interface EditorProps {
   initialDocument?: UIDLDocument;
+  /**
+   * The document the host owns.
+   *
+   * When this is given, the editor is controlled: the host decides what the document
+   * is, and the editor reports what it would change. The host replaces the document
+   * whenever it wants the editor to show something else, including a document it
+   * reloaded from disk after an external edit.
+   */
+  document?: UIDLDocument;
+  /**
+   * The host's identity for the document it just passed.
+   *
+   * Two documents with the same content are still two revisions, and a host that
+   * reloads a draft needs the editor to take the new one even if nothing changed.
+   */
+  documentRevision?: string;
+  /** Called after every edit, with the intent and the document it produced. */
+  onEdit?: (edit: EditorEdit, document: UIDLDocument) => void;
+  /** Called when the selected node changes. */
+  onSelectionChange?: (nodeId: string | null) => void;
+  /** Refuse every edit. A host that only inspects a document uses it. */
+  readOnly?: boolean;
+  /** The host's undo request. Used when the host owns the history. */
+  onUndoRequest?: () => void;
+  /** The host's redo request. Used when the host owns the history. */
+  onRedoRequest?: () => void;
   /** Host-owned handler for live-preview `mutate` actions; unset means mutations are disabled. */
   mutationHandler?: MutationHandler;
   /** Host-owned handler for live-preview `command` actions; unset means commands are disabled. */
@@ -30,6 +57,13 @@ export interface EditorProps {
 
 export function Editor({
   initialDocument,
+  document: controlledDocument,
+  documentRevision,
+  onEdit,
+  onSelectionChange,
+  readOnly = false,
+  onUndoRequest,
+  onRedoRequest,
   mutationHandler,
   commandHandler,
   apiAllowlist,
@@ -37,12 +71,43 @@ export function Editor({
   apiMaxConcurrentCalls,
   className,
 }: EditorProps) {
-  const useStore = useMemo(() => createEditorStore(initialDocument), [initialDocument]);
+  const controlled = controlledDocument !== undefined;
+  // The store is created once. A host that replaces the document does so through
+  // `replaceDocument`, not by remounting the editor and losing the author's place.
+  const [useStore] = useState(() =>
+    createEditorStore(controlled ? controlledDocument : initialDocument, {
+      historyOwner: controlled ? "host" : "editor",
+    }),
+  );
   const state = useStore();
+
+  // The host's callbacks are replaced rather than captured, so a host may pass new
+  // functions on every render without the store keeping a stale closure.
+  useEffect(() => {
+    useStore.getState().setCallbacks({ onEdit, onSelectionChange });
+  }, [onEdit, onSelectionChange, useStore]);
   const [activeTab, setActiveTab] = useState<"properties" | "style">("properties");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const document = state.document;
+  const document = controlled ? (state.document ?? controlledDocument) : state.document;
+
+  // Adopt the host's document whenever its identity changes. A revision bump with the
+  // same content is still a new revision, and the host may have reasons the editor
+  // cannot see.
+  const applied = useRef<{ document?: UIDLDocument; revision?: string }>({
+    document: controlledDocument,
+    revision: documentRevision,
+  });
+  useEffect(() => {
+    if (!controlled || !controlledDocument) return;
+    if (applied.current.document === controlledDocument && applied.current.revision === documentRevision) return;
+    applied.current = { document: controlledDocument, revision: documentRevision };
+    useStore.getState().replaceDocument(controlledDocument);
+  }, [controlled, controlledDocument, documentRevision, useStore]);
+
+  useEffect(() => {
+    useStore.getState().setReadOnly(readOnly);
+  }, [readOnly, useStore]);
   const selectedNode = useMemo(() => {
     if (!state.selectedNodeId) return null;
     return state.flatNodeMap.get(state.selectedNodeId) ?? null;
@@ -147,6 +212,23 @@ export function Editor({
     [state],
   );
 
+  // In controlled mode the host owns the history, so the editor asks instead of
+  // undoing. Two histories would undo the same change twice.
+  const handleUndo = useCallback(() => {
+    if (controlled) {
+      onUndoRequest?.();
+      return;
+    }
+    state.undo();
+  }, [controlled, onUndoRequest, state]);
+  const handleRedo = useCallback(() => {
+    if (controlled) {
+      onRedoRequest?.();
+      return;
+    }
+    state.redo();
+  }, [controlled, onRedoRequest, state]);
+
   return (
     <div
       className={`flex h-screen w-full flex-col bg-background text-text-primary ${
@@ -162,15 +244,15 @@ export function Editor({
           <ValidationStatus errors={state.validationErrors} />
           <div className="flex items-center gap-1">
             <button
-              onClick={state.undo}
-              disabled={!state.canUndo}
+              onClick={handleUndo}
+              disabled={!controlled && !state.canUndo}
               className="rounded-md border border-border px-2 py-1 text-xs disabled:opacity-50"
             >
               Undo
             </button>
             <button
-              onClick={state.redo}
-              disabled={!state.canRedo}
+              onClick={handleRedo}
+              disabled={!controlled && !state.canRedo}
               className="rounded-md border border-border px-2 py-1 text-xs disabled:opacity-50"
             >
               Redo
@@ -230,6 +312,7 @@ export function Editor({
           <WidgetPalette
             onSelectWidget={handleSelectWidget}
             selectedNodeId={state.selectedNodeId}
+            readOnly={readOnly}
           />
         </aside>
         <aside className="w-64 flex-shrink-0">
@@ -288,11 +371,13 @@ export function Editor({
                 <PropertyPanel
                   node={selectedNode}
                   onUpdateNode={state.updateNode}
+                  readOnly={readOnly}
                 />
               ) : (
                 <StylePanel
                   node={selectedNode}
                   onUpdateNode={state.updateNode}
+                  readOnly={readOnly}
                 />
               )}
             </div>

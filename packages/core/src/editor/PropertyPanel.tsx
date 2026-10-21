@@ -4,10 +4,12 @@ import type { UIDLNode } from "../types";
 export interface PropertyPanelProps {
   node: UIDLNode | null;
   onUpdateNode: (nodeId: string, changes: Partial<UIDLNode>) => void;
+  /** Disables the editable fields, so a read-only editor does not look editable. */
+  readOnly?: boolean;
   className?: string;
 }
 
-export function PropertyPanel({ node, onUpdateNode, className }: PropertyPanelProps) {
+export function PropertyPanel({ node, onUpdateNode, readOnly = false, className }: PropertyPanelProps) {
   const handleChange = useCallback(
     (field: keyof UIDLNode, value: unknown) => {
       if (!node) return;
@@ -61,6 +63,8 @@ export function PropertyPanel({ node, onUpdateNode, className }: PropertyPanelPr
           <input
             type="text"
             value={node.name ?? ""}
+            disabled={readOnly}
+
             onChange={(e) => handleChange("name", e.target.value || undefined)}
             className="w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
             placeholder="Node name"
@@ -72,6 +76,8 @@ export function PropertyPanel({ node, onUpdateNode, className }: PropertyPanelPr
           <input
             type="text"
             value={node.themeRef ?? ""}
+            disabled={readOnly}
+
             onChange={(e) => handleChange("themeRef", e.target.value || undefined)}
             className="w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
             placeholder="variant name"
@@ -83,6 +89,8 @@ export function PropertyPanel({ node, onUpdateNode, className }: PropertyPanelPr
           <input
             type="text"
             value={node.testId ?? ""}
+            disabled={readOnly}
+
             onChange={(e) => handleChange("testId", e.target.value || undefined)}
             className="w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
             placeholder="data-testid"

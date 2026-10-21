@@ -4,6 +4,8 @@ import type { UIDLNode } from "../types";
 export interface StylePanelProps {
   node: UIDLNode | null;
   onUpdateNode: (nodeId: string, changes: Partial<UIDLNode>) => void;
+  /** Disables the editable fields, so a read-only editor does not look editable. */
+  readOnly?: boolean;
   className?: string;
 }
 
@@ -28,7 +30,7 @@ const STYLE_FIELDS = [
   { key: "opacity", label: "Opacity", type: "text" as const },
 ] as const;
 
-export function StylePanel({ node, onUpdateNode, className }: StylePanelProps) {
+export function StylePanel({ node, onUpdateNode, readOnly = false, className }: StylePanelProps) {
   const style = useMemo(() => node?.style ?? {}, [node?.style]);
 
   const handleChange = useCallback(
@@ -97,6 +99,8 @@ export function StylePanel({ node, onUpdateNode, className }: StylePanelProps) {
               <input
                 type="text"
                 value={responsive[bp] ?? ""}
+                disabled={readOnly}
+
                 onChange={(e) => handleResponsiveChange(field, bp, e.target.value)}
                 className="flex-1 rounded-md border border-border bg-surface px-2 py-1 text-xs text-text-primary"
                 placeholder={bp === "base" ? "base value" : `${bp}:value`}
@@ -112,6 +116,8 @@ export function StylePanel({ node, onUpdateNode, className }: StylePanelProps) {
         <input
           type="text"
           value={value}
+          disabled={readOnly}
+
           onChange={(e) => handleChange(field, e.target.value || undefined)}
           className="w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
         />
@@ -122,6 +128,8 @@ export function StylePanel({ node, onUpdateNode, className }: StylePanelProps) {
       <input
         type="text"
         value=""
+        disabled={readOnly}
+
         onChange={(e) => handleChange(field, e.target.value || undefined)}
         className="w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
         placeholder="Enter value"
