@@ -3,8 +3,13 @@ package dev.uidl.generator.conformance;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,6 +69,82 @@ class ConformanceRunnerTest {
                             .as("Case %s should fail document validation", caseId)
                             .isInstanceOf(Exception.class);
                 }
+            }
+        }
+    }
+
+    @Test
+    void testThemeCasesAgainstSharedExport() throws Exception {
+        Path repoRoot = findRepoRoot();
+        Path casesDir = repoRoot.resolve("conformance/cases/theme");
+        Path themesDir = repoRoot.resolve("conformance/themes");
+        if (!Files.exists(casesDir)) {
+            // If running standalone without repo root, skip external fixture directory
+            return;
+        }
+
+        Map<String, ThemeTokens> cache = new HashMap<>();
+        try (var stream = Files.list(casesDir)) {
+            var caseFiles = stream.filter(p -> p.toString().endsWith(".json")).toList();
+            for (var file : caseFiles) {
+                JsonNode caseNode = mapper.readTree(file.toFile());
+                if (!"active".equals(caseNode.path("status").asText())) {
+                    continue;
+                }
+                JsonNode input = caseNode.get("input");
+                String caseId = caseNode.path("id").asText();
+                String themeName = input.path("theme").asText();
+                String ref = input.path("ref").asText();
+
+                ThemeTokens theme = cache.computeIfAbsent(themeName, name -> loadTheme(themesDir, name, caseId));
+                JsonNode actual = ref.startsWith("{")
+                        ? mapper.valueToTree(ThemeTokens.tokenRefToCssVar(ref))
+                        : mapper.valueToTree(theme.resolveToken(ref));
+                assertThat(actual)
+                        .as("Case %s", caseId)
+                        .isEqualTo(caseNode.get("expected"));
+            }
+        }
+    }
+
+    @Test
+    void testEmittedTokenRefsResolveInEveryShippedTheme() throws Exception {
+        Path moduleMain = Path.of("src/main/java");
+        Path repoRoot = findRepoRoot();
+        Path themesDir = repoRoot.resolve("conformance/themes");
+        if (!Files.isDirectory(moduleMain) || !Files.isDirectory(themesDir)) {
+            // If running standalone without the module sources or repo root, skip fixtures
+            return;
+        }
+
+        // Every {primitives.*}/{semantics.*} literal the production compilers emit.
+        Pattern tokenRef = Pattern.compile("\\{(primitives|semantics)\\.[A-Za-z0-9_.-]+\\}");
+        Set<String> emitted = new TreeSet<>();
+        try (var stream = Files.walk(moduleMain)) {
+            for (Path source : stream.filter(p -> p.toString().endsWith(".java")).toList()) {
+                Matcher matcher = tokenRef.matcher(Files.readString(source));
+                while (matcher.find()) {
+                    emitted.add(matcher.group());
+                }
+            }
+        }
+        assertThat(emitted).as("production compilers emit token refs").isNotEmpty();
+
+        Map<String, ThemeTokens> themes = new HashMap<>();
+        try (var stream = Files.list(themesDir)) {
+            for (var file : stream.filter(p -> p.toString().endsWith(".json")).toList()) {
+                String name = file.getFileName().toString().replace(".json", "");
+                themes.put(name, ThemeTokens.parse(mapper.readTree(file.toFile())));
+            }
+        }
+        assertThat(themes).as("shipped themes export").isNotEmpty();
+
+        for (String ref : emitted) {
+            String path = ref.substring(1, ref.length() - 1);
+            for (var theme : themes.entrySet()) {
+                assertThat(theme.getValue().resolveToken(path))
+                        .as("Emitted ref %s must resolve in theme %s", ref, theme.getKey())
+                        .isNotNull();
             }
         }
     }
@@ -157,6 +238,19 @@ class ConformanceRunnerTest {
                 )))
         );
         assertValidUidl(compiler.compilePage(new CompilePageInput.WizardInput(wizMeta, caps, uiPolicy, routePolicy)));
+    }
+
+    private ThemeTokens loadTheme(Path themesDir, String themeName, String caseId) {
+        Path file = themesDir.resolve(themeName + ".json");
+        assertThat(Files.isRegularFile(file))
+                .as("Case %s names theme '%s' but %s does not exist", caseId, themeName, file)
+                .isTrue();
+        try {
+            return ThemeTokens.parse(mapper.readTree(file.toFile()));
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Theme %s could not be parsed: %s".formatted(themeName, e.getMessage()), e);
+        }
     }
 
     private void assertValidUidl(UidlDocument doc) throws Exception {
