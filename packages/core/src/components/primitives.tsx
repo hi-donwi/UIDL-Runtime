@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, isValidElement } from "react";
 import type React from "react";
 import type {
   ReactNode,
@@ -186,12 +186,20 @@ export interface TextProps extends HTMLAttributes<HTMLParagraphElement> {
 }
 
 export function Text({ value, heading, format, locale, currency, ...props }: TextProps) {
-  const printed = format
-    ? formatCellValue(value, format, {
-        ...(locale ? { locale } : {}),
-        ...(currency ? { currency } : {}),
-      })
-    : value;
+  let printed: ReactNode = value as ReactNode;
+  if (format) {
+    printed = formatCellValue(value, format, {
+      ...(locale ? { locale } : {}),
+      ...(currency ? { currency } : {}),
+    });
+  } else if (value !== null && typeof value === "object" && !isValidElement(value)) {
+    const obj = value as Record<string, unknown>;
+    printed = typeof obj.message === "string" && obj.message
+      ? obj.message
+      : typeof obj.code === "string" && obj.code
+        ? obj.code
+        : JSON.stringify(obj);
+  }
   if (heading) {
     const Tag = `h${heading}` as "h1";
     return <Tag {...props}>{printed}</Tag>;
