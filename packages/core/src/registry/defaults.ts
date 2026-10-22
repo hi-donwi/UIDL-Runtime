@@ -366,7 +366,7 @@ export const defaultWidgets: WidgetManifest[] = [
     category: "data",
     acceptsChildren: false,
     defaultProps: {},
-    propDescriptors: [prop("title", "string"), prop("dataSource", "string"), prop("columns", "array"), prop("rows", "array"), prop("emptyMessage", "string")],
+    propDescriptors: [prop("title", "string"), prop("badge", "string"), prop("dataSource", "string"), prop("columns", "array"), prop("rows", "array"), prop("emptyMessage", "string")],
     events: ["onCardClick"],
     eventDescriptors: [event("onCardClick", "card")],
     hideFromPalette: true,

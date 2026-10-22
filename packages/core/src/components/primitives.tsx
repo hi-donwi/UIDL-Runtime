@@ -1283,6 +1283,7 @@ export interface KanbanCardItem {
 
 export interface KanbanBoardProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;
+  badge?: string;
   dataSource?: string;
   columns?: KanbanColumn[];
   rows?: KanbanCardItem[];
@@ -1292,6 +1293,7 @@ export interface KanbanBoardProps extends HTMLAttributes<HTMLDivElement> {
 
 export function KanbanBoard({
   title,
+  badge,
   dataSource: _dataSource,
   columns = [],
   rows = [],
@@ -1309,7 +1311,7 @@ export function KanbanBoard({
       {title && (
         <div className="mb-4 flex items-baseline justify-between">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h3>
-          <span className="text-sm text-gray-600 dark:text-gray-500">{rows.length} records</span>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{badge ?? `${rows.length} records`}</span>
         </div>
       )}
       <div className="grid grid-cols-1 gap-4 md:grid-flow-col md:auto-cols-fr">
@@ -1319,10 +1321,12 @@ export function KanbanBoard({
             <div key={col.id} className="flex flex-col rounded-md border border-gray-200 bg-gray-25 p-3 dark:border-gray-800 dark:bg-gray-890">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: col.color ?? "#7c7c7c" }} />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{col.title}</span>
+                  {col.color && (
+                    <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: col.color }} />
+                  )}
+                  <span className="text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">{col.title}</span>
                 </div>
-                <span className="pill bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                   {colCards.length}
                 </span>
               </div>
@@ -1340,14 +1344,14 @@ export function KanbanBoard({
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <span className="text-base font-medium text-gray-900 dark:text-gray-100">{card.title}</span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{card.title}</span>
                         {card.badge && (
                           <span className="pill flex-shrink-0 bg-gray-200 font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-200">
                             {card.badge}
                           </span>
                         )}
                       </div>
-                      {card.subtitle && <p className="mt-1 text-sm text-gray-600 dark:text-gray-500">{card.subtitle}</p>}
+                      {card.subtitle && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{card.subtitle}</p>}
                       {card.value !== undefined && (
                         <p className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-25">{String(card.value)}</p>
                       )}
