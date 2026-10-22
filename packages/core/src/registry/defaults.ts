@@ -306,7 +306,7 @@ export const defaultWidgets: WidgetManifest[] = [
         "Array of { key, label, align?, format? } columns. `format` is one of text | currency | number | integer | date | status | check and drives how the value is printed (status renders a coloured pill; numeric formats right-align).",
       ),
       prop("rows", "array", "Static row objects. Prefer dataSource for adapter-backed data."),
-      prop("rowActions", "array", "Array of { label, event? } row actions. Omit for a Meridian-style list where the row itself opens the record."),
+      prop("rowActions", "array", "Array of { label, event?, visibleWhen? } row actions. visibleWhen is a UIDL expression evaluated against data.row for each row. Omit for a Meridian-style list where the row itself opens the record."),
       prop("emptyMessage", "string"),
       prop("showIndex", "boolean"),
       prop("paginate", "boolean"),

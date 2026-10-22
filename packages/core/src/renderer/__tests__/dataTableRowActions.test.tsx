@@ -40,6 +40,50 @@ function documentWithRowActions(events: Record<string, unknown>): UIDLDocument {
 }
 
 describe("DataTable row actions", () => {
+  it("shows an action only when its visibleWhen expression matches that row", () => {
+    const doc = documentWithRowActions({
+      onDownload: [{ setState: { path: "downloadedId", value: { $bind: "event.id" } } }],
+    });
+    doc.dataSources!.invoices = [
+      { id: "APP-001", cvScanStatus: "pending" },
+      { id: "APP-002", cvScanStatus: "clean" },
+      { id: "APP-003", cvScanStatus: "rejected" },
+    ];
+    doc.root.props!.rowActions = [
+      {
+        label: "Download CV",
+        event: "onDownload",
+        visibleWhen: {
+          op: "eq",
+          left: { $bind: "data.row.cvScanStatus" },
+          right: { literal: "clean" },
+        },
+      },
+    ];
+    const stateStore = createDocumentState({ downloadedId: null }).getState();
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} stateStore={stateStore} />);
+
+    const actions = screen.getAllByRole("button", { name: "Download CV" });
+    expect(actions).toHaveLength(1);
+    fireEvent.click(actions[0]);
+    expect(stateStore.getValue("downloadedId")).toBe("APP-002");
+  });
+
+  it("hides a conditional action when the expression is missing or cannot be evaluated", () => {
+    const doc = documentWithRowActions({ onDownload: [{ setState: { path: "downloaded", value: true } }] });
+    doc.dataSources!.invoices = [{ id: "APP-001" }];
+    doc.root.props!.rowActions = [
+      { label: "Missing field", event: "onDownload", visibleWhen: { $bind: "data.row.cvScanStatus" } },
+      { label: "Unknown expression", event: "onDownload", visibleWhen: { unsupported: true } },
+      { label: "Malformed expression", event: "onDownload", visibleWhen: { "==": null } },
+    ];
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} />);
+
+    expect(screen.queryByRole("button", { name: "Missing field" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Unknown expression" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Malformed expression" })).not.toBeInTheDocument();
+  });
+
   it("clicking a row action fires the mapped event with that row's own data via {\"$bind\": \"event.<field>\"}", () => {
     const doc = documentWithRowActions({
       onOpen: [{ navigate: { route: { $bind: "event.route" } } }],
