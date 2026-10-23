@@ -10,6 +10,7 @@ import type {
 } from "react";
 import { cn } from "../utils/cn";
 import { formatCellValue, isNumericFormat, statusColor, type CellFormat } from "../utils/listCell";
+import { evaluate, type Expr } from "../expr/evaluate";
 import { Icon } from "./icons";
 import { useElementWidth } from "../hooks/useElementWidth";
 import { MeridianBarChart, MeridianDonutChart, MeridianLineChart } from "./charts";
@@ -712,6 +713,8 @@ export interface DataTableColumn {
 export interface DataTableAction {
   label: string;
   event?: string;
+  /** UIDL expression evaluated for each row against the `data.row` scope. */
+  visibleWhen?: Expr;
 }
 
 export interface DataTableProps extends HTMLAttributes<HTMLDivElement> {
@@ -742,6 +745,17 @@ export interface DataTableProps extends HTMLAttributes<HTMLDivElement> {
   locale?: string;
   /** ISO 4217 code used to format `currency` columns. */
   currency?: string;
+}
+
+function isDataTableActionVisible(action: DataTableAction, row: Record<string, unknown>): boolean {
+  if (action.visibleWhen === undefined) return true;
+
+  try {
+    return Boolean(evaluate(action.visibleWhen, { data: { row } }));
+  } catch {
+    // A broken optional condition must not expose a row action or break the table render.
+    return false;
+  }
 }
 
 /**
@@ -894,7 +908,7 @@ export function DataTable({
                   })}
                   {rowActions.length > 0 && (
                     <div className="flex items-center justify-end gap-2 pe-4">
-                      {rowActions.map((action) => (
+                      {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
                         <button
                           key={action.label}
                           type="button"
