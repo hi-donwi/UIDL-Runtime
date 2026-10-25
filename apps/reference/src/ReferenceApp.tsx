@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { UIDocumentRenderer } from "~/renderer/UIDocumentRenderer";
 import { DocumentSchema } from "~/schemas/document";
 import { meridianDarkTheme, meridianLightTheme } from "~/theme/meridianPreset";
+import { applyPresentationPreset, presentationPresetCatalog } from "~/presentation";
+import type { Theme, UIDLDocument } from "~/types";
 import { MeridianShell } from "./MeridianShell";
 import { MeridianReferenceRoute } from "@uidl-runtime/templates/meridian/MeridianReferenceRoute";
 import { ShoePosScreen } from "./shoe/ShoePosScreen";
@@ -42,6 +44,24 @@ interface ActiveDrawerState {
   printUrl?: string;
   printLabel?: string;
   printIcon?: string;
+}
+
+const REFERENCE_PRESET_ID = "dense-business";
+
+function applyReferencePresentation(document: UIDLDocument, mode: "light" | "dark"): UIDLDocument {
+  const preset = presentationPresetCatalog.get(REFERENCE_PRESET_ID);
+  return preset ? applyPresentationPreset(document, preset, mode) : document;
+}
+
+function resolveReferenceTheme(document: UIDLDocument, mode: "light" | "dark"): Theme {
+  const reference = document.presentationPreset;
+  const preset = reference ? presentationPresetCatalog.get(reference.id) : undefined;
+  if (preset && preset.version === reference?.version) {
+    const theme = preset.themePresets[mode]?.theme;
+    if (theme) return theme;
+  }
+
+  return mode === "dark" ? meridianDarkTheme : meridianLightTheme;
 }
 
 interface DrawerPrintConfig {
@@ -232,8 +252,13 @@ export function ReferenceApp() {
   const activePage = activeCompany?.pages[activePageId];
 
   const document = useMemo(
-    () => (activeCompany && activePage ? DocumentSchema.parse(createConsoleDocument(activeCompany, activePageId, activePage)) : null),
-    [activeCompany, activePageId, activePage],
+    () => (activeCompany && activePage
+      ? applyReferencePresentation(
+          DocumentSchema.parse(createConsoleDocument(activeCompany, activePageId, activePage)),
+          themeMode,
+        )
+      : null),
+    [activeCompany, activePageId, activePage, themeMode],
   );
   // Which record (if any) the current path is editing, and the DoctypeMeta needed to fetch it —
   // computed once so the fetch effect below and the editRecord lookup used for rendering always
@@ -282,8 +307,10 @@ export function ReferenceApp() {
     [path, companyDataset, language, editRecordForRoute],
   );
   const generatedDocument = useMemo(
-    () => (generatedRoute ? DocumentSchema.parse(generatedRoute.document) : null),
-    [generatedRoute],
+    () => (generatedRoute
+      ? applyReferencePresentation(DocumentSchema.parse(generatedRoute.document), themeMode)
+      : null),
+    [generatedRoute, themeMode],
   );
   const generatedStateStore = useMemo(
     () => (generatedDocument ? createDocumentState(generatedDocument.state ?? {}).getState() : undefined),
@@ -553,7 +580,7 @@ export function ReferenceApp() {
     }
 
     if (generatedRoute && generatedDocument && generatedStateStore) {
-      const currentTheme = themeMode === "dark" ? meridianDarkTheme : meridianLightTheme;
+      const currentTheme = resolveReferenceTheme(generatedDocument, themeMode);
 
       return (
         <MeridianShell
@@ -605,7 +632,7 @@ export function ReferenceApp() {
     }
 
     const drawerData = selectedRecord && activeCompany ? getDrawerDataFromRow(selectedRecord, activeCompany.id) : null;
-    const currentTheme = themeMode === "dark" ? meridianDarkTheme : meridianLightTheme;
+    const currentTheme = document ? resolveReferenceTheme(document, themeMode) : meridianLightTheme;
 
     return (
       <MeridianShell
