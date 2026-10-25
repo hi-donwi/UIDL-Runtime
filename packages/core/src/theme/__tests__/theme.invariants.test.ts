@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { createThemeEngine } from "../engine";
 import { defaultLightTheme, defaultDarkTheme } from "../presets";
 import { meridianLightTheme, meridianDarkTheme } from "../meridianPreset";
+import { denseBusinessLightTheme, denseBusinessDarkTheme } from "../../presentation/denseBusiness";
 import type { Theme } from "../../types/theme";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../../../..");
@@ -14,6 +15,8 @@ const SHIPPED_THEMES: Record<string, Theme> = {
   "default-dark": defaultDarkTheme,
   "meridian-light": meridianLightTheme,
   "meridian-dark": meridianDarkTheme,
+  "dense-business-light": denseBusinessLightTheme,
+  "dense-business-dark": denseBusinessDarkTheme,
 };
 
 /** Every `{primitives.<category>.<key>}` text token reference with its category/key. */

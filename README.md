@@ -227,6 +227,25 @@ const consoles = gallery.entries.filter((entry) => entry.category === "industry"
 const document = consoles[0].documents.en;
 ```
 
+### Presentation preset catalog
+
+Presentation presets are owned by the runtime and referenced by version from a document. Hosts
+may discover a preset, apply its selected theme, and preserve the reference without copying the
+preset definition into application code.
+
+```ts
+import {
+  applyPresentationPreset,
+  presentationPresetCatalog,
+} from "uidl-runtime";
+
+const preset = presentationPresetCatalog.get("dense-business");
+if (!preset) throw new Error("Presentation preset is unavailable");
+
+const themedDocument = applyPresentationPreset(document, preset, "light");
+// themedDocument.presentationPreset is { id: "dense-business", version: "0.1.0" }
+```
+
 ### 2. Android Native (Kotlin)
 
 ```kotlin

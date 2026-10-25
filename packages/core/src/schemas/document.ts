@@ -46,6 +46,11 @@ export const LayoutConfigSchema = z.object({
   centered: z.boolean().optional(),
 });
 
+export const PresentationPresetReferenceSchema = z.object({
+  id: z.string().min(1),
+  version: z.string().min(1),
+}).strict();
+
 export const DocumentSchema = z.object({
   $schema: z.string().optional(),
   version: z.string(),
@@ -53,6 +58,7 @@ export const DocumentSchema = z.object({
   name: z.string(),
   route: z.string().optional(),
   theme: z.string().optional(),
+  presentationPreset: PresentationPresetReferenceSchema.optional(),
   layout: LayoutConfigSchema.optional(),
   state: z.record(z.string(), z.unknown()).optional(),
   // Each entry is either an inline array (resolved synchronously, as it always has been) or a

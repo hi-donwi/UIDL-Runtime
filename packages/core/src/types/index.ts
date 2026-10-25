@@ -9,6 +9,12 @@ export interface LayoutConfig {
   centered?: boolean;
 }
 
+/** A version-pinned reference to a presentation preset owned by the runtime catalog. */
+export interface PresentationPresetReference {
+  id: string;
+  version: string;
+}
+
 export interface UIDLDocument {
   $schema?: string;
   version: string;
@@ -16,6 +22,7 @@ export interface UIDLDocument {
   name: string;
   route?: string;
   theme?: string;
+  presentationPreset?: PresentationPresetReference;
   layout?: LayoutConfig;
   state?: Record<string, unknown>;
   dataSources?: Record<string, unknown>;

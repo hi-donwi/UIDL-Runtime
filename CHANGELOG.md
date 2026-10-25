@@ -13,6 +13,9 @@ lacked the row-action condition below. 0.1.11 is the first version built from co
 source that contains every change listed here.
 
 ### Added
+- Versioned presentation preset catalog with the `dense-business` light/dark preset,
+  `presentationPresetCatalog`, `applyPresentationPreset`, and the additive UIDL
+  `presentationPreset: { id, version }` reference.
 - `DataTable.rowActions[].visibleWhen`: a UIDL expression evaluated per row against `data.row`; a falsey or unevaluable result hides the action for that row.
 - `KanbanBoard` accepts a header `badge`.
 - Tonal surface container tokens (`surface-container-low`, `surface-container`, `surface-container-high` and their `bg-surface-container-*` semantics) on the default and Meridian light/dark themes, giving host surfaces declared tonal elevation instead of per-component shadow decisions.
@@ -179,7 +182,8 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.11...HEAD
+[0.1.11]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.9...v0.1.11
 [0.1.4]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.1...v0.1.2

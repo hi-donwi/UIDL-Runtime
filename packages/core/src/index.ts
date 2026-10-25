@@ -8,7 +8,7 @@ export { reportDocumentVersion, assertSupportedDocumentVersion, DocumentVersionE
 export type { DocumentVersionReport, DocumentVersionStatus } from "./version";
 export { resolvePath, isBindPath, RENDER_SCOPE_PREFIXES } from "./state/bindings";
 export type { BindingScope, RenderScopePrefix } from "./state/bindings";
-export type { UIDLDocument, UIDLNode, LayoutConfig, DesignTokens, WidgetManifest, ComponentRegistry, ComponentPropDescriptor, ComponentPropType, ComponentEventDescriptor, Theme, ThemePreset, PrimitiveTokens, SemanticTokens, TypographyToken, ComponentVariant, StyleIntent, ResponsiveValue } from "./types";
+export type { UIDLDocument, UIDLNode, LayoutConfig, PresentationPresetReference, DesignTokens, WidgetManifest, ComponentRegistry, ComponentPropDescriptor, ComponentPropType, ComponentEventDescriptor, Theme, ThemePreset, PrimitiveTokens, SemanticTokens, TypographyToken, ComponentVariant, StyleIntent, ResponsiveValue } from "./types";
 export type {
   Action,
   SetStateAction,
@@ -40,7 +40,13 @@ export type {
   SequenceAction,
   IfAction,
 } from "./types/actions";
-export { DocumentSchema, LayoutConfigSchema, DesignTokensSchema, ThemePresetsSchema } from "./schemas/document";
+export {
+  DocumentSchema,
+  LayoutConfigSchema,
+  PresentationPresetReferenceSchema,
+  DesignTokensSchema,
+  ThemePresetsSchema,
+} from "./schemas/document";
 export { ActionSchema, ActionsSchema } from "./schemas/actions";
 export { generateJsonSchemas } from "./schema/jsonSchema";
 export type { JsonSchemaExport } from "./schema/jsonSchema";
@@ -113,6 +119,32 @@ export { formatCellValue, isNumericFormat, statusColor } from "./utils/listCell"
 export type { CellFormat, CellFormatOptions } from "./utils/listCell";
 export { t, formatRupiah, formatIndonesianDate, formatTerbilang } from "./utils/i18n";
 export type { Language } from "./utils/i18n";
+export {
+  applyPresentationPreset,
+  createPresentationPresetCatalog,
+  denseBusinessDarkPreset,
+  denseBusinessDarkTheme,
+  denseBusinessLightPreset,
+  denseBusinessLightTheme,
+  denseBusinessPreset,
+  presentationPresetCatalog,
+  PRESENTATION_CAPABILITIES,
+  PRESENTATION_RECIPES,
+  PRESENTATION_TARGETS,
+  PRESENTATION_THEME_MODES,
+  PresentationPresetManifestSchema,
+  validatePresentationPreset,
+  validatePresentationPresetManifest,
+} from "./presentation";
+export type {
+  PresentationCapability,
+  PresentationPreset,
+  PresentationPresetCatalog,
+  PresentationPresetManifest,
+  PresentationRecipe,
+  PresentationTarget,
+  PresentationThemeMode,
+} from "./presentation";
 export { generateUidlFromPrompt } from "./services/aiPromptGenerator";
 export { executeAiPipeline, validateAndSanitizeUidl } from "./services/aiPipeline";
 export type {
