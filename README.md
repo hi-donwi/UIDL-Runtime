@@ -44,41 +44,6 @@ dependencies:
 
 https://pub.dev/packages/uidl_flutter
 
-### GitHub Packages mirror
-
-The public npm package above is the primary distribution. A GitHub Packages mirror is
-published as `@hi-donwi/uidl-runtime`, because GitHub Packages requires npm packages to
-use a scope. GitHub Packages requires authentication even for public packages.
-
-```ini
-@hi-donwi:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-```
-
-```bash
-NODE_AUTH_TOKEN="$(gh auth token)" npm install @hi-donwi/uidl-runtime
-```
-
-```tsx
-import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "@hi-donwi/uidl-runtime";
-import "@hi-donwi/uidl-runtime/style.css";
-```
-
-To test the mirror without writing a token to your repository, use a temporary npm config:
-
-```bash
-tmpdir="$(mktemp -d)"
-printf '%s\n' \
-  '@hi-donwi:registry=https://npm.pkg.github.com' \
-  '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' \
-  > "$tmpdir/.npmrc"
-
-NODE_AUTH_TOKEN="$(gh auth token)" \
-  npm --userconfig "$tmpdir/.npmrc" \
-  view @hi-donwi/uidl-runtime@0.1.1 version \
-  --registry=https://npm.pkg.github.com
-```
-
 ```tsx
 import { DocumentSchema, UIDocumentRenderer, meridianLightTheme } from "uidl-runtime";
 import "uidl-runtime/style.css";
@@ -362,12 +327,8 @@ uses Node.js 24, disables package-manager cache in the release job, requires man
 dispatches to run from the default branch, validates the requested version against
 `package.json`, and refuses to publish a version that already exists on npm.
 
-The GitHub Packages mirror is published separately by
-`.github/workflows/publish-github-packages.yml` from the same GitHub release. The mirror
-workflow waits for the same version to become available on public npm before it publishes,
-and it refuses to overwrite an existing mirror version. After a release, run the manual
-`Verify npm package` and `Verify GitHub Packages mirror` workflows with the released
-version.
+Distribution is npm-only. After a release, run the manual `Verify npm package` workflow with
+the released version.
 
 ## Commands
 

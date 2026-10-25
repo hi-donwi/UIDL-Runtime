@@ -41,7 +41,7 @@ When models are compiled with Kerangka, use the official `@kerangka/uidl` bridge
 
 ```tsx
 import React from "react";
-import { UIDocumentRenderer, meridianLightTheme } from "@hi-donwi/uidl-runtime";
+import { UIDocumentRenderer, meridianLightTheme } from "uidl-runtime";
 import { createKerangkaDataAdapter, createKerangkaMutationHandler } from "@kerangka/uidl";
 import screenDoc from "./screens/task-list.uidl.json";
 

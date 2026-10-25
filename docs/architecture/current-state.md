@@ -162,9 +162,8 @@ From `types/actions.ts` + `schemas/actions.ts`: `setState`, `navigate`, `api`,
 
 - Build: `tsc -b` + Vite build + Tailwind CSS + JSON-schema generation.
 - Tests: Vitest unit+integration; Playwright acceptance + visual baselines (canonical Linux).
-- CI: `ci.yml` (lint/typecheck/test/audit), publish workflows for npm (Trusted
-  Publishing OIDC) and GitHub Packages mirror, agent-secure security gate, verified
-  manually by `verify-*.yml`.
+- CI: `ci.yml` (lint/typecheck/test/audit), npm publishing through Trusted
+  Publishing OIDC, agent-secure security gate, and the manual npm package verifier.
 
 ## 11. Architecture gaps vs. the target platform
 
