@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-10-25
+
+### Fixed
+- Published the presentation preset catalog and `presentationPreset` protocol exports in the
+  package root artifact so npm consumers receive the same public API as the source checkout.
+
 ## [0.1.11] - 2026-10-23
 
 0.1.10 was never published; it existed only as locally packed builds, one of which
@@ -182,7 +188,8 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.11...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.12...HEAD
+[0.1.12]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.9...v0.1.11
 [0.1.4]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.2...v0.1.3
