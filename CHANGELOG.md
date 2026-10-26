@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-10-26
+
+### Fixed
+- Patched npm package dependencies and transitive audit findings for Vite, Zod, Vitest,
+  `undici`, `source-map-js`, `fast-uri`, and `brace-expansion`.
+- Updated the reference and workspace-control application builds to use the patched Vite release.
+
 ## [0.1.12] - 2026-10-25
 
 ### Fixed
@@ -188,7 +195,8 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.12...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.13...HEAD
+[0.1.13]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.12...v0.1.13
 [0.1.12]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.9...v0.1.11
 [0.1.4]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.3...v0.1.4
