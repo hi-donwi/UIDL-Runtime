@@ -134,7 +134,7 @@
   "author": "donwi <hi.donwi@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hi-donwi/UIDL-Runtime.git"
+    "url": "https://github.com/hi-donwi/UIDL-Runtime"
   },
   "homepage": "https://github.com/hi-donwi/UIDL-Runtime#readme",
   "bugs": {
