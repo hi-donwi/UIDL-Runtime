@@ -147,7 +147,7 @@
 /* Structure + spacing shared across DataTable/Chart/Kanban/TreeView. */
 @source inline("section grid grid-cols-3 justify-end justify-center justify-self-start justify-self-center justify-self-end place-items-center flex-wrap flex-shrink-0 items-baseline");
 @source inline("me-2 ms-2 ms-auto my-auto my-3 my-20 mt-1 mt-2 mt-4 mb-1 mb-3 mb-4 pe-4 py-4 py-8 w-3 w-7 w-8 w-9 w-28 h-3 h-4 w-1/2 w-full");
-@source inline("table-fixed border-collapse text-start text-center font-normal");
+@source inline("table-fixed text-start text-center font-normal w-40");
 @source inline("truncate select-none whitespace-nowrap overflow-x-auto overflow-y-auto resize-none appearance-none");
 /* Meridian row heights, widths and component utilities (src/meridian-theme.css). */
 @source inline("h-row-smallest h-row-small h-row-mid h-row-large h-row-largest min-h-row-mid w-sidebar w-form w-dialog w-toast w-quick-edit pill flex-center no-scrollbar custom-scroll backdrop meridian-overlay meridian-ui vb-slider");

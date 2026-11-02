@@ -824,7 +824,11 @@ export function DataTable({
       )}
 
       <div className="min-w-0 flex-1 overflow-y-auto">
-        <table aria-label={title || "Data table"} className="w-full min-w-full table-fixed border-collapse text-base">
+        <table
+          aria-label={title || "Data table"}
+          className="w-full min-w-0 table-fixed text-base"
+          style={{ borderCollapse: "separate", borderSpacing: 0 }}
+        >
           <colgroup>
             {showIndex && <col style={{ width: indexColumnWidth }} />}
             {columns.map((column, index) => (
@@ -838,9 +842,9 @@ export function DataTable({
             {rowActions.length > 0 && <col style={{ width: lastGridColumnWidth }} />}
           </colgroup>
           <thead className="sticky top-0 z-10 bg-white text-gray-700 dark:bg-gray-890 dark:text-gray-400">
-            <tr className="border-b border-gray-200 dark:border-gray-800">
+            <tr style={{ height: "calc(var(--h-row-mid) + 1px)" }}>
               {showIndex && (
-                <th scope="col" className="h-row-mid pe-2 text-end font-normal">
+                <th scope="col" className="h-row-mid border-b border-gray-200 pe-2 text-end font-normal dark:border-gray-800">
                   #
                 </th>
               )}
@@ -850,7 +854,7 @@ export function DataTable({
                   scope="col"
                   title={column.label}
                   className={cn(
-                    "h-row-mid min-w-0 pe-4 text-start text-sm font-normal truncate",
+                    "h-row-mid min-w-0 border-b border-gray-200 pe-4 text-start text-sm font-normal truncate dark:border-gray-800",
                     alignOf(column) === "right" && "text-end",
                     alignOf(column) === "center" && "text-center",
                   )}
@@ -859,26 +863,36 @@ export function DataTable({
                 </th>
               ))}
               {rowActions.length > 0 && (
-                <th scope="col" aria-label="Row actions" className="h-row-mid pe-4 text-end text-sm font-normal" />
+                <th
+                  scope="col"
+                  aria-label="Row actions"
+                  className="h-row-mid border-b border-gray-200 pe-4 text-end text-sm font-normal dark:border-gray-800"
+                />
               )}
             </tr>
           </thead>
           <tbody>
             {visibleRows.map((row, index) => {
               const rowNumber = pageStart + index + 1;
+              const isLastRow = index === visibleRows.length - 1;
+              const rowSeparatorClass = isLastRow ? undefined : "border-b border-gray-200 dark:border-gray-800";
               const openRow = () => onRowOpen?.(row, pageStart + index);
               return (
                 <tr
                   key={String(row.id ?? row.name ?? pageStart + index)}
+                  style={{ height: isLastRow ? "var(--h-row-mid)" : "calc(var(--h-row-mid) + 1px)" }}
                   className={cn(
-                    "border-b border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-850",
+                    "hover:bg-gray-50 dark:hover:bg-gray-850",
                     onRowOpen && "cursor-pointer",
                   )}
                   data-row-id={String(row.id ?? row.name ?? pageStart + index)}
                   onClick={onRowOpen ? openRow : undefined}
                 >
                   {showIndex && (
-                    <th scope="row" className="h-row-mid pe-2 text-end font-normal text-gray-700 dark:text-gray-400">
+                    <th
+                      scope="row"
+                      className={cn("h-row-mid pe-2 text-end font-normal text-gray-700 dark:text-gray-400", rowSeparatorClass)}
+                    >
                       {onRowOpen ? (
                         <button
                           type="button"
@@ -905,6 +919,7 @@ export function DataTable({
                         key={column.key}
                         className={cn(
                           "h-row-mid min-w-0 pe-4 text-gray-900 dark:text-gray-300",
+                          rowSeparatorClass,
                           alignOf(column) === "right" && "text-end",
                           alignOf(column) === "center" && "text-center",
                         )}
@@ -926,7 +941,7 @@ export function DataTable({
                     );
                   })}
                   {rowActions.length > 0 && (
-                    <td className="h-row-mid pe-4 text-end">
+                    <td className={cn("h-row-mid pe-4 text-end", rowSeparatorClass)}>
                       <div className="flex items-center justify-end gap-2">
                         {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
                           <button
