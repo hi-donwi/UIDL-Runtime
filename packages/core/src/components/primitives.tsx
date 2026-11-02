@@ -793,17 +793,16 @@ export function DataTable({
   const visibleRows = paginate ? rows.slice(pageStart, pageStart + count) : rows;
   const gridTrackCount = Math.max(columns.length + (rowActions.length > 0 ? 1 : 0), 1);
   const indexColumnWidth = showIndex ? "2.5rem" : "0rem";
-  // Keep the former 1rem grid gutters by assigning each non-final table track its content width plus the gutter.
+  // Fixed-layout tables distribute the remaining width evenly. Logical padding restores the old grid tracks
+  // and gutters without depending on browser-specific handling of calc() widths on <col> elements.
   const gridGapRem = 1;
-  const indexWidthRem = showIndex ? 2.5 : 0;
-  const trackPercentage = 100 / gridTrackCount;
-  const nonFinalAdjustmentRem = (indexWidthRem - gridGapRem) / gridTrackCount;
-  const widthFromTrack = (extraGutterRem: number) => {
-    const adjustmentRem = nonFinalAdjustmentRem + extraGutterRem;
-    return `calc(${trackPercentage}% ${adjustmentRem < 0 ? "+" : "-"} ${Math.abs(adjustmentRem)}rem)`;
+  const insetsForGridTrack = (index: number) => {
+    const isLastTrack = index === gridTrackCount - 1;
+    return {
+      paddingInlineStart: `${(index * gridGapRem) / gridTrackCount}rem`,
+      paddingInlineEnd: `${((gridTrackCount - index - 1) * gridGapRem) / gridTrackCount + (isLastTrack ? gridGapRem : 0)}rem`,
+    };
   };
-  const gridColumnWidth = widthFromTrack(0);
-  const lastGridColumnWidth = widthFromTrack(gridGapRem);
 
   // Meridian right-aligns numeric fieldtypes without the column having to ask (ListCell's
   // `cellClass`), so an explicit `align` is an override rather than the only source.
@@ -831,15 +830,8 @@ export function DataTable({
         >
           <colgroup>
             {showIndex && <col style={{ width: indexColumnWidth }} />}
-            {columns.map((column, index) => (
-              <col
-                key={column.key}
-                style={{
-                  width: rowActions.length === 0 && index === columns.length - 1 ? lastGridColumnWidth : gridColumnWidth,
-                }}
-              />
-            ))}
-            {rowActions.length > 0 && <col style={{ width: lastGridColumnWidth }} />}
+            {columns.map((column) => <col key={column.key} />)}
+            {rowActions.length > 0 && <col />}
           </colgroup>
           <thead className="sticky top-0 z-10 bg-white text-gray-700 dark:bg-gray-890 dark:text-gray-400">
             <tr style={{ height: "calc(var(--h-row-mid) + 1px)" }}>
@@ -848,16 +840,17 @@ export function DataTable({
                   #
                 </th>
               )}
-              {columns.map((column) => (
+              {columns.map((column, index) => (
                 <th
                   key={column.key}
                   scope="col"
                   title={column.label}
                   className={cn(
-                    "h-row-mid min-w-0 border-b border-gray-200 pe-4 text-start text-sm font-normal truncate dark:border-gray-800",
+                    "h-row-mid min-w-0 border-b border-gray-200 text-start font-normal truncate dark:border-gray-800",
                     alignOf(column) === "right" && "text-end",
                     alignOf(column) === "center" && "text-center",
                   )}
+                  style={insetsForGridTrack(index)}
                 >
                   {column.label}
                 </th>
@@ -867,6 +860,7 @@ export function DataTable({
                   scope="col"
                   aria-label="Row actions"
                   className="h-row-mid border-b border-gray-200 pe-4 text-end text-sm font-normal dark:border-gray-800"
+                  style={insetsForGridTrack(gridTrackCount - 1)}
                 />
               )}
             </tr>
@@ -918,11 +912,12 @@ export function DataTable({
                       <td
                         key={column.key}
                         className={cn(
-                          "h-row-mid min-w-0 pe-4 text-gray-900 dark:text-gray-300",
+                          "h-row-mid min-w-0 text-gray-900 dark:text-gray-300",
                           rowSeparatorClass,
                           alignOf(column) === "right" && "text-end",
                           alignOf(column) === "center" && "text-center",
                         )}
+                        style={insetsForGridTrack(cellIndex)}
                       >
                         {onRowOpen && !showIndex && cellIndex === 0 ? (
                           <button
@@ -941,7 +936,7 @@ export function DataTable({
                     );
                   })}
                   {rowActions.length > 0 && (
-                    <td className={cn("h-row-mid pe-4 text-end", rowSeparatorClass)}>
+                    <td className={cn("h-row-mid text-end", rowSeparatorClass)} style={insetsForGridTrack(gridTrackCount - 1)}>
                       <div className="flex items-center justify-end gap-2">
                         {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
                           <button
