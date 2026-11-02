@@ -791,6 +791,19 @@ export function DataTable({
   const currentPage = Math.min(pageNo, maxPages);
   const pageStart = (currentPage - 1) * count;
   const visibleRows = paginate ? rows.slice(pageStart, pageStart + count) : rows;
+  const gridTrackCount = Math.max(columns.length + (rowActions.length > 0 ? 1 : 0), 1);
+  const indexColumnWidth = showIndex ? "2.5rem" : "0rem";
+  // Keep the former 1rem grid gutters by assigning each non-final table track its content width plus the gutter.
+  const gridGapRem = 1;
+  const indexWidthRem = showIndex ? 2.5 : 0;
+  const trackPercentage = 100 / gridTrackCount;
+  const nonFinalAdjustmentRem = (indexWidthRem - gridGapRem) / gridTrackCount;
+  const widthFromTrack = (extraGutterRem: number) => {
+    const adjustmentRem = nonFinalAdjustmentRem + extraGutterRem;
+    return `calc(${trackPercentage}% ${adjustmentRem < 0 ? "+" : "-"} ${Math.abs(adjustmentRem)}rem)`;
+  };
+  const gridColumnWidth = widthFromTrack(0);
+  const lastGridColumnWidth = widthFromTrack(gridGapRem);
 
   // Meridian right-aligns numeric fieldtypes without the column having to ask (ListCell's
   // `cellClass`), so an explicit `align` is an override rather than the only source.
@@ -813,14 +826,21 @@ export function DataTable({
       <div className="min-w-0 flex-1 overflow-y-auto">
         <table aria-label={title || "Data table"} className="w-full min-w-full table-fixed border-collapse text-base">
           <colgroup>
-            {showIndex && <col className="w-8" />}
-            {columns.map((column) => <col key={column.key} />)}
-            {rowActions.length > 0 && <col className="w-40" />}
+            {showIndex && <col style={{ width: indexColumnWidth }} />}
+            {columns.map((column, index) => (
+              <col
+                key={column.key}
+                style={{
+                  width: rowActions.length === 0 && index === columns.length - 1 ? lastGridColumnWidth : gridColumnWidth,
+                }}
+              />
+            ))}
+            {rowActions.length > 0 && <col style={{ width: lastGridColumnWidth }} />}
           </colgroup>
           <thead className="sticky top-0 z-10 bg-white text-gray-700 dark:bg-gray-890 dark:text-gray-400">
             <tr className="border-b border-gray-200 dark:border-gray-800">
               {showIndex && (
-                <th scope="col" className="w-8 px-2 py-3 text-end font-normal">
+                <th scope="col" className="h-row-mid pe-2 text-end font-normal">
                   #
                 </th>
               )}
@@ -830,7 +850,7 @@ export function DataTable({
                   scope="col"
                   title={column.label}
                   className={cn(
-                    "min-w-0 px-4 py-3 text-start text-sm font-normal whitespace-normal break-words",
+                    "h-row-mid min-w-0 pe-4 text-start text-sm font-normal truncate",
                     alignOf(column) === "right" && "text-end",
                     alignOf(column) === "center" && "text-center",
                   )}
@@ -839,9 +859,7 @@ export function DataTable({
                 </th>
               ))}
               {rowActions.length > 0 && (
-                <th scope="col" className="w-40 px-4 py-3 text-end text-sm font-normal">
-                  Row actions
-                </th>
+                <th scope="col" aria-label="Row actions" className="h-row-mid pe-4 text-end text-sm font-normal" />
               )}
             </tr>
           </thead>
@@ -860,7 +878,7 @@ export function DataTable({
                   onClick={onRowOpen ? openRow : undefined}
                 >
                   {showIndex && (
-                    <th scope="row" className="h-row-mid w-8 px-2 text-end font-normal text-gray-700 dark:text-gray-400">
+                    <th scope="row" className="h-row-mid pe-2 text-end font-normal text-gray-700 dark:text-gray-400">
                       {onRowOpen ? (
                         <button
                           type="button"
@@ -886,7 +904,7 @@ export function DataTable({
                       <td
                         key={column.key}
                         className={cn(
-                          "h-row-mid min-w-0 px-4 text-gray-900 dark:text-gray-300",
+                          "h-row-mid min-w-0 pe-4 text-gray-900 dark:text-gray-300",
                           alignOf(column) === "right" && "text-end",
                           alignOf(column) === "center" && "text-center",
                         )}
@@ -908,7 +926,7 @@ export function DataTable({
                     );
                   })}
                   {rowActions.length > 0 && (
-                    <td className="h-row-mid px-4 text-end">
+                    <td className="h-row-mid pe-4 text-end">
                       <div className="flex items-center justify-end gap-2">
                         {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
                           <button
