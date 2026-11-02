@@ -1,5 +1,4 @@
 import { useEffect, useId, useMemo, useRef, useState, isValidElement } from "react";
-import type React from "react";
 import type {
   ReactNode,
   HTMLAttributes,
@@ -793,14 +792,6 @@ export function DataTable({
   const pageStart = (currentPage - 1) * count;
   const visibleRows = paginate ? rows.slice(pageStart, pageStart + count) : rows;
 
-  const columnCount = columns.length + (rowActions.length > 0 ? 1 : 0);
-  const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: `repeat(${Math.max(columnCount, 1)}, minmax(0, 1fr))`,
-    gridGap: "1rem",
-  } as const;
-
-  const isLast = (index: number) => index === columnCount - 1;
   // Meridian right-aligns numeric fieldtypes without the column having to ask (ListCell's
   // `cellClass`), so an explicit `align` is an override rather than the only source.
   const alignOf = (column: DataTableColumn) =>
@@ -819,119 +810,128 @@ export function DataTable({
         </>
       )}
 
-      {/* Title Row */}
-      <div className="flex items-center">
-        {showIndex && <div className="me-2 w-8 text-end text-gray-700 dark:text-gray-400">#</div>}
-        <div className="h-row-mid flex-1 text-gray-700 dark:text-gray-400" style={gridStyle}>
-          {columns.map((column, index) => (
-            // List makes each header cell its own `overflow-x-auto` scroller. Reproduced
-            // literally that is a scrollable region no keyboard can reach (axe's
-            // `scrollable-region-focusable`, serious) — and making every header cell a tab stop
-            // to satisfy the rule would put one stop per column ahead of the actual content.
-            // A column label is static text, so it truncates like the body cells below it and
-            // keeps the full text in `title`: same appearance, nothing left unreachable.
-            <div
-              key={column.key}
-              title={column.label}
-              className={cn(
-                "flex h-full items-center truncate",
-                alignOf(column) === "right" && "justify-end",
-                alignOf(column) === "center" && "justify-center",
-                isLast(index) && "pe-4",
+      <div className="min-w-0 flex-1 overflow-y-auto">
+        <table aria-label={title || "Data table"} className="w-full min-w-full table-fixed border-collapse text-base">
+          <colgroup>
+            {showIndex && <col className="w-8" />}
+            {columns.map((column) => <col key={column.key} />)}
+            {rowActions.length > 0 && <col className="w-40" />}
+          </colgroup>
+          <thead className="sticky top-0 z-10 bg-white text-gray-700 dark:bg-gray-890 dark:text-gray-400">
+            <tr className="border-b border-gray-200 dark:border-gray-800">
+              {showIndex && (
+                <th scope="col" className="w-8 px-2 py-3 text-end font-normal">
+                  #
+                </th>
               )}
-            >
-              {column.label}
-            </div>
-          ))}
-          {rowActions.length > 0 && (
-            // Meridian has no per-row action column at all (rows navigate on click), so there is
-            // no upstream header label to copy — left empty rather than inventing one.
-            <div className="flex h-full items-center justify-end pe-4" aria-hidden="true" />
-          )}
-        </div>
-      </div>
-      <hr className="border-gray-200 dark:border-gray-800" />
-
-      {/* Data Rows */}
-      {visibleRows.length > 0 && (
-        <div className="overflow-y-auto">
-          {visibleRows.map((row, index) => (
-            <div key={String(row.id ?? row.name ?? pageStart + index)}>
-              {/* DataTable's own rows aren't separate UIDL nodes (RenderNode only stamps
-                  data-node-id on nodes it renders directly), so a data-row-id here is the only
-                  stable per-row hook a test or a future "row click navigates" affordance has. */}
-              <div
-                className={cn(
-                  "flex items-center hover:bg-gray-50 dark:hover:bg-gray-850",
-                  onRowOpen && "cursor-pointer",
-                )}
-                data-row-id={String(row.id ?? row.name ?? pageStart + index)}
-                {...(onRowOpen
-                  ? {
-                      role: "button",
-                      tabIndex: 0,
-                      onClick: () => onRowOpen(row, pageStart + index),
-                      // A div-as-button is only an affordance for a mouse until it answers the
-                      // keys a real button answers.
-                      onKeyDown: (event: React.KeyboardEvent) => {
-                        if (event.key !== "Enter" && event.key !== " ") return;
-                        event.preventDefault();
-                        onRowOpen(row, pageStart + index);
-                      },
-                    }
-                  : {})}
-              >
-                {showIndex && (
-                  <div className="me-2 w-8 text-end text-gray-700 dark:text-gray-400">{pageStart + index + 1}</div>
-                )}
-                <div className="h-row-mid flex-1 text-gray-900 dark:text-gray-300" style={gridStyle}>
+              {columns.map((column) => (
+                <th
+                  key={column.key}
+                  scope="col"
+                  title={column.label}
+                  className={cn(
+                    "min-w-0 px-4 py-3 text-start text-sm font-normal whitespace-normal break-words",
+                    alignOf(column) === "right" && "text-end",
+                    alignOf(column) === "center" && "text-center",
+                  )}
+                >
+                  {column.label}
+                </th>
+              ))}
+              {rowActions.length > 0 && (
+                <th scope="col" className="w-40 px-4 py-3 text-end text-sm font-normal">
+                  Row actions
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {visibleRows.map((row, index) => {
+              const rowNumber = pageStart + index + 1;
+              const openRow = () => onRowOpen?.(row, pageStart + index);
+              return (
+                <tr
+                  key={String(row.id ?? row.name ?? pageStart + index)}
+                  className={cn(
+                    "border-b border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-850",
+                    onRowOpen && "cursor-pointer",
+                  )}
+                  data-row-id={String(row.id ?? row.name ?? pageStart + index)}
+                  onClick={onRowOpen ? openRow : undefined}
+                >
+                  {showIndex && (
+                    <th scope="row" className="h-row-mid w-8 px-2 text-end font-normal text-gray-700 dark:text-gray-400">
+                      {onRowOpen ? (
+                        <button
+                          type="button"
+                          aria-label={`Open row ${rowNumber}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openRow();
+                          }}
+                          className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {rowNumber}
+                        </button>
+                      ) : rowNumber}
+                    </th>
+                  )}
                   {columns.map((column, cellIndex) => {
                     const raw = row[column.key];
                     const text = formatCellValue(raw, column.format, cellOptions);
+                    const content = column.format === "status" && text
+                      ? <Badge label={text} color={statusColor(text)} variant="pill" />
+                      : <span className="block truncate" title={text}>{text}</span>;
                     return (
-                      <div
+                      <td
                         key={column.key}
                         className={cn(
-                          "flex items-center truncate",
-                          alignOf(column) === "right" && "justify-end",
-                          alignOf(column) === "center" && "justify-center",
-                          isLast(cellIndex) && "pe-4",
+                          "h-row-mid min-w-0 px-4 text-gray-900 dark:text-gray-300",
+                          alignOf(column) === "right" && "text-end",
+                          alignOf(column) === "center" && "text-center",
                         )}
                       >
-                        {column.format === "status" && text ? (
-                          <Badge label={text} color={statusColor(text)} variant="pill" />
-                        ) : (
-                          <span className="truncate">{text}</span>
-                        )}
-                      </div>
+                        {onRowOpen && !showIndex && cellIndex === 0 ? (
+                          <button
+                            type="button"
+                            aria-label={`Open row ${String(raw ?? rowNumber)}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openRow();
+                            }}
+                            className="w-full rounded-sm text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            {content}
+                          </button>
+                        ) : content}
+                      </td>
                     );
                   })}
                   {rowActions.length > 0 && (
-                    <div className="flex items-center justify-end gap-2 pe-4">
-                      {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
-                        <button
-                          key={action.label}
-                          type="button"
-                          onClick={(event) => {
-                            // The row itself may be an open-affordance; a verb inside it is a
-                            // different intent and must not also open the document.
-                            event.stopPropagation();
-                            onRowAction?.(row, action, pageStart + index);
-                          }}
-                          className="flex h-row-smallest items-center rounded-md bg-gray-100 px-3 text-sm text-gray-700 hover:bg-gray-200 dark:bg-gray-890 dark:text-gray-200 dark:hover:bg-gray-800"
-                        >
-                          {action.label}
-                        </button>
-                      ))}
-                    </div>
+                    <td className="h-row-mid px-4 text-end">
+                      <div className="flex items-center justify-end gap-2">
+                        {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
+                          <button
+                            key={action.label}
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              onRowAction?.(row, action, pageStart + index);
+                            }}
+                            className="flex h-row-smallest items-center rounded-md bg-gray-100 px-3 text-sm text-gray-700 hover:bg-gray-200 dark:bg-gray-890 dark:text-gray-200 dark:hover:bg-gray-800"
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
+                    </td>
                   )}
-                </div>
-              </div>
-              {index !== visibleRows.length - 1 && <hr className="border-gray-200 dark:border-gray-800" />}
-            </div>
-          ))}
-        </div>
-      )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination Footer */}
       {rows.length > 0 && paginate && (
