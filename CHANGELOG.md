@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-11-02
+
+### Changed
+- Render `DataTable` with native table semantics, associated row and column headers, and
+  keyboard-operable row-opening controls.
+
+### Fixed
+- Make the vertically scrollable DataTable rows a named keyboard-focusable region.
+
 ## [0.1.13] - 2026-10-26
 
 ### Fixed

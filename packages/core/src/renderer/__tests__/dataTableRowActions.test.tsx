@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { renderUIDocument } from "../renderDocument";
 import { UIDocumentRenderer } from "../UIDocumentRenderer";
 import { createDocumentState } from "../../state/createDocumentState";
@@ -40,6 +40,16 @@ function documentWithRowActions(events: Record<string, unknown>): UIDLDocument {
 }
 
 describe("DataTable row actions", () => {
+  it("exposes a named action column without adding a visible heading", () => {
+    render(<UIDocumentRenderer document={documentWithRowActions({})} />);
+
+    const table = screen.getByRole("table", { name: "Data table" });
+    const actionHeader = within(table).getByRole("columnheader", { name: "Row actions" });
+
+    expect(actionHeader).toBeEmptyDOMElement();
+    expect(within(table).getAllByRole("button", { name: "Open" })).toHaveLength(2);
+  });
+
   it("shows an action only when its visibleWhen expression matches that row", () => {
     const doc = documentWithRowActions({
       onDownload: [{ setState: { path: "downloadedId", value: { $bind: "event.id" } } }],

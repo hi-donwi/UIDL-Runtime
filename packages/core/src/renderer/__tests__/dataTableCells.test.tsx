@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { UIDocumentRenderer } from "../UIDocumentRenderer";
 import { createDocumentState } from "../../state/createDocumentState";
 import type { UIDLDocument } from "../../types";
@@ -144,8 +145,8 @@ describe("DataTable cell rendering — ListCell parity", () => {
 
   it("right-aligns the numeric column without the document asking", () => {
     renderList();
-    const cell = screen.getByText(/Rp\s?1\.500\.000/).closest("div");
-    expect(cell?.className).toContain("justify-end");
+    const cell = screen.getByText(/Rp\s?1\.500\.000/).closest("td");
+    expect(cell?.className).toContain("text-end");
   });
 
   it("opens the document when the row itself is clicked (Meridian has no action column)", () => {
@@ -155,9 +156,11 @@ describe("DataTable cell rendering — ListCell parity", () => {
     expect(state.getValue("opened")).toBe("SO-001");
   });
 
-  it("opens the document from the keyboard, so the row is not mouse-only", () => {
+  it("opens the document with native keyboard activation, so the row is not mouse-only", async () => {
     const state = renderList();
-    fireEvent.keyDown(screen.getByText("Sales Order 001").closest("[data-row-id]")!, { key: "Enter" });
+    const user = userEvent.setup();
+    screen.getByRole("button", { name: "Open row 1" }).focus();
+    await user.keyboard("{Enter}");
     expect(state.getValue("opened")).toBe("SO-001");
   });
 

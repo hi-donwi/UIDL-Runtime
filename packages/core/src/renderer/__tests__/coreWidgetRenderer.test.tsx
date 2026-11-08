@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { UIDocumentRenderer } from "../UIDocumentRenderer";
 import { createDocumentState } from "../../state/createDocumentState";
 import type { UIDLDocument } from "../../types";
@@ -54,7 +54,7 @@ describe("renderer · Text", () => {
 });
 
 describe("renderer · DataTable (static rows)", () => {
-  it("renders column headers and static row values", () => {
+  it("renders a named semantic table with associated column headers, rows, and cells", () => {
     const doc: UIDLDocument = {
       version: "1.0.0", id: "dt1", name: "DT1", root: {
         id: "table", type: "DataTable", props: {
@@ -72,12 +72,37 @@ describe("renderer · DataTable (static rows)", () => {
       },
     };
     render(<UIDocumentRenderer document={doc} />);
+    const table = screen.getByRole("table", { name: "Customers" });
+    const headers = within(table).getAllByRole("columnheader");
+    const rows = within(table).getAllByRole("row");
+    expect(headers.map((header) => header.textContent)).toEqual(["#", "Name", "Tier"]);
+    expect(rows).toHaveLength(3);
+    expect(within(rows[0]!).getByRole("columnheader", { name: "Name" })).toHaveAttribute("scope", "col");
+    expect(within(rows[1]!).getByRole("rowheader")).toHaveAttribute("scope", "row");
+    expect(within(rows[1]!).getByRole("cell", { name: "Acme" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Customers" })).toBeInTheDocument();
     expect(screen.getByText("Customers")).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Tier")).toBeInTheDocument();
     expect(screen.getByText("Acme")).toBeInTheDocument();
     expect(screen.getByText("Platinum")).toBeInTheDocument();
     expect(screen.getByText("Globex")).toBeInTheDocument();
+  });
+
+  it("makes the vertically scrollable rows keyboard accessible", () => {
+    const doc: UIDLDocument = {
+      version: "1.0.0", id: "dt-scroll", name: "Scrollable table", root: {
+        id: "table", type: "DataTable", props: {
+          title: "Customers",
+          columns: [{ key: "name", label: "Name" }],
+          rows: [{ name: "Acme" }],
+        },
+      },
+    };
+    render(<UIDocumentRenderer document={doc} />);
+
+    const scrollRegion = screen.getByRole("region", { name: "Customers rows" });
+    expect(scrollRegion).toHaveAttribute("tabindex", "0");
   });
 
   it("shows emptyMessage when rows are empty", () => {

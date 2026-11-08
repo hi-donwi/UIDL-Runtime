@@ -19,7 +19,7 @@
         { "id": "nav-variance", "type": "Button", "props": { "label": "Variance Review" }, "visibility": { "condition": { "path": "session.permissions.finance.variance" } }, "events": { "onClick": [{ "navigate": { "route": "/finance/variance" } }] } },
         { "id": "nav-admin", "type": "Button", "props": { "label": "Admin Controls" }, "visibility": { "condition": { "path": "session.permissions.finance.admin" } } }
       ] },
-      { "id": "main", "type": "Column", "style": { "flex": "flex-1", "gap": "gap-5", "padding": "p-6" }, "children": [
+      { "id": "main", "type": "Column", "props": { "className": "flex-1 min-w-0" }, "style": { "gap": "gap-5", "padding": "p-6" }, "children": [
         { "id": "navbar", "type": "Navbar", "style": { "justifyContent": "space-between" }, "children": [
           { "id": "title", "type": "Text", "props": { "value": "Month-End Close" }, "style": { "fontSize": "text-3xl", "fontWeight": "font-bold" } },
           { "id": "user", "type": "Text", "props": { "value": { "$expr": { "path": "session.user.name" } } } }
