@@ -822,7 +822,12 @@ export function DataTable({
         </>
       )}
 
-      <div className="min-w-0 flex-1 overflow-y-auto">
+      <div
+        className="min-w-0 flex-1 overflow-y-auto"
+        role="region"
+        aria-label={title ? `${title} rows` : "Data table rows"}
+        tabIndex={0}
+      >
         <table
           aria-label={title || "Data table"}
           className="w-full min-w-0 table-fixed text-base"

@@ -89,6 +89,22 @@ describe("renderer · DataTable (static rows)", () => {
     expect(screen.getByText("Globex")).toBeInTheDocument();
   });
 
+  it("makes the vertically scrollable rows keyboard accessible", () => {
+    const doc: UIDLDocument = {
+      version: "1.0.0", id: "dt-scroll", name: "Scrollable table", root: {
+        id: "table", type: "DataTable", props: {
+          title: "Customers",
+          columns: [{ key: "name", label: "Name" }],
+          rows: [{ name: "Acme" }],
+        },
+      },
+    };
+    render(<UIDocumentRenderer document={doc} />);
+
+    const scrollRegion = screen.getByRole("region", { name: "Customers rows" });
+    expect(scrollRegion).toHaveAttribute("tabindex", "0");
+  });
+
   it("shows emptyMessage when rows are empty", () => {
     const doc: UIDLDocument = {
       version: "1.0.0", id: "dt2", name: "DT2",
