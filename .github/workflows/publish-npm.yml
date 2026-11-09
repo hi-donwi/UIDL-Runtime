@@ -1,4 +1,4 @@
-name: Publish npm package
+name: Stage npm package
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Expected package version to publish, with or without a leading v
+        description: Expected package version to stage, with or without a leading v
         required: true
         type: string
 
@@ -15,11 +15,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: npm-publish-${{ github.ref }}
+  group: npm-stage-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  publish:
+  stage:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +31,9 @@ jobs:
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
+      - name: Install npm CLI with staged publishing support
+        run: npm install --global npm@11.21.2
+
       - run: corepack enable && corepack prepare pnpm@10.18.1 --activate && pnpm install --frozen-lockfile
 
       - name: Check manual dispatch uses default branch
@@ -39,7 +42,7 @@ jobs:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           if [ "$GITHUB_REF_NAME" != "$DEFAULT_BRANCH" ]; then
-            echo "Manual publish must run from ${DEFAULT_BRANCH}; current ref is ${GITHUB_REF_NAME}."
+            echo "Manual staging must run from ${DEFAULT_BRANCH}; current ref is ${GITHUB_REF_NAME}."
             exit 1
           fi
 
@@ -83,5 +86,7 @@ jobs:
       - name: Build and smoke-test package artifact
         run: pnpm run smoke:package
 
-      - name: Publish to npm
-        run: npm publish
+      - name: Stage package for maintainer approval
+        run: |
+          npm stage publish --provenance
+          echo "Package staged. A maintainer must review and approve the stage with npm 2FA before it is publicly available." >> "$GITHUB_STEP_SUMMARY"
