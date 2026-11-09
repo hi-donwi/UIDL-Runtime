@@ -310,7 +310,7 @@ pnpm run dev:reference:http
 
 ## Release Automation
 
-The public npm package is published from `.github/workflows/publish-npm.yml` using npm
+The public npm package is staged from `.github/workflows/publish-npm.yml` using npm
 Trusted Publishing with GitHub Actions OIDC. Configure the `uidl-runtime` package on
 npmjs.com with this trusted publisher before cutting the next release:
 
@@ -319,16 +319,26 @@ Publisher: GitHub Actions
 Organization or user: hi-donwi
 Repository: UIDL-Runtime
 Workflow filename: publish-npm.yml
-Allowed action: npm publish
+Allowed action: npm stage publish
 ```
 
-No `NPM_TOKEN` repository secret is required for the public npm publish path. The workflow
-uses Node.js 24, disables package-manager cache in the release job, requires manual publish
-dispatches to run from the default branch, validates the requested version against
-`package.json`, and refuses to publish a version that already exists on npm.
+No `NPM_TOKEN` repository secret is required for staging. The workflow uses Node.js 24 and
+npm 11.21.2, disables package-manager cache in the release job, requires manual dispatches
+to run from the default branch, validates the requested version against `package.json`, and
+refuses to stage a version that already exists on npm. Staged packages are not publicly
+available until a package maintainer reviews and approves the exact stage with npm 2FA:
 
-Distribution is npm-only. After a release, run the manual `Verify npm package` workflow with
-the released version.
+```bash
+npm stage list uidl-runtime
+npm stage view <stage-id>
+npm stage approve <stage-id>
+```
+
+After approval, verify the released version with `npm view uidl-runtime@<version> version`.
+
+The GitHub release tag records the source version; npm publication is completed only after
+the staged package receives maintainer approval. After approval, run the manual `Verify npm
+package` workflow with the released version.
 
 ## Commands
 
