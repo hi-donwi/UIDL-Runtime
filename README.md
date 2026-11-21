@@ -1,4 +1,6 @@
-# uidl-runtime
+# UIDL Runtime
+
+*Part of the DONWI App Stack. The npm package is `uidl-runtime` and the Flutter package is `uidl_flutter`.*
 
 [![npm version](https://img.shields.io/npm/v/uidl-runtime.svg)](https://www.npmjs.com/package/uidl-runtime)
 [![pub package](https://img.shields.io/pub/v/uidl_flutter.svg)](https://pub.dev/packages/uidl_flutter)
@@ -270,7 +272,7 @@ String jsonOutput = doc.toJson();
 
 ### 5. Workspace Control Companion Desk
 
-The companion application pairs directly with the local Agent Workspace daemon (`ws_web.py`) for live Kanban boards, backlog grooming, and activity tracking:
+The companion application pairs directly with the local DONWI Workspace daemon (`ws_web.py`) for live Kanban boards, backlog grooming, and activity tracking:
 
 ```bash
 # Start local workspace backend with the UIDL runtime
