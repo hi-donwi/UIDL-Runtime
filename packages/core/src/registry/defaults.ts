@@ -307,6 +307,7 @@ export const defaultWidgets: WidgetManifest[] = [
       ),
       prop("rows", "array", "Static row objects. Prefer dataSource for adapter-backed data."),
       prop("rowActions", "array", "Array of { label, event?, visibleWhen? } row actions. visibleWhen is a UIDL expression evaluated against data.row for each row. Omit for a Meridian-style list where the row itself opens the record."),
+      prop("rowActionPresentation", "object", "Optional row action presentation: { mode: buttons | menu, triggerLabel?, triggerAriaLabel?, menuLabel?, columnAriaLabel? }. Defaults to inline buttons."),
       prop("emptyMessage", "string"),
       prop("showIndex", "boolean"),
       prop("paginate", "boolean"),

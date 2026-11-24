@@ -155,6 +155,7 @@ export type {
 } from "./services/aiPipeline";
 export { Drawer, Snackbar, Dialog, Button, Badge } from "./components/primitives";
 export type { DrawerProps, SnackbarProps, DialogProps, ButtonProps, BadgeProps } from "./components/primitives";
+export type { DataTableAction, DataTableActionPresentation, DataTableColumn, DataTableProps } from "./components/primitives";
 export {
   PAGE_RECIPES,
   isPageRecipe,

@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-11-24
+
+### Added
+- Add an optional, localized `DataTable.rowActionPresentation` contract for accessible row action menus.
+- Keep per-row visibility checks and action callbacks in the DataTable renderer, without DOM scraping.
+
 ## [0.1.14] - 2026-11-02
 
 ### Changed
@@ -204,7 +210,9 @@ Initial public release.
 - JSON Schema exports for the document, action, theme-presets and design-tokens contracts.
 - `uidl-validate` CLI for validating UIDL documents against the schema.
 
-[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.13...HEAD
+[Unreleased]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.15...HEAD
+[0.1.15]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.14...v0.1.15
+[0.1.14]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.13...v0.1.14
 [0.1.13]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.12...v0.1.13
 [0.1.12]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/hi-donwi/UIDL-Runtime/compare/v0.1.9...v0.1.11

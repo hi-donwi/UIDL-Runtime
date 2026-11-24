@@ -50,6 +50,121 @@ describe("DataTable row actions", () => {
     expect(within(table).getAllByRole("button", { name: "Open" })).toHaveLength(2);
   });
 
+  it("renders row actions in a configurable menu and toggles the menu from the same trigger", async () => {
+    const doc = documentWithRowActions({
+      onOpen: [{ setState: { path: "selectedId", value: { $bind: "event.id" } } }],
+    });
+    doc.root.props!.rowActionPresentation = {
+      mode: "menu",
+      triggerLabel: "More",
+      triggerAriaLabel: "Invoice actions",
+      menuLabel: "Invoice action menu",
+      columnAriaLabel: "Invoice action column",
+    };
+    const stateStore = createDocumentState({ selectedId: null }).getState();
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} stateStore={stateStore} />);
+
+    const trigger = screen.getAllByRole("button", { name: "Invoice actions" })[1];
+    expect(screen.getByRole("columnheader", { name: "Invoice action column" })).toBeInTheDocument();
+    fireEvent.click(trigger);
+    expect(await screen.findByRole("menu", { name: "Invoice action menu" })).toBeInTheDocument();
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menuitem", { name: "Open" })).toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("menu", { name: "Invoice action menu" })).not.toBeInTheDocument();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(trigger);
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Open" }));
+    expect(stateStore.getValue("selectedId")).toBe("SINV-002");
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("closes a row action menu on Escape and restores focus to its trigger", async () => {
+    const doc = documentWithRowActions({});
+    doc.root.props!.rowActionPresentation = { mode: "menu" };
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} />);
+
+    const trigger = screen.getAllByRole("button", { name: "Row actions" })[0];
+    fireEvent.click(trigger);
+    const menu = await screen.findByRole("menu", { name: "Row actions menu" });
+    expect(menu).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("dismisses the row action menu when the user clicks outside it", async () => {
+    const doc = documentWithRowActions({});
+    doc.root.props!.rowActionPresentation = { mode: "menu" };
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Row actions" })[0]);
+    expect(await screen.findByRole("menu", { name: "Row actions menu" })).toBeInTheDocument();
+    fireEvent.pointerDown(document.body);
+
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("closes the menu on Tab and returns focus to the trigger before native tab navigation", async () => {
+    const doc = documentWithRowActions({});
+    doc.root.props!.rowActionPresentation = { mode: "menu" };
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} />);
+
+    const trigger = screen.getAllByRole("button", { name: "Row actions" })[0];
+    fireEvent.click(trigger);
+    expect(await screen.findByRole("menu", { name: "Row actions menu" })).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: "Tab" });
+
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("portals the menu into the table's shadow root and still dismisses it from outside", () => {
+    const doc = documentWithRowActions({});
+    doc.root.props!.rowActionPresentation = { mode: "menu" };
+    const host = document.createElement("div");
+    document.body.append(host);
+    const shadowRoot = host.attachShadow({ mode: "open" });
+    const container = document.createElement("div");
+    shadowRoot.append(container);
+    const view = render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} />, { container });
+
+    const trigger = shadowRoot.querySelector<HTMLButtonElement>('button[aria-label="Row actions"]');
+    expect(trigger).not.toBeNull();
+    fireEvent.click(trigger!);
+    expect(shadowRoot.querySelector('[role="menu"]')).not.toBeNull();
+    expect(document.body.querySelector('[role="menu"]')).toBeNull();
+
+    fireEvent.pointerDown(document.body);
+    expect(shadowRoot.querySelector('[role="menu"]')).toBeNull();
+    view.unmount();
+    host.remove();
+  });
+
+  it("does not render a menu trigger when a row has no visible actions", () => {
+    const doc = documentWithRowActions({});
+    doc.dataSources!.invoices = [
+      { id: "APP-001", cvScanStatus: "pending" },
+      { id: "APP-002", cvScanStatus: "clean" },
+    ];
+    doc.root.props!.rowActions = [{
+      label: "Download CV",
+      visibleWhen: {
+        op: "eq",
+        left: { $bind: "data.row.cvScanStatus" },
+        right: { literal: "clean" },
+      },
+    }];
+    doc.root.props!.rowActionPresentation = { mode: "menu" };
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} />);
+
+    expect(screen.getAllByRole("button", { name: "Row actions" })).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: "Download CV" })).not.toBeInTheDocument();
+  });
+
   it("shows an action only when its visibleWhen expression matches that row", () => {
     const doc = documentWithRowActions({
       onDownload: [{ setState: { path: "downloadedId", value: { $bind: "event.id" } } }],

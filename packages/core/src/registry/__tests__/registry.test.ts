@@ -49,6 +49,7 @@ describe("createRegistry", () => {
     const tableProps = new Set(defaultRegistry.get("DataTable")!.propDescriptors!.map((descriptor) => descriptor.name));
     expect(tableProps.has("rows")).toBe(true);
     expect(tableProps.has("dataSource")).toBe(true);
+    expect(tableProps.has("rowActionPresentation")).toBe(true);
     expect(tableProps.has("data")).toBe(false);
 
     const fieldProps = new Set(defaultRegistry.get("TextField")!.propDescriptors!.map((descriptor) => descriptor.name));
