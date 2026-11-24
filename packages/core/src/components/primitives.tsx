@@ -9,8 +9,9 @@ import type {
 } from "react";
 import { cn } from "../utils/cn";
 import { formatCellValue, isNumericFormat, statusColor, type CellFormat } from "../utils/listCell";
-import { evaluate, type Expr } from "../expr/evaluate";
+import { evaluate } from "../expr/evaluate";
 import { Icon } from "./icons";
+import { DataTableRowActions, type DataTableAction, type DataTableActionPresentation } from "./DataTableRowActions";
 import { useElementWidth } from "../hooks/useElementWidth";
 import { MeridianBarChart, MeridianDonutChart, MeridianLineChart } from "./charts";
 import { MERIDIAN_DONUT_COLORS, MERIDIAN_SERIES_COLORS } from "../utils/chart";
@@ -709,12 +710,7 @@ export interface DataTableColumn {
   format?: CellFormat;
 }
 
-export interface DataTableAction {
-  label: string;
-  event?: string;
-  /** UIDL expression evaluated for each row against the `data.row` scope. */
-  visibleWhen?: Expr;
-}
+export type { DataTableAction, DataTableActionPresentation } from "./DataTableRowActions";
 
 export interface DataTableProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;
@@ -722,6 +718,7 @@ export interface DataTableProps extends HTMLAttributes<HTMLDivElement> {
   columns?: DataTableColumn[];
   rows?: Array<Record<string, unknown>>;
   rowActions?: DataTableAction[];
+  rowActionPresentation?: DataTableActionPresentation;
   emptyMessage?: string;
   /** Meridian numbers every list row in a narrow leading column. */
   showIndex?: boolean;
@@ -773,6 +770,7 @@ export function DataTable({
   columns = [],
   rows = [],
   rowActions = [],
+  rowActionPresentation,
   emptyMessage = "No entries found",
   showIndex = true,
   paginate = true,
@@ -863,7 +861,7 @@ export function DataTable({
               {rowActions.length > 0 && (
                 <th
                   scope="col"
-                  aria-label="Row actions"
+                  aria-label={rowActionPresentation?.columnAriaLabel ?? "Row actions"}
                   className="h-row-mid border-b border-gray-200 pe-4 text-end text-sm font-normal dark:border-gray-800"
                   style={insetsForGridTrack(gridTrackCount - 1)}
                 />
@@ -942,21 +940,11 @@ export function DataTable({
                   })}
                   {rowActions.length > 0 && (
                     <td className={cn("h-row-mid text-end", rowSeparatorClass)} style={insetsForGridTrack(gridTrackCount - 1)}>
-                      <div className="flex items-center justify-end gap-2">
-                        {rowActions.filter((action) => isDataTableActionVisible(action, row)).map((action) => (
-                          <button
-                            key={action.label}
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              onRowAction?.(row, action, pageStart + index);
-                            }}
-                            className="flex h-row-smallest items-center rounded-md bg-gray-100 px-3 text-sm text-gray-700 hover:bg-gray-200 dark:bg-gray-890 dark:text-gray-200 dark:hover:bg-gray-800"
-                          >
-                            {action.label}
-                          </button>
-                        ))}
-                      </div>
+                      <DataTableRowActions
+                        actions={rowActions.filter((action) => isDataTableActionVisible(action, row))}
+                        presentation={rowActionPresentation}
+                        onAction={(action) => onRowAction?.(row, action, pageStart + index)}
+                      />
                     </td>
                   )}
                 </tr>

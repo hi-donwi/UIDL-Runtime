@@ -38,3 +38,21 @@ An omitted `visibleWhen` preserves the existing always-visible behavior. A confi
 condition whose evaluated result is falsey hides that action for the row. This controls
 the UI affordance only; the action handler must still enforce authorization and business
 rules when it executes.
+
+The reference runtime also accepts an optional `rowActionPresentation` object:
+
+```json
+{
+  "mode": "menu",
+  "triggerLabel": "More",
+  "triggerAriaLabel": "Invoice actions",
+  "menuLabel": "Invoice action menu",
+  "columnAriaLabel": "Invoice action column"
+}
+```
+
+`mode` is `buttons` or `menu`; when omitted, the runtime preserves inline buttons.
+Trigger, menu and column labels can be localized by the document author. The menu includes
+only actions visible for the current row. This is presentation behavior, not authorization.
+This contract describes the current reference runtime; other renderers may implement it
+as their DataTable adapters are brought to parity.
