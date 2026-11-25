@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-11-25
+
+### Added
+- Add an optional `DataTableColumn.statusColors` map so a `status` column names the pill colour
+  of its own labels, in any language. Column entries win over the built-in status colours,
+  which stay the fallback.
+- Export the `BadgeColor` type.
+
 ## [0.1.15] - 2026-11-24
 
 ### Added

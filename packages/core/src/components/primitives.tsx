@@ -708,6 +708,12 @@ export interface DataTableColumn {
    * right-aligned unless `align` says otherwise, matching Meridian's `isNumeric` rule.
    */
   format?: CellFormat;
+  /**
+   * Colours of this column's own status labels, for a `status` column: label to Badge colour,
+   * compared trimmed and case-insensitively with the cell text. Entries win over the built-in
+   * status colours, which stay the fallback. An unknown colour renders gray.
+   */
+  statusColors?: Record<string, BadgeColor>;
 }
 
 export type { DataTableAction, DataTableActionPresentation } from "./DataTableRowActions";
@@ -909,7 +915,7 @@ export function DataTable({
                     const raw = row[column.key];
                     const text = formatCellValue(raw, column.format, cellOptions);
                     const content = column.format === "status" && text
-                      ? <Badge label={text} color={statusColor(text)} variant="pill" />
+                      ? <Badge label={text} color={statusColor(text, column.statusColors)} variant="pill" />
                       : <span className="block truncate" title={text}>{text}</span>;
                     return (
                       <td
