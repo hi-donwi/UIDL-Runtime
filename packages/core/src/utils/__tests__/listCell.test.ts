@@ -74,4 +74,22 @@ describe("statusColor — StatusPill's statusColorMap", () => {
   it("falls back to gray for anything unmapped", () => {
     expect(statusColor("Whatever")).toBe("gray");
   });
+
+  it("colours a column's own labels from its colour map, case- and space-insensitively", () => {
+    const columnColors = { Disetujui: "green", " menunggu ": "yellow" };
+    expect(statusColor("disetujui", columnColors)).toBe("green");
+    expect(statusColor(" MENUNGGU", columnColors)).toBe("yellow");
+  });
+
+  it("lets the column map win over the built-in map, which stays the fallback", () => {
+    const columnColors = { paid: "orange" };
+    expect(statusColor("Paid", columnColors)).toBe("orange");
+    expect(statusColor("Cancelled", columnColors)).toBe("red");
+    expect(statusColor("Ditolak", columnColors)).toBe("gray");
+  });
+
+  it("ignores column map entries whose colour is not text", () => {
+    const columnColors = { Paid: 3 } as unknown as Record<string, string>;
+    expect(statusColor("Paid", columnColors)).toBe("green");
+  });
 });

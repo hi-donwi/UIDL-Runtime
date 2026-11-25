@@ -56,3 +56,25 @@ Trigger, menu and column labels can be localized by the document author. The men
 only actions visible for the current row. This is presentation behavior, not authorization.
 This contract describes the current reference runtime; other renderers may implement it
 as their DataTable adapters are brought to parity.
+
+## Reference-runtime component contract: `DataTable` column `statusColors`
+
+A `DataTable` column with `format: "status"` renders each value as a coloured pill. The
+runtime colours a small built-in set of status labels; any other label is gray. A column may
+name the colour of its own labels with `statusColors`, which maps a label to a pill colour
+(`gray`, `orange`, `green`, `red`, `yellow`, `blue`, `indigo`, `pink`, `purple`, `teal`):
+
+```json
+{
+  "key": "status",
+  "label": "Status",
+  "format": "status",
+  "statusColors": { "Approved": "green", "Waiting": "yellow", "Declined": "red" }
+}
+```
+
+Labels are compared with the cell text trimmed and case-insensitively. Column entries win
+over the built-in colours, which remain the fallback; an unknown colour renders gray. The map
+keys are display labels, so a document in another language colours its own words without a
+runtime change. This contract describes the current reference runtime; other renderers may
+implement it as their DataTable adapters are brought to parity.

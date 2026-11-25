@@ -46,8 +46,21 @@ const STATUS_COLORS: Record<string, string> = {
   archived: "gray",
 };
 
-export function statusColor(status: string): string {
-  return STATUS_COLORS[status.trim().toLowerCase()] ?? "gray";
+/**
+ * The pill colour for a status label. A column may name the colour of its own labels
+ * (`DataTableColumn.statusColors`): a document in another language, or with its own lifecycle,
+ * uses labels the built-in map cannot know. Column entries win, compared trimmed and
+ * case-insensitively like the built-in map, which stays the fallback; anything still unmapped
+ * is gray.
+ */
+export function statusColor(status: string, columnColors?: Readonly<Record<string, string>>): string {
+  const key = status.trim().toLowerCase();
+  if (columnColors) {
+    for (const [label, color] of Object.entries(columnColors)) {
+      if (typeof color === "string" && label.trim().toLowerCase() === key) return color;
+    }
+  }
+  return STATUS_COLORS[key] ?? "gray";
 }
 
 /**

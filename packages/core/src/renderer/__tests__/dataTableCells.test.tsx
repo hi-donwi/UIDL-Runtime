@@ -143,6 +143,19 @@ describe("DataTable cell rendering — ListCell parity", () => {
     expect(status.className).toMatch(/blue/);
   });
 
+  it("colours a status pill from the column's own colour map when the label is not built in", () => {
+    const doc = listDocument();
+    doc.dataSources = { rows: [{ id: "SO-002", name: "Sales Order 002", status: "Disetujui" }] };
+    const props = doc.root.props as { columns: Array<Record<string, unknown>> };
+    props.columns = props.columns.map((column) => column.key === "status"
+      ? { ...column, statusColors: { disetujui: "green" } }
+      : column);
+    render(<UIDocumentRenderer document={doc} dataSources={doc.dataSources} stateStore={createDocumentState({}).getState()} />);
+    const status = screen.getByText("Disetujui");
+    expect(status.className).toContain("pill");
+    expect(status.className).toMatch(/green/);
+  });
+
   it("right-aligns the numeric column without the document asking", () => {
     renderList();
     const cell = screen.getByText(/Rp\s?1\.500\.000/).closest("td");

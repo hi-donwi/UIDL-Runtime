@@ -303,7 +303,7 @@ export const defaultWidgets: WidgetManifest[] = [
       prop(
         "columns",
         "array",
-        "Array of { key, label, align?, format? } columns. `format` is one of text | currency | number | integer | date | status | check and drives how the value is printed (status renders a coloured pill; numeric formats right-align).",
+        "Array of { key, label, align?, format?, statusColors? } columns. `format` is one of text | currency | number | integer | date | status | check and drives how the value is printed (status renders a coloured pill; numeric formats right-align). `statusColors` maps a status column's own labels to pill colours (gray | orange | green | red | yellow | blue | indigo | pink | purple | teal), compared case-insensitively; unlisted labels use the built-in status colours.",
       ),
       prop("rows", "array", "Static row objects. Prefer dataSource for adapter-backed data."),
       prop("rowActions", "array", "Array of { label, event?, visibleWhen? } row actions. visibleWhen is a UIDL expression evaluated against data.row for each row. Omit for a Meridian-style list where the row itself opens the record."),
