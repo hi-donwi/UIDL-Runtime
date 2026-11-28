@@ -1,4 +1,6 @@
 import type { SVGProps } from "react";
+import { useRuntimeMessages } from "../i18n/runtimeMessagesContext";
+import { formatMessage } from "../i18n/runtimeMessages";
 
 export interface QRCodeSVGProps extends SVGProps<SVGSVGElement> {
   value?: string;
@@ -18,6 +20,7 @@ export function QRCodeSVG({
   className,
   ...props
 }: QRCodeSVGProps) {
+  const messages = useRuntimeMessages();
   // Generate a consistent matrix pattern based on hash of string value
   const gridSize = 25; // 25x25 QR Matrix (Version 2)
   const hash = Array.from(value).reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0);
@@ -60,7 +63,7 @@ export function QRCodeSVG({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label={`QR Code for ${value}`}
+      aria-label={formatMessage(messages.qrCode, { value })}
       role="img"
       {...props}
     >
@@ -101,6 +104,7 @@ export function BarcodeSVG({
   className,
   ...props
 }: BarcodeSVGProps) {
+  const messages = useRuntimeMessages();
   // Generate bar sequence based on character codes
   const barPattern: number[] = [2, 1, 1, 2]; // Start pattern
   for (let i = 0; i < value.length; i++) {
@@ -123,7 +127,7 @@ export function BarcodeSVG({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label={`Barcode for ${value}`}
+      aria-label={formatMessage(messages.barcode, { value })}
       role="img"
       {...props}
     >
@@ -170,6 +174,7 @@ export interface DataMatrixSVGProps extends SVGProps<SVGSVGElement> {
  * 2D DataMatrix SVG generator for ISO 13485 Medical Device UDI (Unique Device Identification).
  */
 export function DataMatrixSVG({ value = "UDI-13485", size = 64, className, ...props }: DataMatrixSVGProps) {
+  const messages = useRuntimeMessages();
   const gridSize = 16;
   const cellSize = size / gridSize;
   const hash = Array.from(value).reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0);
@@ -182,7 +187,7 @@ export function DataMatrixSVG({ value = "UDI-13485", size = 64, className, ...pr
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label={`UDI DataMatrix for ${value}`}
+      aria-label={formatMessage(messages.dataMatrix, { value })}
       role="img"
       {...props}
     >

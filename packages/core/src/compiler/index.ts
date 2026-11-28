@@ -118,3 +118,12 @@ export type {
   ValidateResult,
   RemoteHealthResult,
 } from "./remoteCompiler.js";
+export {
+  runtimeMessagesEn,
+  runtimeMessagesId,
+  runtimeMessageCatalogs,
+  findRuntimeMessageCatalog,
+  resolveRuntimeMessages,
+  formatMessage,
+} from "../i18n/runtimeMessages.js";
+export type { RuntimeMessages, RuntimeMessageKey } from "../i18n/runtimeMessages.js";

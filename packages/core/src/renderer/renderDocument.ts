@@ -11,6 +11,8 @@ import { assertSupportedDocumentVersion } from "../version";
 import type { DataAdapter } from "../data/types";
 import type { CommandHandler, DownloadHandler, MutationHandler } from "../types/actions";
 import { resolveContainerStyles } from "../components/primitives";
+import { RuntimeMessagesProvider } from "../i18n/RuntimeMessagesProvider";
+import type { RuntimeMessages } from "../i18n/runtimeMessages";
 
 export interface RenderOptions {
   theme?: Theme;
@@ -57,6 +59,17 @@ export interface RenderOptions {
   apiMaxResponseBytes?: number;
   /** Max number of `api` actions to run concurrently; further calls fail fast. Default 6. */
   apiMaxConcurrentCalls?: number;
+  /**
+   * BCP 47 tag for the runtime's own text (close buttons, pagination, empty states, accessible
+   * names) and the default number/date formatting locale of components that format values.
+   * A tag without a built-in catalog keeps English text. Unset means English and `en-US`.
+   */
+  locale?: string;
+  /**
+   * Overrides for individual runtime messages, applied over the `locale` catalog. A host with
+   * a language that has no built-in catalog passes a complete catalog here.
+   */
+  messages?: Partial<RuntimeMessages>;
 }
 
 export interface RenderContext {
@@ -182,7 +195,23 @@ export function renderUIDocument(
   });
 
   const themed = withThemeCssVariables(rendered, theme);
-  return withDocumentLayout(themed, document.layout);
+  return withRuntimeMessages(withDocumentLayout(themed, document.layout), options);
+}
+
+/**
+ * Wraps rendered content in a `RuntimeMessagesProvider` when the host set `locale` or
+ * `messages`; otherwise returns it unchanged so the default tree has no extra element.
+ */
+export function withRuntimeMessages(
+  rendered: React.ReactNode,
+  options: Pick<RenderOptions, "locale" | "messages">,
+): React.ReactNode {
+  if (options.locale === undefined && options.messages === undefined) return rendered;
+  return React.createElement(
+    RuntimeMessagesProvider,
+    { locale: options.locale, messages: options.messages },
+    rendered,
+  );
 }
 
 /**

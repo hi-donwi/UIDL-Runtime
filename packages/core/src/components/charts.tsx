@@ -16,6 +16,7 @@
 
 import { useMemo } from "react";
 import { prefixFormat } from "../utils/chart";
+import { useRuntimeMessages } from "../i18n/runtimeMessagesContext";
 
 export interface ChartGeometryProps {
   /** One array per series; each inner array is that series' y values. */
@@ -163,6 +164,7 @@ export function MeridianBarChart({
   drawZeroLine = true,
   ariaLabel,
 }: BarChartProps) {
+  const messages = useRuntimeMessages();
   const scale = useChartScale({
     points,
     viewBoxHeight,
@@ -203,7 +205,7 @@ export function MeridianBarChart({
         viewBox={`0 0 ${scale.viewBoxWidth} ${viewBoxHeight}`}
         xmlns="http://www.w3.org/2000/svg"
         role="img"
-        aria-label={ariaLabel ?? "bar chart"}
+        aria-label={ariaLabel ?? messages.barChart}
       >
         {drawXGrid && (
           <path d={scale.xGrid} stroke={gridColor} strokeWidth={gridThickness} strokeLinecap="round" fill="transparent" />
@@ -308,6 +310,7 @@ export function MeridianLineChart({
   drawLabels = true,
   ariaLabel,
 }: LineChartProps) {
+  const messages = useRuntimeMessages();
   const scale = useChartScale({
     points,
     viewBoxHeight,
@@ -338,7 +341,7 @@ export function MeridianLineChart({
         viewBox={`0 0 ${scale.viewBoxWidth} ${viewBoxHeight}`}
         xmlns="http://www.w3.org/2000/svg"
         role="img"
-        aria-label={ariaLabel ?? "line chart"}
+        aria-label={ariaLabel ?? messages.lineChart}
       >
         {drawXGrid && (
           <path d={scale.xGrid} stroke={gridColor} strokeWidth={gridThickness} strokeLinecap="round" fill="transparent" />
@@ -442,7 +445,7 @@ export interface DonutChartProps {
 export function MeridianDonutChart({
   sectors,
   className,
-  totalLabel = "Total",
+  totalLabel,
   radius = 36,
   startAngle = Math.PI,
   thickness = 10,
@@ -453,6 +456,7 @@ export function MeridianDonutChart({
   valueFormatter = (value) => value.toString(),
   ariaLabel,
 }: DonutChartProps) {
+  const messages = useRuntimeMessages();
   const cx = 50 + offsetX;
   const cy = 50 + offsetY;
   const total = sectors.reduce((sum, sector) => sum + Math.max(sector.value, 0), 0);
@@ -473,7 +477,7 @@ export function MeridianDonutChart({
 
   return (
     <div className={className}>
-      <svg viewBox="0 0 100 100" version="1.1" role="img" aria-label={ariaLabel ?? "donut chart"}>
+      <svg viewBox="0 0 100 100" version="1.1" role="img" aria-label={ariaLabel ?? messages.donutChart}>
         <defs>
           <clipPath id={clipId}>
             <circle cx={cx} cy={cy} r={radius + thickness / 2} fill="black" strokeWidth="0" />
@@ -504,7 +508,7 @@ export function MeridianDonutChart({
         ))}
 
         <text x={cx + textOffsetX} y={cy + textOffsetY} textAnchor="middle" style={{ fontSize: 7, fill: "#7c7c7c" }}>
-          {totalLabel}
+          {totalLabel ?? messages.chartTotal}
         </text>
         <text
           x={cx + textOffsetX}

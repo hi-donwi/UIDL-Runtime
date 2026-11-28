@@ -1,6 +1,8 @@
 import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "../utils/cn";
+import { useRuntimeMessages } from "../i18n/runtimeMessagesContext";
+import { formatMessage } from "../i18n/runtimeMessages";
 import type { Expr } from "../expr/evaluate";
 
 export interface DataTableAction {
@@ -49,14 +51,19 @@ function positionMenu(trigger: HTMLButtonElement, actionCount: number): MenuPosi
 /** Renders row actions as inline buttons or an accessible, configurable menu. */
 export function DataTableRowActions({ actions, presentation, onAction }: DataTableRowActionsProps) {
   const mode = presentation?.mode ?? "buttons";
-  const triggerLabel = presentation?.triggerLabel ?? "Actions";
-  const triggerAriaLabel = presentation?.triggerAriaLabel ?? "Row actions";
-  const menuLabel = presentation?.menuLabel ?? `${triggerAriaLabel} menu`;
+  const messages = useRuntimeMessages();
+  const triggerLabel = presentation?.triggerLabel ?? messages.rowActionsTrigger;
+  const triggerAriaLabel = presentation?.triggerAriaLabel ?? messages.rowActions;
+  const menuLabel = presentation?.menuLabel ?? formatMessage(messages.rowActionsMenu, { label: triggerAriaLabel });
   const menuId = `uidl-row-actions-${useId().replace(/:/g, "")}`;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState<MenuPosition>({ top: 0, left: 0 });
+  // Resolved when the menu opens (an event handler), never during render: refs are not
+  // readable while rendering. A trigger inside a shadow root portals into that root so the
+  // host's scoped styles still apply to the menu.
+  const [portalContainer, setPortalContainer] = useState<Element | ShadowRoot | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -140,16 +147,12 @@ export function DataTableRowActions({ actions, presentation, onAction }: DataTab
       setIsOpen(false);
       return;
     }
-    if (triggerRef.current) setPosition(positionMenu(triggerRef.current, actions.length));
+    const trigger = triggerRef.current;
+    if (trigger) setPosition(positionMenu(trigger, actions.length));
+    const root = trigger?.getRootNode();
+    setPortalContainer(typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root : document.body);
     setIsOpen(true);
   };
-
-  const root = triggerRef.current?.getRootNode();
-  const portalContainer = typeof document === "undefined"
-    ? null
-    : typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot
-      ? root
-      : document.body;
 
   return (
     <div className="flex items-center justify-end">

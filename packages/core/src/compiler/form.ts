@@ -9,6 +9,7 @@
 
 import type { UIDLDocument, UIDLNode } from "../types";
 import type { Language } from "../utils/i18n";
+import { findRuntimeMessageCatalog, formatMessage, runtimeMessagesEn } from "../i18n/runtimeMessages";
 import {
   MERIDIAN_FORM_CONTROL_PROPS,
   MERIDIAN_FORM_CONTROL_STYLE,
@@ -151,6 +152,7 @@ function buildFormControlNode(
   lang: Language,
   meta: FormPageMeta,
 ): UIDLNode {
+  const messages = findRuntimeMessageCatalog(lang) ?? runtimeMessagesEn;
   const isCheckbox = field.widget === "Checkbox" || field.widget === "Switch";
   const isReadOnly = field.readOnly === true;
 
@@ -224,28 +226,28 @@ function buildFormControlNode(
               // of their keys is the stored value and which is the visible text.
               optionValueKey: linkValueKey,
               optionLabelKey: linkLabelKey,
-              placeholder: typeof field.placeholder === "string" ? field.placeholder : field.placeholder?.[lang] ?? `Select ${field.label[lang] ?? field.key}`,
+              placeholder: typeof field.placeholder === "string" ? field.placeholder : field.placeholder?.[lang] ?? formatMessage(messages.selectPlaceholder, { label: field.label[lang] ?? field.key }),
             },
             events: { onChange: [{ setState: { path: field.key, value: null } }] },
           },
           {
             id: `${semanticNodeId("form", meta.name, field.key)}-loading`,
             type: "Text",
-            props: { value: "Loading…" },
+            props: { value: messages.loading },
             style: { fontSize: "text-xs", color: "{primitives.color.text-secondary}" },
             visibility: { condition: { "==": [{ path: `state.$data.${dsKey}.status` }, { literal: "loading" }] } },
           },
           {
             id: `${semanticNodeId("form", meta.name, field.key)}-error`,
             type: "Text",
-            props: { value: "Failed to load options" },
+            props: { value: messages.optionsLoadFailed },
             style: { fontSize: "text-xs", color: "{primitives.color.error}" },
             visibility: { condition: { "==": [{ path: `state.$data.${dsKey}.status` }, { literal: "error" }] } },
           },
           {
             id: `${semanticNodeId("form", meta.name, field.key)}-empty`,
             type: "Text",
-            props: { value: "No options" },
+            props: { value: messages.optionsEmpty },
             style: { fontSize: "text-xs", color: "{primitives.color.text-secondary}" },
             visibility: {
               condition: {
@@ -268,7 +270,7 @@ function buildFormControlNode(
         ...baseProps,
         value: { $bind: `state.${field.key}` },
         options: optionsList,
-        placeholder: typeof field.placeholder === "string" ? field.placeholder : field.placeholder?.[lang] ?? `Select ${field.label[lang] ?? field.key}`,
+        placeholder: typeof field.placeholder === "string" ? field.placeholder : field.placeholder?.[lang] ?? formatMessage(messages.selectPlaceholder, { label: field.label[lang] ?? field.key }),
       },
       events: { onChange: [{ setState: { path: field.key, value: null } }] },
     };

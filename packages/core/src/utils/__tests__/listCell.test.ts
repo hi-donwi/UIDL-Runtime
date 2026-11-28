@@ -39,6 +39,9 @@ describe("formatCellValue — ListCell's `the column format rule` rules", () => 
     // left an Enabled column looking like it had no value at all.
     expect(formatCellValue(true, "check")).toBe("True");
     expect(formatCellValue(false, "check")).toBe("False");
+    const booleanLabels = { true: "Ya", false: "Tidak" };
+    expect(formatCellValue(true, "check", { booleanLabels })).toBe("Ya");
+    expect(formatCellValue(false, "check", { booleanLabels })).toBe("Tidak");
   });
 
   it("prints a Float as a fixed decimal, never as money", () => {

@@ -81,6 +81,8 @@ export interface CellFormatOptions {
   currency?: string;
   /** Decimal places for `number` columns — SystemSettings.displayPrecision upstream. */
   precision?: number;
+  /** Text for `check` cells. Defaults to "True" / "False". */
+  booleanLabels?: { true: string; false: string };
 }
 
 /**
@@ -122,7 +124,7 @@ export function formatCellValue(
   if (value === undefined || value === null) return "";
 
   // fyo/utils/format.ts: `titleCase(Boolean(value).toString())`.
-  if (format === "check") return value ? "True" : "False";
+  if (format === "check") return value ? options.booleanLabels?.true ?? "True" : options.booleanLabels?.false ?? "False";
 
   if (format === "date") {
     // A value that is not a real date must survive as itself — a half-typed filter value or a

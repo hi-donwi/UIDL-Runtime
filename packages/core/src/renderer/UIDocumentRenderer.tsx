@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { UIDLDocument } from "../types";
 import type { RenderOptions } from "./renderDocument";
-import { createRenderContext, withThemeCssVariables, withDocumentLayout } from "./renderDocument";
+import { createRenderContext, withThemeCssVariables, withDocumentLayout, withRuntimeMessages } from "./renderDocument";
 import { renderNode } from "./RenderNode";
 import { Dialog, Snackbar } from "../components/primitives";
 import { runDataSources, serializeResolvedQueries, isQueryDataSource } from "../state/dataSources";
@@ -45,6 +45,8 @@ export function UIDocumentRenderer({
   apiAllowlist,
   apiMaxResponseBytes,
   apiMaxConcurrentCalls,
+  locale,
+  messages,
 }: UIDocumentRendererProps) {
   // Re-render when the document state store changes, so `state.*` bindings (e.g. an overlay's
   // `open: { "$bind": "state.overlays.x" }` closed by an onClose setState action) stay live.
@@ -226,7 +228,7 @@ export function UIDocumentRenderer({
   const themed = withThemeCssVariables(rendered, context.theme);
   const layoutWrapped = withDocumentLayout(themed, document.layout);
 
-  return (
+  return withRuntimeMessages(
     <>
       {layoutWrapped}
       <Dialog
@@ -240,6 +242,7 @@ export function UIDocumentRenderer({
         duration={snackbar?.duration}
         onClose={() => setSnackbar(null)}
       />
-    </>
+    </>,
+    { locale, messages },
   );
 }
