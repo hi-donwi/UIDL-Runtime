@@ -15,6 +15,8 @@ import { DataTableRowActions, type DataTableAction, type DataTableActionPresenta
 import { useElementWidth } from "../hooks/useElementWidth";
 import { MeridianBarChart, MeridianDonutChart, MeridianLineChart } from "./charts";
 import { MERIDIAN_DONUT_COLORS, MERIDIAN_SERIES_COLORS } from "../utils/chart";
+import { useRuntimeLocale, useRuntimeMessages } from "../i18n/runtimeMessagesContext";
+import { formatMessage } from "../i18n/runtimeMessages";
 
 /*
  * Widget styling follows one token vocabulary — the per-component
@@ -777,7 +779,7 @@ export function DataTable({
   rows = [],
   rowActions = [],
   rowActionPresentation,
-  emptyMessage = "No entries found",
+  emptyMessage,
   showIndex = true,
   paginate = true,
   pageSizes = [50, 100, 500, -1],
@@ -812,7 +814,14 @@ export function DataTable({
   // `cellClass`), so an explicit `align` is an override rather than the only source.
   const alignOf = (column: DataTableColumn) =>
     column.align ?? (isNumericFormat(column.format) ? "right" : undefined);
-  const cellOptions = { ...(locale ? { locale } : {}), ...(currency ? { currency } : {}) };
+  const messages = useRuntimeMessages();
+  const runtimeLocale = useRuntimeLocale();
+  const formatLocale = locale ?? runtimeLocale;
+  const cellOptions = {
+    ...(formatLocale ? { locale: formatLocale } : {}),
+    ...(currency ? { currency } : {}),
+    booleanLabels: { true: messages.booleanTrue, false: messages.booleanFalse },
+  };
 
   return (
     <section {...props} className={cn("flex flex-col overflow-hidden text-base", props.className)}>
@@ -829,11 +838,11 @@ export function DataTable({
       <div
         className="min-w-0 flex-1 overflow-y-auto"
         role="region"
-        aria-label={title ? `${title} rows` : "Data table rows"}
+        aria-label={title ? formatMessage(messages.dataTableRegion, { title }) : messages.dataTableRegionUntitled}
         tabIndex={0}
       >
         <table
-          aria-label={title || "Data table"}
+          aria-label={title || messages.dataTable}
           className="w-full min-w-0 table-fixed text-base"
           style={{ borderCollapse: "separate", borderSpacing: 0 }}
         >
@@ -867,7 +876,7 @@ export function DataTable({
               {rowActions.length > 0 && (
                 <th
                   scope="col"
-                  aria-label={rowActionPresentation?.columnAriaLabel ?? "Row actions"}
+                  aria-label={rowActionPresentation?.columnAriaLabel ?? messages.rowActions}
                   className="h-row-mid border-b border-gray-200 pe-4 text-end text-sm font-normal dark:border-gray-800"
                   style={insetsForGridTrack(gridTrackCount - 1)}
                 />
@@ -899,7 +908,7 @@ export function DataTable({
                       {onRowOpen ? (
                         <button
                           type="button"
-                          aria-label={`Open row ${rowNumber}`}
+                          aria-label={formatMessage(messages.openRow, { row: rowNumber })}
                           onClick={(event) => {
                             event.stopPropagation();
                             openRow();
@@ -931,7 +940,7 @@ export function DataTable({
                         {onRowOpen && !showIndex && cellIndex === 0 ? (
                           <button
                             type="button"
-                            aria-label={`Open row ${String(raw ?? rowNumber)}`}
+                            aria-label={formatMessage(messages.openRow, { row: String(raw ?? rowNumber) })}
                             onClick={(event) => {
                               event.stopPropagation();
                               openRow();
@@ -983,7 +992,7 @@ export function DataTable({
       {/* Empty State */}
       {rows.length === 0 && (
         <div className="my-auto flex flex-col items-center justify-center py-8">
-          <p className="my-3 text-gray-800 dark:text-gray-200">{emptyMessage}</p>
+          <p className="my-3 text-gray-800 dark:text-gray-200">{emptyMessage ?? messages.dataTableEmpty}</p>
         </div>
       )}
     </section>
@@ -1017,12 +1026,13 @@ function Paginator({
   onPageNo,
   onPageSize,
 }: PaginatorProps) {
+  const messages = useRuntimeMessages();
   const visibleSizes = pageSizes.filter((size) =>
     size === -1 ? itemCount >= (pageSizes[0] ?? 50) : itemCount >= size,
   );
 
   return (
-    <nav aria-label="Pagination" className="uidl-pagination text-sm">
+    <nav aria-label={messages.pagination} className="uidl-pagination text-sm">
       <div className="uidl-pagination-range">
         {`${itemCount === 0 ? 0 : (pageNo - 1) * count + 1} - ${Math.min(pageNo * count, itemCount)}`}
       </div>
@@ -1030,7 +1040,7 @@ function Paginator({
       <div className="uidl-pagination-stepper">
         <button
           type="button"
-          aria-label="Previous page"
+          aria-label={messages.previousPage}
           onClick={() => onPageNo(pageNo - 1)}
           disabled={pageNo <= 1}
           className="uidl-pagination-button"
@@ -1038,14 +1048,14 @@ function Paginator({
         >
           <ChevronIcon direction="left" />
         </button>
-        <div className="uidl-pagination-status" role="status" aria-label={`Page ${pageNo} of ${maxPages}`}>
+        <div className="uidl-pagination-status" role="status" aria-label={formatMessage(messages.pageStatus, { page: pageNo, pages: maxPages })}>
           <span>{pageNo}</span>
           <span aria-hidden="true">/</span>
           <span>{maxPages}</span>
         </div>
         <button
           type="button"
-          aria-label="Next page"
+          aria-label={messages.nextPage}
           onClick={() => onPageNo(pageNo + 1)}
           disabled={pageNo >= maxPages}
           className="uidl-pagination-button"
@@ -1057,7 +1067,7 @@ function Paginator({
 
       <div className="uidl-pagination-sizes">
         {visibleSizes.length > 0 && (
-          <div role="group" aria-label="Items per page" className="uidl-pagination-size-options">
+          <div role="group" aria-label={messages.itemsPerPage} className="uidl-pagination-size-options">
             {visibleSizes.map((size) => (
               <button
                 key={size}
@@ -1066,7 +1076,7 @@ function Paginator({
                 aria-pressed={activePageSize === size || (activePageSize === itemCount && size === -1)}
                 className="uidl-pagination-size"
               >
-                {size === -1 ? "All" : size}
+                {size === -1 ? messages.pageSizeAll : size}
               </button>
             ))}
           </div>
@@ -1205,12 +1215,13 @@ export function Chart({
   xKey = "label",
   yKey = "value",
   series,
-  emptyMessage = "No transactions yet",
+  emptyMessage,
   action,
-  totalLabel = "Total",
+  totalLabel,
   height = 235,
   ...props
 }: ChartProps) {
+  const messages = useRuntimeMessages();
   const [containerRef, containerWidth] = useElementWidth<HTMLElement>();
   const activeSeries = useMemo<ChartSeries[]>(
     () => (series?.length ? series : [{ key: yKey, label: title ?? yKey }]),
@@ -1251,7 +1262,7 @@ export function Chart({
 
       {rows.length === 0 ? (
         <div className="flex-center my-20 h-full w-full flex-1">
-          <span className="text-base text-gray-600 dark:text-gray-500">{emptyMessage}</span>
+          <span className="text-base text-gray-600 dark:text-gray-500">{emptyMessage ?? messages.chartEmpty}</span>
         </div>
       ) : isDonut ? (
         <div className="relative flex">
@@ -1338,10 +1349,11 @@ export function KanbanBoard({
   dataSource: _dataSource,
   columns = [],
   rows = [],
-  emptyMessage = "No items in this board",
+  emptyMessage,
   onCardClick,
   ...props
 }: KanbanBoardProps) {
+  const messages = useRuntimeMessages();
   return (
     /*
      * Kanban is a Pipeline CRM surface rather than a Meridian one, so there is no upstream class
@@ -1373,7 +1385,7 @@ export function KanbanBoard({
               </div>
               <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
                 {colCards.length === 0 ? (
-                  <div className="py-6 text-center text-sm text-gray-600 dark:text-gray-500">{emptyMessage}</div>
+                  <div className="py-6 text-center text-sm text-gray-600 dark:text-gray-500">{emptyMessage ?? messages.kanbanEmpty}</div>
                 ) : (
                   colCards.map((card) => (
                     <div
@@ -1494,10 +1506,11 @@ export function TreeView({
   dataSource: _dataSource,
   items,
   rows,
-  emptyMessage = "No tree data",
+  emptyMessage,
   onNodeClick,
   ...props
 }: TreeViewProps) {
+  const messages = useRuntimeMessages();
   const treeItems = items ?? rows ?? [];
 
   return (
@@ -1508,7 +1521,7 @@ export function TreeView({
         </h3>
       )}
       {treeItems.length === 0 ? (
-        <div className="py-8 text-center text-base text-gray-600 dark:text-gray-500">{emptyMessage}</div>
+        <div className="py-8 text-center text-base text-gray-600 dark:text-gray-500">{emptyMessage ?? messages.treeEmpty}</div>
       ) : (
         <div className="custom-scroll flex flex-col overflow-y-auto">
           {treeItems.map((item) => (
@@ -1691,6 +1704,8 @@ export interface DrawerProps extends HTMLAttributes<HTMLDivElement> {
   size?: DrawerSize;
   /** Show the dimming backdrop (click-to-close). Defaults to true. */
   backdrop?: boolean;
+  /** Accessible name of the header close button. Defaults to the runtime `closeDrawer` message. */
+  closeLabel?: string;
   /** Optional sticky footer content (e.g. Cancel and Submit buttons). */
   footer?: ReactNode;
   children?: ReactNode;
@@ -1833,8 +1848,9 @@ function useOverlayPresence(open: boolean | undefined): { mounted: boolean; clos
   return { mounted, closing, entered };
 }
 
-export function Drawer({ open, onClose, title, subtitle, side = "right", size, backdrop = true, closeButton = false, footer, children, ...props }: DrawerProps) {
+export function Drawer({ open, onClose, title, subtitle, side = "right", size, backdrop = true, closeButton = false, closeLabel, footer, children, ...props }: DrawerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const messages = useRuntimeMessages();
   // Engage the overlay behavior only while the overlay is actually in the DOM: mounting is
   // deferred by one commit (useOverlayPresence flips `mounted` after the first render), so
   // gating on `open` alone would run the effect before the container ref is attached.
@@ -1893,7 +1909,7 @@ export function Drawer({ open, onClose, title, subtitle, side = "right", size, b
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close drawer"
+                aria-label={closeLabel || messages.closeDrawer}
                 className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 dark:hover:text-slate-200"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -2067,9 +2083,12 @@ export interface DialogProps extends Omit<HTMLAttributes<HTMLDivElement>, "conte
   content?: ReactNode;
   open?: boolean;
   onClose?: () => void;
+  /** Text of the footer close button. Defaults to the runtime `close` message. */
+  closeLabel?: string;
 }
 
-export function Dialog({ title, content, open, onClose, ...props }: DialogProps) {
+export function Dialog({ title, content, open, onClose, closeLabel, ...props }: DialogProps) {
+  const messages = useRuntimeMessages();
   // Same presence/motion story as Drawer/Panel: fade in on show, fade out on close. Snackbar
   // stays instant on purpose — it's a transient, timer-managed notification where an exit
   // transition would fight the auto-dismiss timing.
@@ -2105,7 +2124,7 @@ export function Dialog({ title, content, open, onClose, ...props }: DialogProps)
         )}
         <div className="px-4 py-4 text-base text-gray-900 dark:text-gray-200">{content}</div>
         <div className="flex justify-end border-t border-gray-200 px-4 py-3 dark:border-gray-800">
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose}>{closeLabel || messages.close}</Button>
         </div>
       </div>
     </div>

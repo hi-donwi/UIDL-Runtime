@@ -78,3 +78,31 @@ over the built-in colours, which remain the fallback; an unknown colour renders 
 keys are display labels, so a document in another language colours its own words without a
 runtime change. This contract describes the current reference runtime; other renderers may
 implement it as their DataTable adapters are brought to parity.
+
+## Reference-runtime contract: runtime messages
+
+Some text is rendered by the runtime itself rather than supplied by a document: the Drawer
+close button, the Dialog close button, pagination controls, empty states, `check` cell text,
+and the accessible names of tables, charts, row-action menus and generated codes. These
+strings come from a message catalog the host selects, not from the document.
+
+- `RenderOptions.locale` (a BCP 47 tag) picks a built-in catalog by exact tag, then by primary
+  language subtag (`id-ID` -> `id`). Built-in catalogs are `en` (the default) and `id`. A tag
+  without a catalog keeps English text.
+- `RenderOptions.messages` overrides single messages over that catalog. A host whose language
+  has no built-in catalog passes a complete catalog here.
+- The same `locale` is the default number and date formatting locale for DataTable cells. A
+  DataTable's own `locale` prop still wins.
+- Text a document sets wins over the catalog: `closeLabel` on Drawer and Dialog, and the
+  existing `emptyMessage`, `totalLabel`, `ariaLabel` and `rowActionPresentation` labels.
+
+```tsx
+<UIDocumentRenderer document={doc} locale="id" messages={{ closeDrawer: "Tutup formulir" }} />
+```
+
+Templates use `{name}` placeholders (`"Page {page} of {pages}"`) so a catalog stays plain JSON.
+`RuntimeMessagesProvider` and `useRuntimeMessages` let a host component outside a rendered
+document share the same messages. The catalogs are exported from the React-free
+`uidl-runtime/recipes` entry too, and the form recipe emits its lookup states (`loading`,
+`optionsLoadFailed`, `optionsEmpty`, `selectPlaceholder`) in the compile language. The Flutter
+and Android runtimes do not read this catalog yet.

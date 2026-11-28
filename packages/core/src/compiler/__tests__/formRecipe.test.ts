@@ -75,7 +75,8 @@ describe("Form/detail recipe — fields/links/children/validation/lifecycle", ()
     }
     const fromSpecifiers = Array.from(importsText.matchAll(/from\s+["']([^"']+)["']/g)).map((m) => m[1]);
     for (const spec of fromSpecifiers) {
-      expect(spec).toMatch(/^(\.\.\/types|\.\.\/utils\/i18n|\.\/types(\.js)?)$/);
+      // `../i18n/runtimeMessages` is the React-free runtime message catalog (it imports nothing).
+      expect(spec).toMatch(/^(\.\.\/types|\.\.\/utils\/i18n|\.\.\/i18n\/runtimeMessages|\.\/types(\.js)?)$/);
     }
   });
 

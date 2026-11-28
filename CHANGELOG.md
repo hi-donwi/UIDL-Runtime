@@ -6,6 +6,29 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-11-28
+
+### Added
+- Add runtime message catalogs for the text the runtime renders itself: Drawer and Dialog
+  close buttons, pagination, empty states, `check` cells, and table, chart, row-action and
+  code accessible names. English is the default and unchanged; Indonesian (`id`) is built in.
+- Add `RenderOptions.locale` and `RenderOptions.messages`, honoured by `UIDocumentRenderer`
+  and `renderUIDocument`. The locale is also the default DataTable number and date format.
+- Add `closeLabel` to Drawer and Dialog, declared in the component registry.
+- Export `RuntimeMessagesProvider`, `useRuntimeMessages`, `useRuntimeLocale`,
+  `resolveRuntimeMessages`, `formatMessage`, the catalogs, and the `RuntimeMessages` type; the
+  catalogs and helpers are also exported from `uidl-runtime/recipes`.
+- Add `CellFormatOptions.booleanLabels` for `check` cells.
+
+### Changed
+- The form recipe emits its lookup loading, error, empty and placeholder text in the compile
+  language instead of always in English. Documents compiled with the default `id` language now
+  read "Memuat…" and "Pilih …".
+
+### Fixed
+- Resolve the row-action menu's portal target when the menu opens instead of reading a ref
+  during render, which failed the `react-hooks/refs` lint rule on `main`.
+
 ## [0.1.16] - 2026-11-25
 
 ### Added
